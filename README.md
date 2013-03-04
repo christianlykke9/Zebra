@@ -5,16 +5,10 @@ Group:  sw607f13
 Office: 5.1.57
 
 Authors:
-<<<<<<< HEAD
 
-[Søren Knudsen](https://github.com/skdenmark)
-[Søren Enevoldsen](https://github.com/senevoldsen90)
-[Sam Olesen](https://github.com/samolesen)
-=======
 [Søren Knudsen](https://github.com/skdenmark),
 [Søren Enevoldsen](https://github.com/senevoldsen90),
 [Sam Olesen](https://github.com/samolesen),
->>>>>>> b461979d0951f81849fd79a4020fa63e34286d55
 [Christian Lykke](https://github.com/christianlykke9)
 
 License
