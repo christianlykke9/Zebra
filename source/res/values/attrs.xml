@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="SequenceGroup">
+    <declare-styleable name="SequenceViewGroup">
         <attr name="horizontalSpacing" format="dimension" />
         <attr name="itemHeight" format="dimension" />
         <attr name="itemWidth" format="dimension" />

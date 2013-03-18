@@ -27,15 +27,15 @@ public class SequenceViewGroup extends ViewGroup {
 		super(context, attrs);
 
 		TypedArray a = context.obtainStyledAttributes(attrs,
-				R.styleable.SequenceGroup);
+				R.styleable.SequenceViewGroup);
 		try {
 			horizontalSpacing = a.getDimensionPixelSize(
-					R.styleable.SequenceGroup_horizontalSpacing,
+					R.styleable.SequenceViewGroup_horizontalSpacing,
 					DEFAULT_HORIZONTAL_SPACING);
 			itemWidth = a.getDimensionPixelSize(
-					R.styleable.SequenceGroup_itemWidth, DEFAULT_ITEM_WIDTH);
+					R.styleable.SequenceViewGroup_itemWidth, DEFAULT_ITEM_WIDTH);
 			itemHeight = a.getDimensionPixelSize(
-					R.styleable.SequenceGroup_itemHeight, DEFAULT_ITEM_HEIGHT);
+					R.styleable.SequenceViewGroup_itemHeight, DEFAULT_ITEM_HEIGHT);
 		} finally {
 			a.recycle();
 		}
@@ -57,8 +57,7 @@ public class SequenceViewGroup extends ViewGroup {
 		if (height < minHeight)
 			height = minHeight;
 
-		int surplusHeight = height - itemHeight - getPaddingTop()
-				- getPaddingBottom();
+		int surplusHeight = height - minHeight;
 
 		offsetY = surplusHeight / 2;
 		if (offsetY < 0)
@@ -106,8 +105,6 @@ public class SequenceViewGroup extends ViewGroup {
 
 			int y = getPaddingTop() + offsetY;
 
-			x += getPaddingLeft();
-			y += getPaddingTop();
 			child.layout(x, y, x + child.getMeasuredWidth(),
 					y + child.getMeasuredHeight());
 		}
