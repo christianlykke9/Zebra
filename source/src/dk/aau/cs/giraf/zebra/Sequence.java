@@ -7,7 +7,7 @@ import android.graphics.drawable.Drawable;
 public class Sequence {
 	private String name;
 	private Drawable image;
-	private List<Drawable> pictograms;
+	public List<Drawable> pictograms;
 	
 	public String getName() {
 		return name;
@@ -24,12 +24,4 @@ public class Sequence {
 	public void setImage(Drawable image) {
 		this.image = image;
 	}
-	
-	public List<Drawable> getPictograms() {
-		return pictograms;
-	}
-	
-	public void setPictograms(List<Drawable> pictograms) {
-		this.pictograms = pictograms;
-	}	
 }

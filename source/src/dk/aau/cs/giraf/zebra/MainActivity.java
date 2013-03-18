@@ -1,7 +1,6 @@
 package dk.aau.cs.giraf.zebra;
 
 import android.app.Activity;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
@@ -17,22 +16,13 @@ public class MainActivity extends Activity {
 		
 		ViewGroup sequenceGroup = (ViewGroup) findViewById(R.id.sequenceViewGroup);
 		
-		int[] drawableIds = new int[] {
-			R.drawable.vask_1,
-			R.drawable.vask_2,
-			R.drawable.vask_3,
-			R.drawable.vask_4
-		};
+		Sequence sequence = Test.createSequence(this);
 		
-		Resources resources = getResources();
-		
-		for (int i = 0; i < drawableIds.length; i++) {
-			Drawable pictoImage = resources.getDrawable(drawableIds[i]);
+		for (Drawable pictogram : sequence.pictograms) {
 			ImageView imageView = new ImageView(getApplication());
-			imageView.setImageDrawable(pictoImage);
+			imageView.setImageDrawable(pictogram);
 			sequenceGroup.addView(imageView);
 		}
-		
 	}
 
 	@Override
