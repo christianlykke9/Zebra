@@ -16,6 +16,7 @@ public class MainActivity extends Activity {
 		
 		ViewGroup sequenceGroup = (ViewGroup) findViewById(R.id.sequenceViewGroup);
 		
+		
 		Sequence sequence = Test.createSequence(this);
 		
 		for (Drawable pictogram : sequence.pictograms) {
@@ -23,6 +24,7 @@ public class MainActivity extends Activity {
 			imageView.setImageDrawable(pictogram);
 			sequenceGroup.addView(imageView);
 		}
+		
 	}
 
 	@Override
