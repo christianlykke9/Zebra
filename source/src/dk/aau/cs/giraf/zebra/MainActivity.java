@@ -3,6 +3,7 @@ package dk.aau.cs.giraf.zebra;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -23,8 +24,7 @@ public class MainActivity extends Activity {
 			ImageView imageView = new ImageView(getApplication());
 			imageView.setImageDrawable(pictogram);
 			sequenceGroup.addView(imageView);
-		}
-		
+		}		
 	}
 
 	@Override

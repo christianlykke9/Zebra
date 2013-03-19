@@ -67,11 +67,9 @@ public class SequenceViewGroup extends ViewGroup {
 
 		int width = getPaddingLeft() + getPaddingRight();
 
-		if (numChildren > 0) {
-			width = numChildren * itemWidth;
-			if (numChildren > 1) {
-				width += (numChildren - 1) * horizontalSpacing;
-			}
+		width += numChildren * itemWidth;
+		if (numChildren > 1) {
+			width += (numChildren - 1) * horizontalSpacing;
 		}
 
 		int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(itemWidth,
@@ -94,19 +92,13 @@ public class SequenceViewGroup extends ViewGroup {
 		for (int i = 0; i < count; i++) {
 			View child = getChildAt(i);
 
-			int prevAccumulatedSpacing = 0;
-			int prevAccumulatedWidth = 0;
-			if (i > 0) {
-				prevAccumulatedSpacing = i * horizontalSpacing;
-				prevAccumulatedWidth = i * itemWidth;
-			}
-			int x = prevAccumulatedSpacing + prevAccumulatedWidth;
-			x += getPaddingLeft();
-
+			int prevAccumulatedSpacing = i * horizontalSpacing;
+			int prevAccumulatedWidth = i * itemWidth;
+			
+			int x = prevAccumulatedSpacing + prevAccumulatedWidth + getPaddingLeft();
 			int y = getPaddingTop() + offsetY;
 
-			child.layout(x, y, x + child.getMeasuredWidth(),
-					y + child.getMeasuredHeight());
+			child.layout(x, y, x + child.getMeasuredWidth(), y + child.getMeasuredHeight());
 		}
 	}
 
