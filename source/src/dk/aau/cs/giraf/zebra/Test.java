@@ -1,8 +1,6 @@
 package dk.aau.cs.giraf.zebra;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.webkit.WebView.FindListener;
 
 public class Test {
 	public static Sequence createSequence(Context context) {
