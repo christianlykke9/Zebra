@@ -29,8 +29,9 @@ public class MainActivity extends Activity {
 		Sequence sequence = Test.createSequence(this);
 		
 		for (Drawable pictogram : sequence.pictograms) {
-			ImageView imageView = new ImageView(getApplication());
+			SequenceImageView imageView = new SequenceImageView(getApplication());
 			imageView.setImageDrawable(pictogram);
+			imageView.setDeleteButtonVisibility(View.VISIBLE);
 			sequenceGroup.addView(imageView);
 		}
 		
