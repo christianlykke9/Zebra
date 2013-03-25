@@ -52,9 +52,8 @@ public class SequenceImageView extends RelativeLayout {
 	
 	private void initializeDeleteButton() {
 		deleteButton = new ImageButton(getContext());
-		deleteButton.setImageResource(android.R.drawable.btn_dialog);
+		deleteButton.setImageResource(R.layout.selector_delete_pictogram);
 		deleteButton.setBackgroundColor(Color.TRANSPARENT);
-		//deleteButton.setBackgroundResource(R.drawable.btn_circle);
 		deleteButton.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		deleteButton.setVisibility(deleteButtonVisibility);
 		
