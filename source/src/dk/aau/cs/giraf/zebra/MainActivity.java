@@ -6,11 +6,13 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -55,6 +57,7 @@ public class MainActivity extends Activity {
 	}
 	
 	
+	
 	private void initializeTopBar() {
         TextView editText = (TextView) findViewById(R.id.sequence_title);
 		
@@ -63,7 +66,7 @@ public class MainActivity extends Activity {
 		    @Override
 		    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 		        if(actionId==EditorInfo.IME_ACTION_DONE) {
-		        	TextView editText = (TextView) findViewById(R.id.sequence_title);
+		        	EditText editText = (EditText) findViewById(R.id.sequence_title);
 		        	
 		            editText.clearFocus();
 		        }
@@ -72,17 +75,21 @@ public class MainActivity extends Activity {
 		});
 		
 		
-		// Create listener to hide the keyboard and save when the textbox loses focus
+		// Create listeners on every view to remove focus from the EditText when touched
+		createClearFocusListeners(findViewById(R.id.parent_container));
+		
+		
+		// Create listener to hide the keyboard and save when the EditText loses focus
 		editText.setOnFocusChangeListener(new OnFocusChangeListener() {
-			
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if (!hasFocus)
 				{
-                    TextView editText = (TextView) findViewById(R.id.sequence_title);
+					
+                    EditText editText = (EditText) findViewById(R.id.sequence_title);
 		        	
-		        	InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+                    
+                    hideSoftKeyboardFromView(editText);
                     
                     // TODO Save changes in the title
 				}
@@ -90,6 +97,9 @@ public class MainActivity extends Activity {
 			}
 		});
 		
+		
+		
+		// Get the childID parameter or choose default
 		long childId;
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {        	   
@@ -99,11 +109,55 @@ public class MainActivity extends Activity {
         }
 		
 		
+		// Get the full name from the database
 		String name = getFullNameFromProfileId(childId);
+		
 		
 		TextView childName = (TextView) findViewById(R.id.child_name);
 		childName.setText(name);
 	}
+	
+	
+	
+	public void hideSoftKeyboardFromView(View view) {
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+	}
+	
+	
+	
+	/**
+	 * Creates listeners to remove focus from EditText when something else is touched (to hide the softkeyboard)
+	 * @param view The parent container. The function runs recursively on its children
+	 */
+	public void createClearFocusListeners(View view) {
+		// Create listener to remove focus from EditText when something else is touched
+	    if(!(view instanceof EditText)) {
+	        view.setOnTouchListener(new View.OnTouchListener() {
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					EditText editText = (EditText) findViewById(R.id.sequence_title);
+		            editText.clearFocus();
+		            
+					return false;
+				}
+
+	        });
+	    }
+
+	    // If the view is a container, run the function recursively on the children
+	    if (view instanceof ViewGroup) {
+
+	        for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+
+	            View innerView = ((ViewGroup) view).getChildAt(i);
+
+	            createClearFocusListeners(innerView);
+	        }
+	    }
+	}
+	
+	
 	
 	private String addWordToString(String string, String word) {
 		if (word != null) {
@@ -116,6 +170,8 @@ public class MainActivity extends Activity {
 		
 		return string;
 	}
+	
+	
 	
 	public String getFullNameFromProfileId(long profileId)
 	{
