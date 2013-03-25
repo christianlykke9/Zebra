@@ -1,17 +1,14 @@
 package dk.aau.cs.giraf.zebra;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 
 /**
  * Layouts its children with fixed sizes and fixed spacing between each child in
@@ -32,11 +29,10 @@ public class SequenceViewGroup extends ViewGroup {
 	
 	private View dragging = null;
 	private int dragStartX;
-	private int dragStartY;
-	private int dragStartLeft;
-	private int dragStartTop;
-
-	private HashSet<View> beingAnimated = new HashSet<View>();
+	private int centerOffset;
+	
+	private int draggingIndex = -1;
+	private int curDragIndexPos = -1;
 	
 	public SequenceViewGroup(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -59,84 +55,112 @@ public class SequenceViewGroup extends ViewGroup {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		boolean handled = false;
-		
+
 		final float x = event.getX();
 		final float y = event.getY();
 		
 		switch (event.getActionMasked()) {
 		case MotionEvent.ACTION_DOWN:
-			View touched = childAtPoint((int) x, (int) y);
-			if (touched != null) {
+			dragging = childAtPoint((int) x, (int) y);
+			if (dragging != null) {
 				handled = true;
-				dragStarted(touched, x, y);
 				
 				requestDisallowInterceptTouchEvent(true);
 				
-				Log.e("LALAW", "Clicked: " + x);
-				Log.e("LALAW", "Left: " + touched.getLeft());
+				draggingIndex = indexOfChild(dragging);
+				curDragIndexPos = draggingIndex;
 				
-				//touched.bringToFront();
-				touched.invalidate();
+				dragStartX = (int) x;
+				centerOffset = getCenterX(draggingIndex) - (int) x;
+				
+				((SequenceImageView)dragging).liftUp();
 			}
 			break;
 		case MotionEvent.ACTION_MOVE:
-			if (dragging != null) {
-				int xDelta = (int) (x - dragStartX);
-				int yDelta = (int) (y - dragStartY);
-				int newLeft = dragStartLeft + xDelta;
-				int newTop = dragStartTop + yDelta;
-				dragging.setLeft(newLeft);
-				dragging.setTop(newTop);
-				dragging.setRight(newLeft + itemWidth);
-				dragging.setBottom(newTop + itemHeight);
+			if (draggingIndex != -1) {
+				handled = true;
 				
-				for (View v : getViewsMovedPast(dragging)) {
-					if (!beingAnimated.contains(v)) {
-						v.animate().xBy(itemWidth+horizontalSpacing);
-						beingAnimated.add(v);
-						Log.e("LALAW", "PAST: " + indexOfChild(v) + " - " + indexOfChild(dragging));	
-					}
-					
-				}
+				int xDelta = (int) (x - dragStartX);
+				
+				int newLeft = calcChildLeftPosition(draggingIndex) + xDelta;
+				dragging.layout(newLeft, dragging.getTop(), newLeft + dragging.getMeasuredWidth(), dragging.getTop() + dragging.getMeasuredHeight());
+				
+				checkForSwap((int) x);
 			}
 			break;
 		case MotionEvent.ACTION_UP:
 		case MotionEvent.ACTION_CANCEL:
-			if (dragging != null) {
+			if (draggingIndex != -1) {
 				handled = true;
-				//dragging.setTranslationX(0);
-				beingAnimated.clear();
-				dragEnded();
+				
+				((SequenceImageView)dragging).placeDown();
+				
+				if (draggingIndex != curDragIndexPos) {
+					//Rearrange
+					//???
+					//View dragEnd = getChildAt(curDraggingIndex);				
+				}
+				
+				for (int i = 0; i < getChildCount(); i++) {
+					getChildAt(i).clearAnimation();
+				}
+				
+				draggingIndex = -1;
+				curDragIndexPos = -1;
+				dragging = null;
+				
+				requestLayout();
 			}	
 			break;
 		}
-		
 		return handled;
 	}
+	
+	private void checkForSwap(int x) {
 
-	private void dragEnded() {
-		dragging = null;
-		//Handle snapping
+		int dragCenterX = x + centerOffset;
 		
+		boolean isDraggingRight = x - dragStartX > 0;
+		if (isDraggingRight) {
+			int checkIndex = curDragIndexPos + 1;
+			while (checkIndex < getChildCount() && dragCenterX > getLeftX(checkIndex)) {
+				//Swap
+				doMoveTo(checkIndex, curDragIndexPos);
+				curDragIndexPos++;
+				checkIndex++;
+			}
+		} else {
+			int checkIndex = curDragIndexPos - 1;
+			while (checkIndex >= 0 && dragCenterX < getRightX(checkIndex)) {
+				doMoveTo(checkIndex, curDragIndexPos);
+				curDragIndexPos--;
+				checkIndex--;
+			}
+		}
 	}
 
-	private void dragStarted(View touched, float x, float y) {
-		final int xi = (int) x;
-		final int yi = (int) y;
-		dragging = touched;
-		dragStartX = xi;
-		dragStartY = yi;
-		dragStartLeft = touched.getLeft();
-		dragStartTop = touched.getTop();
-	
+	private void doMoveTo(int indexFrom, int indexTo) {
+		int translateX = calcChildLeftPosition(indexTo) - calcChildLeftPosition(indexFrom);
+		
+		TranslateAnimation anim = new TranslateAnimation(
+				Animation.ABSOLUTE, 0,
+				Animation.ABSOLUTE, translateX,
+				Animation.ABSOLUTE, 0,
+				Animation.ABSOLUTE, 0);
+		
+		anim.setDuration(500);
+		anim.setFillEnabled(true);
+		anim.setFillAfter(true);
+		getChildAt(indexFrom).startAnimation(anim);
+		//getChildAt(i).animate().translationXBy(translateX);
 	}
 	
-	
-	
+	/*
 	private List<View> getViewsMovedPast(View view) {
 		ArrayList<View> viewsMovedPast = new ArrayList<View>();
 		
 		int curLeft = view.getLeft();
+		int curRight = view.getRight();
 		int viewIndex = indexOfChild(view);
 		
 		int layoutLeft = calcChildLeftPosition(indexOfChild(view));
@@ -153,9 +177,9 @@ public class SequenceViewGroup extends ViewGroup {
 			if (checkView == null) continue;
 			int checkCenter = calcChildLeftPosition(checkIndex) + checkView.getMeasuredWidth() / 2;
 			
-			if (direction == 1 && checkCenter < centerX) {
+			if (direction == 1 && checkCenter < curRight) {
 				viewsMovedPast.add(getChildAt(checkIndex));
-			} else if (direction == -1 && checkCenter > centerX) {
+			} else if (direction == -1 && checkCenter > curLeft) {
 				viewsMovedPast.add(getChildAt(checkIndex));
 			} else {
 				break;
@@ -164,6 +188,7 @@ public class SequenceViewGroup extends ViewGroup {
 		
 		return viewsMovedPast;
 	}
+	*/
 
 	private View childAtPoint(int x, int y) {
 		final int numChildren = getChildCount();
@@ -175,6 +200,30 @@ public class SequenceViewGroup extends ViewGroup {
 				return child;
 		}
 		return null;
+	}
+	
+	private int getIndexAtPoint(int x, int y) {
+		View child = childAtPoint(x, y);
+		if (child == null)
+			return -1;
+		else
+			return indexOfChild(child);
+	}
+	
+	private int getIndexAtX(int x) {
+		return getIndexAtPoint(x, calcChildTopPosition() + itemHeight / 2);
+	}
+	
+	private int getCenterX(int index) {
+		return calcChildLeftPosition(index) + itemWidth / 2;
+	}
+	
+	private int getLeftX(int index) {
+		return calcChildLeftPosition(index);
+	}
+	
+	private int getRightX(int index) {
+		return calcChildLeftPosition(index) + itemWidth;
 	}
 	
 	@Override
@@ -234,9 +283,6 @@ public class SequenceViewGroup extends ViewGroup {
 			int y = calcChildTopPosition();
 			
 			child.layout(x, y, x + child.getMeasuredWidth(), y + child.getMeasuredHeight());
-		}
-		if (dragging != null) {
-			dragging.layout(dragging.getLeft(), dragging.getTop(), dragging.getMeasuredWidth(), dragging.getMeasuredHeight());
 		}
 	}
 	
