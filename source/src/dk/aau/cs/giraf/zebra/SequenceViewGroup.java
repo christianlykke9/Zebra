@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
 
 /**
@@ -33,6 +34,11 @@ public class SequenceViewGroup extends ViewGroup {
 	
 	private int draggingIndex = -1;
 	private int curDragIndexPos = -1;
+	private int newX = -1;
+	private int oldX = -1;
+	
+	private int[] newPositions;
+
 	
 	public SequenceViewGroup(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -70,10 +76,19 @@ public class SequenceViewGroup extends ViewGroup {
 				draggingIndex = indexOfChild(dragging);
 				curDragIndexPos = draggingIndex;
 				
+				newPositions = new int[getChildCount()];
+				for (int i = 0; i < newPositions.length; i++) {
+					newPositions[i] = i;
+				}
+				
+				newX = (int) x;
+				oldX = newX;
+				
 				dragStartX = (int) x;
 				centerOffset = getCenterX(draggingIndex) - (int) x;
 				
-				((SequenceImageView)dragging).liftUp();
+				//((SequenceImageView)dragging).liftUp();
+				dragging.invalidate();
 			}
 			break;
 		case MotionEvent.ACTION_MOVE:
@@ -81,6 +96,8 @@ public class SequenceViewGroup extends ViewGroup {
 				handled = true;
 				
 				int xDelta = (int) (x - dragStartX);
+				oldX = newX;
+				newX = (int) x;
 				
 				int newLeft = calcChildLeftPosition(draggingIndex) + xDelta;
 				dragging.layout(newLeft, dragging.getTop(), newLeft + dragging.getMeasuredWidth(), dragging.getTop() + dragging.getMeasuredHeight());
@@ -93,23 +110,56 @@ public class SequenceViewGroup extends ViewGroup {
 			if (draggingIndex != -1) {
 				handled = true;
 				
-				((SequenceImageView)dragging).placeDown();
+				//((SequenceImageView)dragging).placeDown();				
+				dragging.invalidate();
 				
-				if (draggingIndex != curDragIndexPos) {
-					//Rearrange
-					//???
-					//View dragEnd = getChildAt(curDraggingIndex);				
-				}
+				int deltaX = (int) (x - dragStartX);
+				int targetDeltaX = calcChildLeftPosition(curDragIndexPos) - calcChildLeftPosition(draggingIndex);
 				
-				for (int i = 0; i < getChildCount(); i++) {
-					getChildAt(i).clearAnimation();
-				}
+				TranslateAnimation move = new TranslateAnimation(
+						0, 
+						targetDeltaX - deltaX, 
+						0, 
+						0);
+				move.setDuration(500);
 				
-				draggingIndex = -1;
-				curDragIndexPos = -1;
-				dragging = null;
+				move.setAnimationListener(new AnimationListener() {
+
+					@Override
+					public void onAnimationStart(Animation animation) {
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						if (draggingIndex != curDragIndexPos) {
+							//Rearrange
+							View[] views = new View[getChildCount()];
+							for (int i = 0; i < newPositions.length; i++) {
+								views[i] = getChildAt(i);
+								getChildAt(i).clearAnimation();
+							}
+							removeAllViews();
+							for (int i = 0; i < newPositions.length; i++) {
+								addView(views[newPositions[i]]);
+							}		
+						}
+						
+						draggingIndex = -1;
+						curDragIndexPos = -1;
+						dragging = null;
+					}
+				});
 				
-				requestLayout();
+				dragging.startAnimation(move);
+				
 			}	
 			break;
 		}
@@ -120,18 +170,27 @@ public class SequenceViewGroup extends ViewGroup {
 
 		int dragCenterX = x + centerOffset;
 		
-		boolean isDraggingRight = x - dragStartX > 0;
+		//boolean isDraggingRight = x - dragStartX > 0;
+		boolean isDraggingRight = newX > oldX;
 		if (isDraggingRight) {
 			int checkIndex = curDragIndexPos + 1;
-			while (checkIndex < getChildCount() && dragCenterX > getLeftX(checkIndex)) {
-				//Swap
+			while (checkIndex < getChildCount() && dragCenterX > ((getCenterX(curDragIndexPos) + getCenterX(checkIndex)) / 2)) {
+				//Swap position array
+				int temp = newPositions[checkIndex];
+				newPositions[checkIndex] = newPositions[curDragIndexPos];
+				newPositions[curDragIndexPos] = temp;
+				
 				doMoveTo(checkIndex, curDragIndexPos);
 				curDragIndexPos++;
 				checkIndex++;
 			}
 		} else {
 			int checkIndex = curDragIndexPos - 1;
-			while (checkIndex >= 0 && dragCenterX < getRightX(checkIndex)) {
+			while (checkIndex >= 0 && dragCenterX < ((getCenterX(curDragIndexPos) + (getRightX(checkIndex))) / 2)) {
+				int temp = newPositions[checkIndex];
+				newPositions[checkIndex] = newPositions[curDragIndexPos];
+				newPositions[curDragIndexPos] = temp;
+				
 				doMoveTo(checkIndex, curDragIndexPos);
 				curDragIndexPos--;
 				checkIndex--;
