@@ -2,13 +2,15 @@ package dk.aau.cs.giraf.zebra;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
 
 /**
@@ -36,6 +38,9 @@ public class SequenceViewGroup extends ViewGroup {
 	private int curDragIndexPos = -1;
 	private int newX = -1;
 	private int oldX = -1;
+	private int leftOffset = 0;
+	private int touchDeltaX = 0;
+	private boolean animating = false;
 	
 	private int[] newPositions;
 
@@ -56,10 +61,16 @@ public class SequenceViewGroup extends ViewGroup {
 		} finally {
 			a.recycle();
 		}
+		
+		setWillNotDraw(false);
 	}
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		
+		//If animating then consume event to not disrupt
+		if (animating) return true;
+		
 		boolean handled = false;
 
 		final float x = event.getX();
@@ -70,12 +81,13 @@ public class SequenceViewGroup extends ViewGroup {
 			dragging = childAtPoint((int) x, (int) y);
 			if (dragging != null) {
 				handled = true;
-				
 				requestDisallowInterceptTouchEvent(true);
 				
+				//Grap original drag position
 				draggingIndex = indexOfChild(dragging);
 				curDragIndexPos = draggingIndex;
 				
+				//Everything is in the right place at the start.
 				newPositions = new int[getChildCount()];
 				for (int i = 0; i < newPositions.length; i++) {
 					newPositions[i] = i;
@@ -84,10 +96,11 @@ public class SequenceViewGroup extends ViewGroup {
 				newX = (int) x;
 				oldX = newX;
 				
-				dragStartX = (int) x;
-				centerOffset = getCenterX(draggingIndex) - (int) x;
+				dragStartX = newX;
 				
-				//((SequenceImageView)dragging).liftUp();
+				centerOffset = newX - getCenterX(draggingIndex);
+				leftOffset = newX - getLeftX(draggingIndex);
+				
 				dragging.invalidate();
 			}
 			break;
@@ -95,14 +108,17 @@ public class SequenceViewGroup extends ViewGroup {
 			if (draggingIndex != -1) {
 				handled = true;
 				
-				int xDelta = (int) (x - dragStartX);
+				touchDeltaX = (int) (x - dragStartX);
+				
+				//Update old and new position
 				oldX = newX;
 				newX = (int) x;
 				
-				int newLeft = calcChildLeftPosition(draggingIndex) + xDelta;
+				//Layout the dragging element. Is excluded from normal layout			
+				int newLeft = calcChildLeftPosition(draggingIndex) + touchDeltaX;
 				dragging.layout(newLeft, dragging.getTop(), newLeft + dragging.getMeasuredWidth(), dragging.getTop() + dragging.getMeasuredHeight());
 				
-				checkForSwap((int) x);
+				checkForSwap();
 			}
 			break;
 		case MotionEvent.ACTION_UP:
@@ -110,7 +126,7 @@ public class SequenceViewGroup extends ViewGroup {
 			if (draggingIndex != -1) {
 				handled = true;
 				
-				//((SequenceImageView)dragging).placeDown();				
+				/*
 				dragging.invalidate();
 				
 				int deltaX = (int) (x - dragStartX);
@@ -155,99 +171,78 @@ public class SequenceViewGroup extends ViewGroup {
 						draggingIndex = -1;
 						curDragIndexPos = -1;
 						dragging = null;
+						animating = false;
 					}
 				});
 				
 				dragging.startAnimation(move);
-				
+				*/
+				draggingIndex = -1;
+				curDragIndexPos = -1;
+				dragging = null;
+				animating = false;
 			}	
 			break;
 		}
 		return handled;
 	}
 	
-	private void checkForSwap(int x) {
-
-		int dragCenterX = x + centerOffset;
+	private void checkForSwap() {
 		
-		//boolean isDraggingRight = x - dragStartX > 0;
-		boolean isDraggingRight = newX > oldX;
+		int dragCenterX = newX - centerOffset;
+		
+		/*int moved = dragCenterX - getCenterX(curDragIndexPos);
+		if (moved < 10) return;
+		boolean isDraggingRight = moved > 0;*/
+		//boolean isDraggingRight = curDragIndexPos == 0;
+		boolean isDraggingRight = dragCenterX - getCenterX(curDragIndexPos) > 0;
+		
 		if (isDraggingRight) {
 			int checkIndex = curDragIndexPos + 1;
 			while (checkIndex < getChildCount() && dragCenterX > ((getCenterX(curDragIndexPos) + getCenterX(checkIndex)) / 2)) {
-				//Swap position array
-				int temp = newPositions[checkIndex];
-				newPositions[checkIndex] = newPositions[curDragIndexPos];
-				newPositions[curDragIndexPos] = temp;
-				
+				//Animate before swapping indices
 				doMoveTo(checkIndex, curDragIndexPos);
+				swapIndexPositions(checkIndex, curDragIndexPos);
 				curDragIndexPos++;
 				checkIndex++;
 			}
 		} else {
 			int checkIndex = curDragIndexPos - 1;
-			while (checkIndex >= 0 && dragCenterX < ((getCenterX(curDragIndexPos) + (getRightX(checkIndex))) / 2)) {
-				int temp = newPositions[checkIndex];
-				newPositions[checkIndex] = newPositions[curDragIndexPos];
-				newPositions[curDragIndexPos] = temp;
-				
+			while (checkIndex >= 0 && dragCenterX < ((getCenterX(curDragIndexPos) + (getCenterX(checkIndex))) / 2)) {
+				//Animate before swapping indices
 				doMoveTo(checkIndex, curDragIndexPos);
+				swapIndexPositions(checkIndex, curDragIndexPos);
 				curDragIndexPos--;
 				checkIndex--;
 			}
 		}
 	}
 
+	int test = 0;
 	private void doMoveTo(int indexFrom, int indexTo) {
+		
+		int realFrom = newPositions[indexFrom];
+		
 		int translateX = calcChildLeftPosition(indexTo) - calcChildLeftPosition(indexFrom);
+		
+		if ((indexFrom == 0 && indexTo == 1) || (indexFrom == 1 && indexTo == 0)) {
+			if (indexTo == 0)
+				test = -200;
+			else
+				test = 200;
+		}
 		
 		TranslateAnimation anim = new TranslateAnimation(
 				Animation.ABSOLUTE, 0,
-				Animation.ABSOLUTE, translateX,
+				Animation.ABSOLUTE, test,
 				Animation.ABSOLUTE, 0,
 				Animation.ABSOLUTE, 0);
 		
 		anim.setDuration(500);
 		anim.setFillEnabled(true);
 		anim.setFillAfter(true);
-		getChildAt(indexFrom).startAnimation(anim);
-		//getChildAt(i).animate().translationXBy(translateX);
+		getChildAt(realFrom).startAnimation(anim);
 	}
-	
-	/*
-	private List<View> getViewsMovedPast(View view) {
-		ArrayList<View> viewsMovedPast = new ArrayList<View>();
-		
-		int curLeft = view.getLeft();
-		int curRight = view.getRight();
-		int viewIndex = indexOfChild(view);
-		
-		int layoutLeft = calcChildLeftPosition(indexOfChild(view));
-		int centerX = view.getLeft() + view.getMeasuredWidth() / 2;
-		
-		//Moved left or right?
-		int direction = curLeft < layoutLeft ? -1 : 1;
-		
-		int numChildren = getChildCount();
-		
-		//Check if moved past
-		for (int checkIndex = viewIndex+direction; checkIndex >= 0 && checkIndex < numChildren; checkIndex+=direction) {
-			View checkView = getChildAt(checkIndex);
-			if (checkView == null) continue;
-			int checkCenter = calcChildLeftPosition(checkIndex) + checkView.getMeasuredWidth() / 2;
-			
-			if (direction == 1 && checkCenter < curRight) {
-				viewsMovedPast.add(getChildAt(checkIndex));
-			} else if (direction == -1 && checkCenter > curLeft) {
-				viewsMovedPast.add(getChildAt(checkIndex));
-			} else {
-				break;
-			}
-		}
-		
-		return viewsMovedPast;
-	}
-	*/
 
 	private View childAtPoint(int x, int y) {
 		final int numChildren = getChildCount();
@@ -259,6 +254,12 @@ public class SequenceViewGroup extends ViewGroup {
 				return child;
 		}
 		return null;
+	}
+	
+	private void swapIndexPositions(int indexA, int indexB) {
+		int temp = newPositions[indexA];
+		newPositions[indexA] = newPositions[indexB];
+		newPositions[indexB] = temp;
 	}
 	
 	private int getIndexAtPoint(int x, int y) {
@@ -371,6 +372,26 @@ public class SequenceViewGroup extends ViewGroup {
 			itemWidth = width;
 			requestLayout();
 		}
+	}
+	
+	@Override
+	protected void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
+		int numChildren = getChildCount();
+		
+		Paint paint = new Paint();
+		paint.setColor(Color.GRAY);
+		paint.setStrokeWidth(2.0f);
+		for (int i = 0; i < numChildren; i++) {
+			if (i == draggingIndex)
+				canvas.drawLine(newX - centerOffset, 0, newX - centerOffset, 500, paint);
+			else
+				canvas.drawLine(getCenterX(i), 0, getCenterX(i), 500, paint);
+		}
+		boolean goingRight = (newX - centerOffset) - getCenterX(curDragIndexPos) > 0;
+		paint.setTextSize(24);
+		canvas.drawText(goingRight ? "Right" : "Left", 60, 60, paint);
+		
 	}
 
 	public int getItemWidth() {
