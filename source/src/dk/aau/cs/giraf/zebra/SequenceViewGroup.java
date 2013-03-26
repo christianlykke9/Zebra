@@ -2,9 +2,16 @@ package dk.aau.cs.giraf.zebra;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 
 /**
  * Layouts its children with fixed sizes and fixed spacing between each child in
@@ -22,10 +29,25 @@ public class SequenceViewGroup extends ViewGroup {
 	private int itemHeight;
 
 	private int offsetY = 0;
+	
+	private View dragging = null;
+	private int dragStartX;
+	private int centerOffset;
+	
+	private int draggingIndex = -1;
+	private int curDragIndexPos = -1;
+	private int newX = -1;
+	private int oldX = -1;
+	private int leftOffset = 0;
+	private int touchDeltaX = 0;
+	private boolean animating = false;
+	
+	private int[] newPositions;
 
+	
 	public SequenceViewGroup(Context context, AttributeSet attrs) {
 		super(context, attrs);
-
+		
 		TypedArray a = context.obtainStyledAttributes(attrs,
 				R.styleable.SequenceViewGroup);
 		try {
@@ -39,8 +61,231 @@ public class SequenceViewGroup extends ViewGroup {
 		} finally {
 			a.recycle();
 		}
+		
+		setWillNotDraw(false);
+	}
+	
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		
+		//If animating then consume event to not disrupt
+		if (animating) return true;
+		
+		boolean handled = false;
+
+		final float x = event.getX();
+		final float y = event.getY();
+		
+		switch (event.getActionMasked()) {
+		case MotionEvent.ACTION_DOWN:
+			dragging = childAtPoint((int) x, (int) y);
+			if (dragging != null) {
+				handled = true;
+				requestDisallowInterceptTouchEvent(true);
+				
+				//Grap original drag position
+				draggingIndex = indexOfChild(dragging);
+				curDragIndexPos = draggingIndex;
+				
+				//Everything is in the right place at the start.
+				newPositions = new int[getChildCount()];
+				for (int i = 0; i < newPositions.length; i++) {
+					newPositions[i] = i;
+				}
+				
+				newX = (int) x;
+				oldX = newX;
+				
+				dragStartX = newX;
+				
+				centerOffset = newX - getCenterX(draggingIndex);
+				leftOffset = newX - getLeftX(draggingIndex);
+				
+				dragging.invalidate();
+			}
+			break;
+		case MotionEvent.ACTION_MOVE:
+			if (draggingIndex != -1) {
+				handled = true;
+				
+				touchDeltaX = (int) (x - dragStartX);
+				
+				//Update old and new position
+				oldX = newX;
+				newX = (int) x;
+				
+				//Layout the dragging element. Is excluded from normal layout			
+				int newLeft = calcChildLeftPosition(draggingIndex) + touchDeltaX;
+				dragging.layout(newLeft, dragging.getTop(), newLeft + dragging.getMeasuredWidth(), dragging.getTop() + dragging.getMeasuredHeight());
+				
+				checkForSwap();
+			}
+			break;
+		case MotionEvent.ACTION_UP:
+		case MotionEvent.ACTION_CANCEL:
+			if (draggingIndex != -1) {
+				handled = true;
+				
+				/*
+				dragging.invalidate();
+				
+				int deltaX = (int) (x - dragStartX);
+				int targetDeltaX = calcChildLeftPosition(curDragIndexPos) - calcChildLeftPosition(draggingIndex);
+				
+				TranslateAnimation move = new TranslateAnimation(
+						0, 
+						targetDeltaX - deltaX, 
+						0, 
+						0);
+				move.setDuration(500);
+				
+				move.setAnimationListener(new AnimationListener() {
+
+					@Override
+					public void onAnimationStart(Animation animation) {
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						if (draggingIndex != curDragIndexPos) {
+							//Rearrange
+							View[] views = new View[getChildCount()];
+							for (int i = 0; i < newPositions.length; i++) {
+								views[i] = getChildAt(i);
+								getChildAt(i).clearAnimation();
+							}
+							removeAllViews();
+							for (int i = 0; i < newPositions.length; i++) {
+								addView(views[newPositions[i]]);
+							}		
+						}
+						
+						draggingIndex = -1;
+						curDragIndexPos = -1;
+						dragging = null;
+						animating = false;
+					}
+				});
+				
+				dragging.startAnimation(move);
+				*/
+				draggingIndex = -1;
+				curDragIndexPos = -1;
+				dragging = null;
+				animating = false;
+			}	
+			break;
+		}
+		return handled;
+	}
+	
+	private void checkForSwap() {
+		
+		int dragCenterX = newX - centerOffset;
+		
+		/*int moved = dragCenterX - getCenterX(curDragIndexPos);
+		if (moved < 10) return;
+		boolean isDraggingRight = moved > 0;*/
+		//boolean isDraggingRight = curDragIndexPos == 0;
+		boolean isDraggingRight = dragCenterX - getCenterX(curDragIndexPos) > 0;
+		
+		if (isDraggingRight) {
+			int checkIndex = curDragIndexPos + 1;
+			while (checkIndex < getChildCount() && dragCenterX > ((getCenterX(curDragIndexPos) + getCenterX(checkIndex)) / 2)) {
+				//Animate before swapping indices
+				doMoveTo(checkIndex, curDragIndexPos);
+				swapIndexPositions(checkIndex, curDragIndexPos);
+				curDragIndexPos++;
+				checkIndex++;
+			}
+		} else {
+			int checkIndex = curDragIndexPos - 1;
+			while (checkIndex >= 0 && dragCenterX < ((getCenterX(curDragIndexPos) + (getCenterX(checkIndex))) / 2)) {
+				//Animate before swapping indices
+				doMoveTo(checkIndex, curDragIndexPos);
+				swapIndexPositions(checkIndex, curDragIndexPos);
+				curDragIndexPos--;
+				checkIndex--;
+			}
+		}
 	}
 
+	int test = 0;
+	private void doMoveTo(int indexFrom, int indexTo) {
+		
+		int realFrom = newPositions[indexFrom];
+		
+		int translateX = calcChildLeftPosition(indexTo) - calcChildLeftPosition(indexFrom);
+		
+		if ((indexFrom == 0 && indexTo == 1) || (indexFrom == 1 && indexTo == 0)) {
+			if (indexTo == 0)
+				test = -200;
+			else
+				test = 200;
+		}
+		
+		TranslateAnimation anim = new TranslateAnimation(
+				Animation.ABSOLUTE, 0,
+				Animation.ABSOLUTE, test,
+				Animation.ABSOLUTE, 0,
+				Animation.ABSOLUTE, 0);
+		
+		anim.setDuration(500);
+		anim.setFillEnabled(true);
+		anim.setFillAfter(true);
+		getChildAt(realFrom).startAnimation(anim);
+	}
+
+	private View childAtPoint(int x, int y) {
+		final int numChildren = getChildCount();
+		for (int i = 0; i < numChildren; i++) {
+			View child = getChildAt(i);
+			Rect hitRect = new Rect();
+			child.getHitRect(hitRect);
+			if (hitRect.contains(x, y))
+				return child;
+		}
+		return null;
+	}
+	
+	private void swapIndexPositions(int indexA, int indexB) {
+		int temp = newPositions[indexA];
+		newPositions[indexA] = newPositions[indexB];
+		newPositions[indexB] = temp;
+	}
+	
+	private int getIndexAtPoint(int x, int y) {
+		View child = childAtPoint(x, y);
+		if (child == null)
+			return -1;
+		else
+			return indexOfChild(child);
+	}
+	
+	private int getIndexAtX(int x) {
+		return getIndexAtPoint(x, calcChildTopPosition() + itemHeight / 2);
+	}
+	
+	private int getCenterX(int index) {
+		return calcChildLeftPosition(index) + itemWidth / 2;
+	}
+	
+	private int getLeftX(int index) {
+		return calcChildLeftPosition(index);
+	}
+	
+	private int getRightX(int index) {
+		return calcChildLeftPosition(index) + itemWidth;
+	}
+	
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		/*
@@ -67,11 +312,9 @@ public class SequenceViewGroup extends ViewGroup {
 
 		int width = getPaddingLeft() + getPaddingRight();
 
-		if (numChildren > 0) {
-			width = numChildren * itemWidth;
-			if (numChildren > 1) {
-				width += (numChildren - 1) * horizontalSpacing;
-			}
+		width += numChildren * itemWidth;
+		if (numChildren > 1) {
+			width += (numChildren - 1) * horizontalSpacing;
 		}
 
 		int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(itemWidth,
@@ -94,20 +337,23 @@ public class SequenceViewGroup extends ViewGroup {
 		for (int i = 0; i < count; i++) {
 			View child = getChildAt(i);
 
-			int prevAccumulatedSpacing = 0;
-			int prevAccumulatedWidth = 0;
-			if (i > 0) {
-				prevAccumulatedSpacing = i * horizontalSpacing;
-				prevAccumulatedWidth = i * itemWidth;
-			}
-			int x = prevAccumulatedSpacing + prevAccumulatedWidth;
-			x += getPaddingLeft();
-
-			int y = getPaddingTop() + offsetY;
-
-			child.layout(x, y, x + child.getMeasuredWidth(),
-					y + child.getMeasuredHeight());
+			if (child == dragging) continue;
+			
+			int x = calcChildLeftPosition(i);
+			int y = calcChildTopPosition();
+			
+			child.layout(x, y, x + child.getMeasuredWidth(), y + child.getMeasuredHeight());
 		}
+	}
+	
+	private int calcChildTopPosition() {
+		return getPaddingTop() + offsetY;
+	}
+	
+	private int calcChildLeftPosition(int childIndex) {
+		int prevAccumulatedSpacing = childIndex * horizontalSpacing;
+		int prevAccumulatedWidth = childIndex * itemWidth;
+		return prevAccumulatedSpacing + prevAccumulatedWidth + getPaddingLeft();
 	}
 
 	public void setHorizontalSpacing(int spacing) {
@@ -126,6 +372,26 @@ public class SequenceViewGroup extends ViewGroup {
 			itemWidth = width;
 			requestLayout();
 		}
+	}
+	
+	@Override
+	protected void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
+		int numChildren = getChildCount();
+		
+		Paint paint = new Paint();
+		paint.setColor(Color.GRAY);
+		paint.setStrokeWidth(2.0f);
+		for (int i = 0; i < numChildren; i++) {
+			if (i == draggingIndex)
+				canvas.drawLine(newX - centerOffset, 0, newX - centerOffset, 500, paint);
+			else
+				canvas.drawLine(getCenterX(i), 0, getCenterX(i), 500, paint);
+		}
+		boolean goingRight = (newX - centerOffset) - getCenterX(curDragIndexPos) > 0;
+		paint.setTextSize(24);
+		canvas.drawText(goingRight ? "Right" : "Left", 60, 60, paint);
+		
 	}
 
 	public int getItemWidth() {
