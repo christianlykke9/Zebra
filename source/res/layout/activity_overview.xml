@@ -4,18 +4,18 @@
     android:layout_height="match_parent" >
 
    <LinearLayout
-        android:layout_width="400dp"
+        android:layout_width="350dp"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-       <TableLayout
-           android:id="@+id/child_table"
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content" >
-
-           
-       </TableLayout>
-
+	   <ListView
+	       android:id="@+id/child_list"
+	       android:layout_width="fill_parent"
+	       android:layout_height="wrap_content"
+	       android:divider="#dd9639"
+	       android:dividerHeight="2dp"
+	       android:listSelector="@drawable/list_selector" />
+	   
     </LinearLayout>
 
     <LinearLayout
@@ -23,11 +23,15 @@
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
-        <RelativeLayout
+        <GridView
+	        android:id="@+id/sequence_grid"
+		    android:numColumns="auto_fit"
+		    android:gravity="center"
+		    android:columnWidth="200dp"
+		    android:stretchMode="columnWidth"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#f0f0f0" >
-        </RelativeLayout>
+            android:layout_height="match_parent" >
+        </GridView>
 
     </LinearLayout>
 
