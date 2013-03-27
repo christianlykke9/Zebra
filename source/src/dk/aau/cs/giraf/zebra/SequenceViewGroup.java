@@ -2,10 +2,7 @@ package dk.aau.cs.giraf.zebra;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -21,12 +18,15 @@ import android.view.animation.TranslateAnimation;
  * Layouts its children with fixed sizes and fixed spacing between each child in
  * the horizontal dimension.
  * 
+ * TODO: Draw dragged on top
  */
 public class SequenceViewGroup extends ViewGroup {
 
 	private final int DEFAULT_ITEM_WIDTH = 250;
 	private final int DEFAULT_ITEM_HEIGHT = 250;
 	private final int DEFAULT_HORIZONTAL_SPACING = 100;
+	
+	private final int ANIMATION_TIME = 350;
 
 	private int horizontalSpacing;
 	private int itemWidth;
@@ -146,7 +146,7 @@ public class SequenceViewGroup extends ViewGroup {
 				Animation.ABSOLUTE, 0,
 				Animation.ABSOLUTE, 0);
 		
-		anim.setDuration(500);
+		anim.setDuration(ANIMATION_TIME);
 		anim.setFillEnabled(true);
 		anim.setFillAfter(true);
 		view.startAnimation(anim);
@@ -222,18 +222,21 @@ public class SequenceViewGroup extends ViewGroup {
 		return calcChildLeftPosition(index) + itemWidth;
 	}
 
+	private void layoutChild(int i) {
+		View child = getChildAt(i);
+		
+		int x = calcChildLeftPosition(i);
+		int y = calcChildTopPosition();
+		
+		child.layout(x, y, x + child.getMeasuredWidth(), y + child.getMeasuredHeight());
+	}
+	
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		final int count = getChildCount();
 		for (int i = 0; i < count; i++) {
-			View child = getChildAt(i);
-
-			if (child == dragging) continue;
-			
-			int x = calcChildLeftPosition(i);
-			int y = calcChildTopPosition();
-			
-			child.layout(x, y, x + child.getMeasuredWidth(), y + child.getMeasuredHeight());
+			if (i == draggingIndex) continue;
+			layoutChild(i);
 		}
 	}
 
@@ -284,20 +287,89 @@ public class SequenceViewGroup extends ViewGroup {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		
-		//If animating then consume event to not disrupt
+	
+		//If performing drag animation then consume event to not disrupt
 		if (animatingDragReposition) return true;
 		
 		boolean handled = false;
+		
+		float x = event.getX();
+		float y = event.getY();
+		
+		//End drag if UP, Cancel or multiple pointers or pointer is gone
+		if (event.getActionMasked() == MotionEvent.ACTION_UP || 
+				event.getActionMasked() == MotionEvent.ACTION_CANCEL || 
+				event.getPointerCount() != 1) {
+			
+			//Be careful with coordinates from the event if getPointerCount != 1
+			
+			if (draggingIndex != -1) {
+				handled = true;
+				
+				//Disallow movement when repositioning dragged view.
+				animatingDragReposition = true;
+				
+				TranslateAnimation move = new TranslateAnimation(
+						0,
+						calcChildLeftPosition(curDragIndexPos) - dragging.getLeft(), 
+						0, 
+						0);
+				move.setDuration(ANIMATION_TIME);
+				
+				move.setAnimationListener(new AnimationListener() {
 
-		final float x = event.getX();
-		final float y = event.getY();
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						if (draggingIndex != curDragIndexPos) {
+							if (rearrangeListener != null)
+								rearrangeListener.onRearrange(draggingIndex, curDragIndexPos);
+							
+							//TODO: Something here causes flicker on the index originally moved
+							//Rearrange
+							View[] views = new View[getChildCount()];
+							for (int i = 0; i < newPositions.length; i++) {
+								views[i] = getChildAt(i);
+								getChildAt(i).clearAnimation();
+							}
+							removeAllViews();
+							for (int i = 0; i < newPositions.length; i++) {
+								addView(views[newPositions[i]]);
+							}
+							//This prevents lots of flicker
+							onLayout(true, getLeft(), getTop(), getRight(), getBottom());
+						} else {
+							//Must clear animation to prevent flicker - even though it just ended.
+							getChildAt(draggingIndex).clearAnimation();
+							layoutChild(draggingIndex);
+						}
+						
+						draggingIndex = -1;
+						curDragIndexPos = -1;
+						animatingDragReposition = false;
+						dragging = null;
+					}
+
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+					}
+
+					@Override
+					public void onAnimationStart(Animation animation) {
+					}
+				});
+				
+				dragging.startAnimation(move);
+				
+			}
+			return handled;
+		}
 		
 		switch (event.getActionMasked()) {
 		case MotionEvent.ACTION_DOWN:
 			dragging = childAtPoint((int) x, (int) y);
 			if (dragging != null) {
 				handled = true;
+				
 				requestDisallowInterceptTouchEvent(true);
 				
 				//Grap original drag position
@@ -310,8 +382,7 @@ public class SequenceViewGroup extends ViewGroup {
 					newPositions[i] = i;
 				}
 				
-				touchX = (int) x;
-				
+				touchX = (int) x;			
 				dragStartX = touchX;
 				
 				dragging.invalidate();
@@ -330,67 +401,6 @@ public class SequenceViewGroup extends ViewGroup {
 				
 				checkForSwap();
 			}
-			break;
-		case MotionEvent.ACTION_UP:
-		case MotionEvent.ACTION_CANCEL:
-			if (draggingIndex != -1) {
-				handled = true;
-				
-				dragging.invalidate();
-				
-				int deltaX = (int) (x - dragStartX);
-				int targetDeltaX = calcChildLeftPosition(curDragIndexPos) - calcChildLeftPosition(draggingIndex);
-				
-				//Disallow movement when repositioning dragged view.
-				animatingDragReposition = true;
-				
-				TranslateAnimation move = new TranslateAnimation(
-						0,
-						targetDeltaX - deltaX, 
-						0, 
-						0);
-				move.setDuration(500);
-				
-				move.setAnimationListener(new AnimationListener() {
-
-					@Override
-					public void onAnimationEnd(Animation animation) {
-						if (draggingIndex != curDragIndexPos || true) {
-							if (rearrangeListener != null)
-								rearrangeListener.onRearrange(draggingIndex, curDragIndexPos);
-							
-							//TODO: Something here causes flicker on the index originally moved
-							//Rearrange
-							View[] views = new View[getChildCount()];
-							for (int i = 0; i < newPositions.length; i++) {
-								views[i] = getChildAt(i);
-								getChildAt(i).clearAnimation();
-							}
-							removeAllViews();
-							for (int i = 0; i < newPositions.length; i++) {
-								addView(views[newPositions[i]]);
-							}
-							//This prevents lots of flicker
-							onLayout(true, getLeft(), getTop(), getRight(), getBottom());
-						}
-						
-						draggingIndex = -1;
-						curDragIndexPos = -1;
-						animatingDragReposition = false;
-					}
-
-					@Override
-					public void onAnimationRepeat(Animation animation) {
-					}
-
-					@Override
-					public void onAnimationStart(Animation animation) {
-					}
-				});
-				
-				dragging.startAnimation(move);
-				dragging = null;
-			}	
 			break;
 		}
 		return handled;
