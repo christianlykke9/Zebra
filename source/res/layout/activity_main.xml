@@ -1,22 +1,75 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout 
+    android:id="@+id/parent_container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:svg="http://schemas.android.com/apk/res/dk.aau.cs.giraf.zebra"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_bagground"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity" >
+    tools:context=".MainActivity"
+    android:focusableInTouchMode="true" >
 
+    <LinearLayout 
+        android:id="@+id/sequence_bar"
+        android:layout_width="match_parent"
+        android:layout_height="100sp"
+        android:orientation="horizontal"
+        android:background="#cccccc"
+        android:paddingLeft="15sp"
+        android:paddingRight="15sp">
+        
+        <ImageView 
+            android:id="@+id/sequence_image"
+            android:layout_width="70sp"
+            android:layout_height="70sp"
+            android:layout_gravity="left|center_vertical"
+            android:background="#ccccff" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginLeft="15sp" >
+            
+            <EditText
+                android:id="@+id/sequence_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#ffcccc"
+                android:singleLine="true"
+                android:inputType="text"
+                android:imeOptions="actionDone"
+                android:textSize="50sp" />
+            
+            <TextView
+                android:id="@+id/child_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="#909090"
+                android:background="#ffdfdf"
+                android:textSize="26sp" />
+            
+        </LinearLayout>
+
+    </LinearLayout>
+    
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:layout_margin="0dp"
+        android:padding="0dp" >
 
         <dk.aau.cs.giraf.zebra.SequenceViewGroup
             android:id="@+id/sequenceViewGroup"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
           	svg:horizontalSpacing="100dp"
           	svg:itemHeight="225dp"
@@ -25,5 +78,5 @@
         </dk.aau.cs.giraf.zebra.SequenceViewGroup>
 
     </HorizontalScrollView>
-
-</RelativeLayout>
+    
+</LinearLayout>

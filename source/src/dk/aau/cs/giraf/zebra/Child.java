@@ -1,18 +1,12 @@
 package dk.aau.cs.giraf.zebra;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.graphics.drawable.Drawable;
 
-public class Sequence {
-	private String name;
-	private Drawable image;
-	public List<Drawable> pictograms = new ArrayList<Drawable>();
+public class Child {
 	
-	public Sequence(String name) {
-		this.name = name;
-	}
+	private String name;
+	private int sequenceCount;
+	private Drawable image;
 	
 	public String getName() {
 		return name;
@@ -22,6 +16,14 @@ public class Sequence {
 		this.name = name;
 	}
 	
+	public int getSequenceCount() {
+		return sequenceCount;
+	}
+	
+	public void setSequenceCount(int count) {
+		this.sequenceCount = count;
+	}
+
 	public Drawable getImage() {
 		return image;
 	}
@@ -29,4 +31,5 @@ public class Sequence {
 	public void setImage(Drawable image) {
 		this.image = image;
 	}
+
 }
