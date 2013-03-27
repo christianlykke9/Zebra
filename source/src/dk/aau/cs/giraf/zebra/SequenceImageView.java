@@ -1,10 +1,10 @@
 package dk.aau.cs.giraf.zebra;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.view.MotionEvent;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RoundRectShape;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -63,9 +63,26 @@ public class SequenceImageView extends RelativeLayout {
 	private void initializeImageView() {
 		imageView = new ImageView(getContext());
 		imageView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-		imageView.setPadding(PADDING, PADDING, PADDING, PADDING);
 		
-		addView(imageView);
+		// Setup the frame
+		imageView.setPadding(10, 10, 10, 10);
+		RoundRectShape rect = new RoundRectShape(
+				  new float[] {10,10, 10,10, 10,10, 10,10},
+				  null,
+				  null);
+		ShapeDrawable bg = new ShapeDrawable(rect);
+		bg.getPaint().setColor(Color.WHITE);
+		
+		
+		
+		// The FrameLayout is used as margin
+		RelativeLayout frame = new RelativeLayout(getContext());
+		frame.setPadding(PADDING, PADDING, PADDING, PADDING);
+		
+		
+		imageView.setBackgroundDrawable(bg);
+		frame.addView(imageView);
+		addView(frame);
 	}
 	
 	public void setImageDrawable(Drawable drawable)
