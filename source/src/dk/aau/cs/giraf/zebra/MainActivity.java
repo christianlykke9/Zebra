@@ -26,9 +26,9 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		ViewGroup sequenceGroup = (ViewGroup) findViewById(R.id.sequenceViewGroup);
+		SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
 		
-		Sequence sequence = Test.createSequence(this);
+		final Sequence sequence = Test.createSequence(this);
 		
 		for (Drawable pictogram : sequence.pictograms) {
 			SequenceImageView imageView = new SequenceImageView(getApplication());
@@ -36,6 +36,13 @@ public class MainActivity extends Activity {
 			imageView.setDeleteButtonVisibility(View.VISIBLE);
 			sequenceGroup.addView(imageView);
 		}
+		
+		sequenceGroup.setOnRearrangeListener(new OnRearrangeListener() {
+			@Override
+			public void onRearrange(int indexFrom, int indexTo) {
+				sequence.rearrange(indexFrom, indexTo);			
+			}
+		});
 		
 		TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
 		sequenceTitleView.setText(sequence.getName());
