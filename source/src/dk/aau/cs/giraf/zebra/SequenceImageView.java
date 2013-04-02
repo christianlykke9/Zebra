@@ -21,7 +21,7 @@ public class SequenceImageView extends RelativeLayout {
 	public SequenceImageView(Context context) {
 		super(context);
 		
-		this.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+		this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		
 		initializeImageView();
 		initializeDeleteButton();
@@ -62,7 +62,7 @@ public class SequenceImageView extends RelativeLayout {
 	
 	private void initializeImageView() {
 		imageView = new ImageView(getContext());
-		imageView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+		imageView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		
 		// Setup the frame
 		imageView.setPadding(10, 10, 10, 10);
@@ -73,12 +73,10 @@ public class SequenceImageView extends RelativeLayout {
 		ShapeDrawable bg = new ShapeDrawable(rect);
 		bg.getPaint().setColor(Color.WHITE);
 		
-		
-		
+			
 		// The FrameLayout is used as margin
 		RelativeLayout frame = new RelativeLayout(getContext());
 		frame.setPadding(PADDING, PADDING, PADDING, PADDING);
-		
 		
 		imageView.setBackgroundDrawable(bg);
 		frame.addView(imageView);
