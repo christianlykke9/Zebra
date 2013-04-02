@@ -5,6 +5,10 @@ import java.util.List;
 
 import android.graphics.drawable.Drawable;
 
+/**
+ * Represents a ordered collection (sequence) of drawables.
+ *
+ */
 public class Sequence {
 	private String name;
 	private Drawable image;
@@ -29,4 +33,16 @@ public class Sequence {
 	public void setImage(Drawable image) {
 		this.image = image;
 	}
+	
+	/**
+	 * Swaps the position of two drawables.
+	 * @param oldIndex
+	 * @param newIndex
+	 */
+	public void rearrange(int oldIndex, int newIndex) {
+		Drawable temp = pictograms.get(oldIndex);
+		pictograms.set(oldIndex, pictograms.get(newIndex));
+		pictograms.set(newIndex, temp);
+	}
+	
 }
