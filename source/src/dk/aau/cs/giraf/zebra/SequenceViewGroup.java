@@ -384,6 +384,7 @@ public class SequenceViewGroup extends ViewGroup {
 				
 				touchX = (int) x;			
 				dragStartX = touchX;
+				centerOffset = touchX - getCenterX(draggingIndex);
 				
 				dragging.invalidate();
 			}
