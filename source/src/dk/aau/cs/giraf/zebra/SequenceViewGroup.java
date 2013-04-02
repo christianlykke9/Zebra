@@ -441,5 +441,9 @@ public class SequenceViewGroup extends ViewGroup {
 		newPositions[indexA] = newPositions[indexB];
 		newPositions[indexB] = temp;
 	}
+	
+	public interface OnRearrangeListener {
+		public void onRearrange(int indexFrom, int indexTo);
+	}
 
 }

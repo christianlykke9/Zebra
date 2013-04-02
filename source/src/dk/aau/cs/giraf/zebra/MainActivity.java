@@ -37,7 +37,7 @@ public class MainActivity extends Activity {
 			sequenceGroup.addView(imageView);
 		}
 		
-		sequenceGroup.setOnRearrangeListener(new OnRearrangeListener() {
+		sequenceGroup.setOnRearrangeListener(new SequenceViewGroup.OnRearrangeListener() {
 			@Override
 			public void onRearrange(int indexFrom, int indexTo) {
 				sequence.rearrange(indexFrom, indexTo);			
