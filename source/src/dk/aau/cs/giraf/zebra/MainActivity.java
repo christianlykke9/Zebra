@@ -46,8 +46,6 @@ public class MainActivity extends Activity {
 		initializeTopBar();
 	}
 
-	
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -78,7 +76,6 @@ public class MainActivity extends Activity {
 		// Create listeners on every view to remove focus from the EditText when touched
 		createClearFocusListeners(findViewById(R.id.parent_container));
 		
-		
 		// Create listener to hide the keyboard and save when the EditText loses focus
 		editText.setOnFocusChangeListener(new OnFocusChangeListener() {
 			@Override
@@ -97,34 +94,24 @@ public class MainActivity extends Activity {
 			}
 		});
 		
-		
-		
 		// Get the childID parameter or choose default
-		long childId;
+		long childId = 16; // Default child for debugging (Ida Christiansen)
 		Bundle extras = getIntent().getExtras();
-		if (extras != null) {        	   
-			childId = extras.getLong("currentChildID");
-		} else {
-        	childId = 16; // Default child for debugging (Ida Christiansen)
-        }
-		
+		if (extras != null) {       
+			childId = extras.getLong("currentChildId"); 
+		}
 		
 		// Get the full name from the database
 		String name = getFullNameFromProfileId(childId);
-		
 		
 		TextView childName = (TextView) findViewById(R.id.child_name);
 		childName.setText(name);
 	}
 	
-	
-	
 	public void hideSoftKeyboardFromView(View view) {
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 	}
-	
-	
 	
 	/**
 	 * Creates listeners to remove focus from EditText when something else is touched (to hide the softkeyboard)
@@ -157,8 +144,6 @@ public class MainActivity extends Activity {
 	    }
 	}
 	
-	
-	
 	private String addWordToString(String string, String word) {
 		if (word != null) {
 			if (!string.isEmpty())
@@ -170,8 +155,6 @@ public class MainActivity extends Activity {
 		
 		return string;
 	}
-	
-	
 	
 	public String getFullNameFromProfileId(long profileId)
 	{
