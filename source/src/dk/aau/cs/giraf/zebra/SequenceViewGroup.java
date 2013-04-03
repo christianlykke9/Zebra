@@ -299,7 +299,8 @@ public class SequenceViewGroup extends ViewGroup {
 		//End drag if UP, Cancel or multiple pointers or pointer is gone
 		if (event.getActionMasked() == MotionEvent.ACTION_UP || 
 				event.getActionMasked() == MotionEvent.ACTION_CANCEL || 
-				event.getPointerCount() != 1) {
+				event.getPointerCount() != 1 ||
+				x >= getWidth() || x <= 0) {
 			
 			//Be careful with coordinates from the event if getPointerCount != 1
 			
