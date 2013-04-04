@@ -40,6 +40,8 @@ public class Sequence {
 	 * @param newIndex
 	 */
 	public void rearrange(int oldIndex, int newIndex) {
+		if (oldIndex < 0 || oldIndex >= pictograms.size()) throw new IllegalArgumentException("oldIndex out of range");
+		if (newIndex < 0 || newIndex >= pictograms.size()) throw new IllegalArgumentException("newIndex out of range");
 		Drawable temp = pictograms.get(oldIndex);
 		pictograms.set(oldIndex, pictograms.get(newIndex));
 		pictograms.set(newIndex, temp);
