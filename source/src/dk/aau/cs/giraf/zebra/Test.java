@@ -11,7 +11,11 @@ public class Test {
 				R.drawable.vask_1,
 				R.drawable.vask_2,
 				R.drawable.vask_3,
-				R.drawable.vask_4
+				R.drawable.vask_4,
+				R.drawable.vask_2,
+				R.drawable.vask_4,
+				R.drawable.vask_1,
+				R.drawable.vask_3
 			};
 		
 		for (int i : drawableIds) {
