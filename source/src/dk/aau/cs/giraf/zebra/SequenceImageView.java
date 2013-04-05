@@ -3,19 +3,17 @@ package dk.aau.cs.giraf.zebra;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RoundRectShape;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 public class SequenceImageView extends RelativeLayout {
-
-	private final int PADDING = 25;
-	private final int LIFT_PADDING = 15; 
 	
-	private ImageView imageView;
+	private final float NORMAL_SCALE = 0.8f;
+	private final float HIGHLIGHT_SCALE = 0.9f;
+	private final float CORNER_RADIUS = 30f;
+	
+	private RoundedImageView imageView;
 	private ImageButton deleteButton;
 	
 	public SequenceImageView(Context context) {
@@ -40,13 +38,15 @@ public class SequenceImageView extends RelativeLayout {
 	
 	public void liftUp() {
 		deleteButton.setVisibility(View.INVISIBLE);
-		imageView.setPadding(LIFT_PADDING, LIFT_PADDING, LIFT_PADDING, LIFT_PADDING);
+		imageView.setScaleX(HIGHLIGHT_SCALE);
+        imageView.setScaleY(HIGHLIGHT_SCALE);
 		this.setAlpha(0.7f);
 	}
 	
 	public void placeDown() {
 		deleteButton.setVisibility(deleteButtonVisibility);
-		imageView.setPadding(PADDING, PADDING, PADDING, PADDING);
+		imageView.setScaleX(NORMAL_SCALE);
+        imageView.setScaleY(NORMAL_SCALE);
 		this.setAlpha(1.0f);
 	}
 	
@@ -61,26 +61,12 @@ public class SequenceImageView extends RelativeLayout {
 	}
 	
 	private void initializeImageView() {
-		imageView = new ImageView(getContext());
+		imageView = new RoundedImageView(getContext(), CORNER_RADIUS);
 		imageView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		imageView.setScaleX(NORMAL_SCALE);
+		imageView.setScaleY(NORMAL_SCALE);
 		
-		// Setup the frame
-		imageView.setPadding(10, 10, 10, 10);
-		RoundRectShape rect = new RoundRectShape(
-				  new float[] {10,10, 10,10, 10,10, 10,10},
-				  null,
-				  null);
-		ShapeDrawable bg = new ShapeDrawable(rect);
-		bg.getPaint().setColor(Color.WHITE);
-		
-			
-		// The FrameLayout is used as margin
-		RelativeLayout frame = new RelativeLayout(getContext());
-		frame.setPadding(PADDING, PADDING, PADDING, PADDING);
-		
-		imageView.setBackgroundDrawable(bg);
-		frame.addView(imageView);
-		addView(frame);
+		addView(imageView);
 	}
 	
 	public void setImageDrawable(Drawable drawable)
