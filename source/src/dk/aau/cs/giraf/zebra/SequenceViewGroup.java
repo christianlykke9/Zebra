@@ -423,7 +423,7 @@ public class SequenceViewGroup extends ViewGroup {
 	}
 
 	public void setHorizontalSpacing(int spacing) {
-		if (spacing > 0 && spacing != horizontalSpacing) {
+		if (spacing >= 0 && spacing != horizontalSpacing) {
 			horizontalSpacing = spacing;
 			requestLayout();
 		}
