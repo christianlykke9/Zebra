@@ -1,6 +1,6 @@
 package dk.aau.cs.giraf.zebra;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,10 +13,10 @@ import android.widget.TextView;
 
 public class ChildAdapter extends BaseAdapter {
 
-	private ArrayList<Child> items;
+	private List<Child> items;
 	private LayoutInflater inflater;
 	
-	public ChildAdapter(Activity activity, ArrayList<Child> items) {
+	public ChildAdapter(Activity activity, List<Child> items) {
 		
 		this.items = items;
 		this.inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

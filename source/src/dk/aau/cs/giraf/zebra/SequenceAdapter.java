@@ -1,6 +1,6 @@
 package dk.aau.cs.giraf.zebra;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,10 +13,10 @@ import android.widget.TextView;
 
 public class SequenceAdapter extends BaseAdapter {
 
-	private ArrayList<Sequence> items;
+	private List<Sequence> items;
 	private LayoutInflater inflater;
 	
-	public SequenceAdapter(Activity activity, ArrayList<Sequence> items) {
+	public SequenceAdapter(Activity activity, List<Sequence> items) {
 		
 		this.items = items;
 		this.inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

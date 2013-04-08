@@ -1,5 +1,8 @@
 package dk.aau.cs.giraf.zebra;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 
 public class Test {
@@ -23,5 +26,11 @@ public class Test {
 		}
 		
 		return sequence;
+	}
+	
+	public static List<Sequence> getSequences(Context context) {
+		ArrayList<Sequence> list = new ArrayList<Sequence>();
+		list.add(createSequence(context));
+		return list;
 	}
 }

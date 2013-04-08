@@ -1,179 +1,72 @@
 package dk.aau.cs.giraf.zebra;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnFocusChangeListener;
-import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
-import dk.aau.cs.giraf.oasis.lib.Helper;
-import dk.aau.cs.giraf.oasis.lib.models.Profile;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.ListView;
 
 public class MainActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_overview);
 		
-		SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
+		List<Child> children = getChildren();
 		
-		final Sequence sequence = Test.createSequence(this);
+		ChildAdapter childAdapter = new ChildAdapter(this, children);
 		
-		for (Drawable pictogram : sequence.getPictograms()) {
-			SequenceImageView imageView = new SequenceImageView(getApplication());
-			imageView.setImageDrawable(pictogram);
-			imageView.setDeleteButtonVisibility(View.VISIBLE);
-			sequenceGroup.addView(imageView);
-		}
+		ListView childList = (ListView)findViewById(R.id.child_list);
+		childList.setAdapter(childAdapter);
 		
-		sequenceGroup.setOnRearrangeListener(new SequenceViewGroup.OnRearrangeListener() {
+		List<Sequence> sequences = getSequences();
+		
+		final SequenceAdapter sequenceAdapter = new SequenceAdapter(this, sequences);
+		
+		GridView sequenceGrid = (GridView)findViewById(R.id.sequence_grid);
+		sequenceGrid.setAdapter(sequenceAdapter);
+		
+		sequenceGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
 			@Override
-			public void onRearrange(int indexFrom, int indexTo) {
-				sequence.rearrange(indexFrom, indexTo);			
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				//Sequence sequence = sequenceAdapter.getItem(arg2);
+				Intent intent = new Intent(getApplication(), SequenceActivity.class);
+				//TODO: Put sequence id in extras.
+				startActivity(intent);
 			}
+			
 		});
 		
-		TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
-		sequenceTitleView.setText(sequence.getName());
-		ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
-		sequenceImageView.setImageDrawable(sequence.getPictograms().get(0));
-		
-		
-		initializeTopBar();
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+	private List<Sequence> getSequences() {
+		/*ArrayList<Sequence> sequences = new ArrayList<Sequence>();
 		
-		return true;
-	}
-	
-	
-	
-	private void initializeTopBar() {
-        TextView editText = (TextView) findViewById(R.id.sequence_title);
-		
-        // Create listener to remove focus when "Done" is pressed on the keyboard
-		editText.setOnEditorActionListener(new OnEditorActionListener() {        
-		    @Override
-		    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-		        if(actionId==EditorInfo.IME_ACTION_DONE) {
-		        	EditText editText = (EditText) findViewById(R.id.sequence_title);
-		        	
-		            editText.clearFocus();
-		        }
-		        return false;
-		    }
-		});
-		
-		
-		// Create listeners on every view to remove focus from the EditText when touched
-		createClearFocusListeners(findViewById(R.id.parent_container));
-		
-		// Create listener to hide the keyboard and save when the EditText loses focus
-		editText.setOnFocusChangeListener(new OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (!hasFocus)
-				{
-					
-                    EditText editText = (EditText) findViewById(R.id.sequence_title);
-		        	
-                    
-                    hideSoftKeyboardFromView(editText);
-                    
-                    // TODO Save changes in the title
-				}
-				
-			}
-		});
-		
-		// Get the childID parameter or choose default
-		long childId = 16; // Default child for debugging (Ida Christiansen)
-		Bundle extras = getIntent().getExtras();
-		if (extras != null) {       
-			childId = extras.getLong("currentChildId"); 
+		for (int i = 0; i < 20; i++) {
+			Sequence sequence = new Sequence("Lækker musik");
+			sequence.setImage(getResources().getDrawable(R.drawable.steve));
+			sequences.add(sequence);
 		}
+		return sequences;*/
+		return Test.getSequences(this);
+	}
+
+	private List<Child> getChildren() {
+		ArrayList<Child> children = new ArrayList<Child>();
 		
-		// Get the full name from the database
-		String name = getFullNameFromProfileId(childId);
-		
-		TextView childName = (TextView) findViewById(R.id.child_name);
-		childName.setText(name);
-	}
-	
-	public void hideSoftKeyboardFromView(View view) {
-		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-	}
-	
-	/**
-	 * Creates listeners to remove focus from EditText when something else is touched (to hide the softkeyboard)
-	 * @param view The parent container. The function runs recursively on its children
-	 */
-	public void createClearFocusListeners(View view) {
-		// Create listener to remove focus from EditText when something else is touched
-	    if(!(view instanceof EditText)) {
-	        view.setOnTouchListener(new View.OnTouchListener() {
-				@Override
-				public boolean onTouch(View v, MotionEvent event) {
-					EditText editText = (EditText) findViewById(R.id.sequence_title);
-		            editText.clearFocus();
-		            
-					return false;
-				}
-
-	        });
-	    }
-
-	    // If the view is a container, run the function recursively on the children
-	    if (view instanceof ViewGroup) {
-
-	        for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
-
-	            View innerView = ((ViewGroup) view).getChildAt(i);
-
-	            createClearFocusListeners(innerView);
-	        }
-	    }
-	}
-	
-	private String addWordToString(String string, String word) {
-		if (word != null) {
-			if (!string.isEmpty())
-			{
-				string += " ";
-			}
-			string += word;
+		for (int i = 0; i < 20; i++) {
+			Child child = new Child("Sheryl Ann Cole");
+			child.setSequenceCount(23);
+			children.add(child);
 		}
-		
-		return string;
-	}
-	
-	public String getFullNameFromProfileId(long profileId)
-	{
-        Helper helper = new Helper(MainActivity.this);
-		
-		Profile profile = helper.profilesHelper.getProfileById(profileId);
-		
-		String name = "";
-		name = addWordToString(name, profile.getFirstname());
-		name = addWordToString(name, profile.getMiddlename());
-		name = addWordToString(name, profile.getSurname());
-		
-		return name;
+		return children;
 	}
 }
