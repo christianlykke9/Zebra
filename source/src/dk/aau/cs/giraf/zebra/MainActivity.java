@@ -13,25 +13,38 @@ import android.widget.ListView;
 
 public class MainActivity extends Activity {
 
+	List<Child> children;
+	List<Sequence> sequences;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_overview);
 		
-		List<Child> children = getChildren();
-		
-		ChildAdapter childAdapter = new ChildAdapter(this, children);
+		children = getChildren();
+		sequences = getSequences();
 		
 		ListView childList = (ListView)findViewById(R.id.child_list);
+		final ChildAdapter childAdapter = new ChildAdapter(this, children);
 		childList.setAdapter(childAdapter);
 		
-		List<Sequence> sequences = getSequences();
-		
-		final SequenceAdapter sequenceAdapter = new SequenceAdapter(this, sequences);
-		
 		GridView sequenceGrid = (GridView)findViewById(R.id.sequence_grid);
+		final SequenceAdapter sequenceAdapter = new SequenceAdapter(this, sequences);
 		sequenceGrid.setAdapter(sequenceAdapter);
 		
+		//Load Child sequences
+		childList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				Child child = childAdapter.getItem(arg2);
+				sequences.clear();
+				sequences.addAll(getSequencesForChild(child));
+				sequenceAdapter.notifyDataSetChanged();
+			}
+		});
+		
+		//Load Sequence
 		sequenceGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			@Override
@@ -57,6 +70,12 @@ public class MainActivity extends Activity {
 		}
 		return sequences;*/
 		return Test.getSequences(this);
+	}
+	
+	private List<Sequence> getSequencesForChild(Child child) {
+		if (child == children.get(0))
+			return new ArrayList();
+		return getSequences();
 	}
 
 	private List<Child> getChildren() {

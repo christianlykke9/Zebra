@@ -10,6 +10,8 @@ public class Test {
 		
 		Sequence sequence = new Sequence("Test Sequence");
 		
+		sequence.setImage(context.getResources().getDrawable(R.drawable.sheryl));
+		
 		int[] drawableIds = new int[] {
 				R.drawable.vask_1,
 				R.drawable.vask_2,
