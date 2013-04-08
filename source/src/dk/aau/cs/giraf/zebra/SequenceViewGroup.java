@@ -2,8 +2,12 @@ package dk.aau.cs.giraf.zebra;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Paint.Style;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,6 +45,9 @@ public class SequenceViewGroup extends ViewGroup {
 	private int centerOffset;
 	private int touchX = -1;
 	private int touchDeltaX = 0;
+	
+	private boolean isInEditMode = false;
+	private View addNewPictoGramView = null;
 	
 	private OnRearrangeListener rearrangeListener = null;
 	
@@ -86,7 +93,8 @@ public class SequenceViewGroup extends ViewGroup {
 		
 		if (isDraggingRight) {
 			int checkIndex = curDragIndexPos + 1;
-			while (checkIndex < getChildCount() && dragCenterX > ((getCenterX(curDragIndexPos) + getCenterX(checkIndex)) / 2)) {
+			//Don't swap with  new sequence diagram view.
+			while (checkIndex < getDraggableChildCount() && dragCenterX > ((getCenterX(curDragIndexPos) + getCenterX(checkIndex)) / 2)) {
 				//Animate before swapping indices
 				doAnimateTranslation(checkIndex, curDragIndexPos);
 				swapIndexPositions(checkIndex, curDragIndexPos);
@@ -368,7 +376,7 @@ public class SequenceViewGroup extends ViewGroup {
 		switch (event.getActionMasked()) {
 		case MotionEvent.ACTION_DOWN:
 			dragging = childAtPoint((int) x, (int) y);
-			if (dragging != null) {
+			if (dragging != null && dragging != addNewPictoGramView) {
 				handled = true;
 				
 				requestDisallowInterceptTouchEvent(true);
@@ -446,6 +454,48 @@ public class SequenceViewGroup extends ViewGroup {
 	
 	public interface OnRearrangeListener {
 		public void onRearrange(int indexFrom, int indexTo);
+	}
+	
+	private int getDraggableChildCount() {
+		return isInEditMode ? getChildCount() - 1 : getChildCount();
+	}
+	
+	public void setEditModeEnabled(boolean editEnabled) {
+		if (isInEditMode != editEnabled) {
+			if (editEnabled) {
+				addNewPictoGramView = new View(getContext()) {
+					Paint paint = new Paint();
+					
+					@Override
+					protected void onDraw(Canvas canvas) {
+						super.onDraw(canvas);
+						paint.setColor(Color.RED);
+						paint.setStyle(Style.STROKE);
+						paint.setStrokeWidth(10f);
+						canvas.drawRect(5, 5, getMeasuredWidth()-5, getMeasuredHeight()-5, paint);
+						paint.setStrokeWidth(1);
+						paint.setColor(Color.BLUE);
+						canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), paint);
+					}
+				};
+				addView(addNewPictoGramView);
+			} else {
+				removeViewAt(getChildCount() - 1);
+				addNewPictoGramView = null;
+			}
+			
+			isInEditMode = editEnabled;
+			invalidate();
+		}
+	}
+	
+	//TODO: Check this for types
+	public void addNewPictogramAtEnd(View view) {
+		if (isInEditMode) {
+			addView(view, getChildCount()-1);
+		} else {
+			addView(view);
+		}
 	}
 
 }
