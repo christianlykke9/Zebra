@@ -45,8 +45,7 @@ public class OverviewActivity extends Activity {
 		ArrayList<Child> children = new ArrayList<Child>();
 		
 		for (int i = 0; i < 20; i++) {
-			Child child = new Child();
-			child.setName("Sheryl Ann Cole");
+			Child child = new Child("Sheryl Ann Cole");
 			child.setSequenceCount(23);
 			children.add(child);
 		}

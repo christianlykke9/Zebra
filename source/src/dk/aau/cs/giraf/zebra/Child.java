@@ -8,12 +8,13 @@ public class Child {
 	private int sequenceCount;
 	private Drawable image;
 	
-	public String getName() {
-		return name;
+	public Child(String name) {
+		if (name == null) throw new IllegalArgumentException("Child must have name");
+		this.name = name;
 	}
 	
-	public void setName(String name) {
-		this.name = name;
+	public String getName() {
+		return name;
 	}
 	
 	public int getSequenceCount() {
