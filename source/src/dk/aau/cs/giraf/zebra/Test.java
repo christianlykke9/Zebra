@@ -19,7 +19,7 @@ public class Test {
 			};
 		
 		for (int i : drawableIds) {
-			sequence.pictograms.add(context.getResources().getDrawable(i));
+			sequence.addPictogramAtEnd(context.getResources().getDrawable(i));
 		}
 		
 		return sequence;

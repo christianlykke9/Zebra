@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
 		
 		final Sequence sequence = Test.createSequence(this);
 		
-		for (Drawable pictogram : sequence.pictograms) {
+		for (Drawable pictogram : sequence.getPictograms()) {
 			SequenceImageView imageView = new SequenceImageView(getApplication());
 			imageView.setImageDrawable(pictogram);
 			imageView.setDeleteButtonVisibility(View.VISIBLE);
@@ -47,7 +47,7 @@ public class MainActivity extends Activity {
 		TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
 		sequenceTitleView.setText(sequence.getName());
 		ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
-		sequenceImageView.setImageDrawable(sequence.pictograms.get(0));
+		sequenceImageView.setImageDrawable(sequence.getPictograms().get(0));
 		
 		
 		initializeTopBar();

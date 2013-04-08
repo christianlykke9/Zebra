@@ -1,6 +1,8 @@
 package dk.aau.cs.giraf.zebra;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import android.graphics.drawable.Drawable;
@@ -12,7 +14,7 @@ import android.graphics.drawable.Drawable;
 public class Sequence {
 	private String name;
 	private Drawable image;
-	public List<Drawable> pictograms = new ArrayList<Drawable>();
+	private List<Drawable> pictograms = new ArrayList<Drawable>();
 	
 	public Sequence(String name) {
 		this.name = name;
@@ -32,6 +34,10 @@ public class Sequence {
 	
 	public void setImage(Drawable image) {
 		this.image = image;
+	}
+
+	public List<Drawable> getPictograms() {
+		return Collections.unmodifiableList(pictograms);
 	}
 	
 	/**
