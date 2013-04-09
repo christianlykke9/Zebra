@@ -4,3 +4,6 @@
 [submodule "libs/oasis-lib"]
 	path = libs/oasis-lib
 	url = http://cs-cust06-int.cs.aau.dk/git-ro/oasis-lib
+[submodule "source/OasisLib"]
+	path = source/OasisLib
+	url = http://cs-cust06-int.cs.aau.dk/git-ro/oasis-lib
