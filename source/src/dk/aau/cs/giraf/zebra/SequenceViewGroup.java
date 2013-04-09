@@ -57,7 +57,7 @@ public class SequenceViewGroup extends ViewGroup {
 	
 	public SequenceViewGroup(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		
+				
 		TypedArray a = context.obtainStyledAttributes(attrs,
 				R.styleable.SequenceViewGroup);
 		try {
@@ -71,8 +71,6 @@ public class SequenceViewGroup extends ViewGroup {
 		} finally {
 			a.recycle();
 		}
-		
-		setWillNotDraw(false);
 	}
 	
 	private int calcChildLeftPosition(int childIndex) {
@@ -384,6 +382,13 @@ public class SequenceViewGroup extends ViewGroup {
 				
 				// Highlight the selected pictogram
 				((SequenceImageView)dragging).liftUp();
+				
+				EditMode.toggle();
+				
+				for (int i = 0; i < this.getChildCount(); i++) {
+					this.getChildAt(i).invalidate();
+				}
+				
 				
 				requestDisallowInterceptTouchEvent(true);
 				

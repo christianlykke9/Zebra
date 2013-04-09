@@ -1,6 +1,7 @@
 package dk.aau.cs.giraf.zebra;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.View;
@@ -18,6 +19,8 @@ public class SequenceImageView extends RelativeLayout {
 	
 	public SequenceImageView(Context context) {
 		super(context);
+		
+		this.setWillNotDraw(false);
 		
 		this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		
@@ -72,5 +75,16 @@ public class SequenceImageView extends RelativeLayout {
 	public void setImageDrawable(Drawable drawable)
 	{
 		imageView.setImageDrawable(drawable);
+	}
+	
+	@Override
+	protected void onDraw(Canvas canvas) {
+		if (EditMode.get()) {
+			setDeleteButtonVisibility(View.VISIBLE);
+		} else {
+			setDeleteButtonVisibility(View.INVISIBLE);
+		}
+		
+		super.onDraw(canvas);
 	}
 }
