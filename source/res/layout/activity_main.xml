@@ -14,33 +14,33 @@
     tools:context=".SequenceActivity"
     android:focusableInTouchMode="true" >
 
-    <LinearLayout 
+    <RelativeLayout 
         android:id="@+id/sequence_bar"
         android:layout_width="match_parent"
         android:layout_height="100sp"
         android:orientation="horizontal"
-        android:background="#cccccc"
-        android:paddingLeft="15sp"
-        android:paddingRight="15sp">
+        android:background="#cccccc">
         
         <ImageView 
             android:id="@+id/sequence_image"
-            android:layout_width="70sp"
-            android:layout_height="70sp"
-            android:layout_gravity="left|center_vertical"
-            android:background="#ccccff" />
+            android:layout_width="100sp"
+            android:layout_height="100sp"
+            android:layout_centerVertical="true"
+            android:background="#ccccff"
+            android:paddingLeft="15sp"
+            android:paddingRight="15sp" />
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_marginLeft="15sp" >
+            android:layout_toLeftOf="@+id/imageButton1"
+            android:layout_toRightOf="@+id/sequence_image" >
             
             <EditText
                 android:id="@+id/sequence_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:background="#ffcccc"
                 android:singleLine="true"
                 android:inputType="text"
@@ -51,14 +51,22 @@
                 android:id="@+id/child_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:textColor="#909090"
                 android:background="#ffdfdf"
                 android:textSize="26sp" />
-            
         </LinearLayout>
 
-    </LinearLayout>
+        <ImageButton
+            android:id="@+id/imageButton1"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/btn_delete_pictogram_normal"
+            android:layout_alignParentRight="true"
+            android:paddingLeft="15sp"
+            android:paddingRight="15sp" />
+
+    </RelativeLayout>
     
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
