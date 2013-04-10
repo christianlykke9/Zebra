@@ -2,6 +2,7 @@ package dk.aau.cs.giraf.zebra;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -17,6 +18,8 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Transformation;
 import android.view.animation.TranslateAnimation;
+import android.widget.Adapter;
+import android.widget.AdapterView;
 
 /**
  * Layouts its children with fixed sizes and fixed spacing between each child in
@@ -24,7 +27,7 @@ import android.view.animation.TranslateAnimation;
  * 
  * TODO: Draw dragged on top
  */
-public class SequenceViewGroup extends ViewGroup {
+public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 
 	private final int DEFAULT_ITEM_WIDTH = 250;
 	private final int DEFAULT_ITEM_HEIGHT = 250;
@@ -32,12 +35,14 @@ public class SequenceViewGroup extends ViewGroup {
 	
 	private final int ANIMATION_TIME = 350;
 
+	//Layout
 	private int horizontalSpacing;
 	private int itemWidth;
 	private int itemHeight;
 
 	private int offsetY = 0;
-	
+
+	//Dragging data
 	private View dragging = null;
 	private int draggingIndex = -1;
 	private int curDragIndexPos = -1;
@@ -45,15 +50,17 @@ public class SequenceViewGroup extends ViewGroup {
 	private int centerOffset;
 	private int touchX = -1;
 	private int touchDeltaX = 0;
+	private boolean animatingDragReposition = false;
+	private int[] newPositions;
 	
+	//Mode handling
 	private boolean isInEditMode = false;
 	private View addNewPictoGramView = null;
 	
 	private OnRearrangeListener rearrangeListener = null;
 	
-	private boolean animatingDragReposition = false;
-	
-	private int[] newPositions;
+	private SequenceAdapter adapter;
+	private AdapterDataSetObserver observer;
 	
 	public SequenceViewGroup(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -71,6 +78,8 @@ public class SequenceViewGroup extends ViewGroup {
 		} finally {
 			a.recycle();
 		}
+		
+		observer = new AdapterDataSetObserver();
 	}
 	
 	private int calcChildLeftPosition(int childIndex) {
@@ -509,4 +518,41 @@ public class SequenceViewGroup extends ViewGroup {
 		}
 	}
 
+	@Override
+	public SequenceAdapter getAdapter() {
+		return adapter;
+	}
+
+	@Override
+	public View getSelectedView() {
+		return null; //TODO???
+	}
+
+	@Override
+	public void setAdapter(SequenceAdapter adapter) {
+		if (this.adapter != null) {
+			this.adapter.unregisterDataSetObserver(this.observer);
+		}
+		if (adapter != null) {
+			adapter.registerDataSetObserver(observer);
+		}
+	}
+	
+	@Override
+	public void setSelection(int position) {
+		return; //TODO ????
+	}
+	
+	private class AdapterDataSetObserver extends DataSetObserver {
+		
+		@Override
+		public void onChanged() {
+			
+		}
+		
+		@Override
+		public void onInvalidated() {
+			
+		}
+	}
 }
