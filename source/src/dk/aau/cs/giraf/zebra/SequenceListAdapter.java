@@ -11,12 +11,16 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class SequenceAdapter extends BaseAdapter {
+/**
+ * Adapter for a List of Sequences typically associated with a {@link Child}.
+ *
+ */
+public class SequenceListAdapter extends BaseAdapter {
 
 	private List<Sequence> items;
 	private LayoutInflater inflater;
 	
-	public SequenceAdapter(Activity activity, List<Sequence> items) {
+	public SequenceListAdapter(Activity activity, List<Sequence> items) {
 		
 		this.items = items;
 		this.inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

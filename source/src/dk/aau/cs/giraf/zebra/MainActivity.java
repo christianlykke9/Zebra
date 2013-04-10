@@ -29,7 +29,7 @@ public class MainActivity extends Activity {
 		childList.setAdapter(childAdapter);
 		
 		GridView sequenceGrid = (GridView)findViewById(R.id.sequence_grid);
-		final SequenceAdapter sequenceAdapter = new SequenceAdapter(this, sequences);
+		final SequenceListAdapter sequenceAdapter = new SequenceListAdapter(this, sequences);
 		sequenceGrid.setAdapter(sequenceAdapter);
 		
 		//Load Child sequences
