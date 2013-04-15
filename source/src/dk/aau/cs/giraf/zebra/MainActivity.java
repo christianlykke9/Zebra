@@ -10,19 +10,25 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
+import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
+import dk.aau.cs.giraf.oasis.lib.models.Profile;
 
 public class MainActivity extends Activity {
 
-	List<Child> children;
-	List<Sequence> sequences;
+	private List<Child> children;
+	private List<Sequence> sequences;
+	
+	private ProfilesHelper profileHelper;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_overview);
 		
+		profileHelper = new ProfilesHelper(this);
+		
 		children = getChildren();
-		sequences = getSequences();
+		sequences = getSequences(children.get(0));
 		
 		ListView childList = (ListView)findViewById(R.id.child_list);
 		final ChildAdapter childAdapter = new ChildAdapter(this, children);
@@ -35,11 +41,12 @@ public class MainActivity extends Activity {
 		//Load Child sequences
 		childList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+								
 				Child child = childAdapter.getItem(arg2);
+								
 				sequences.clear();
-				sequences.addAll(getSequencesForChild(child));
+				sequences.addAll(getSequences(child));
 				sequenceAdapter.notifyDataSetChanged();
 			}
 		});
@@ -48,10 +55,14 @@ public class MainActivity extends Activity {
 		sequenceGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				//Sequence sequence = sequenceAdapter.getItem(arg2);
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+				Sequence sequence = sequenceAdapter.getItem(arg2);
+				
 				Intent intent = new Intent(getApplication(), SequenceActivity.class);
+				
+				//TODO: LÆKKER MUSIK
+				//intent.putExtra("sequence", sequence);
+				
 				//TODO: Put sequence id in extras.
 				startActivity(intent);
 			}
@@ -60,32 +71,26 @@ public class MainActivity extends Activity {
 		
 	}
 
-	private List<Sequence> getSequences() {
-		/*ArrayList<Sequence> sequences = new ArrayList<Sequence>();
-		
-		for (int i = 0; i < 20; i++) {
-			Sequence sequence = new Sequence("Lækker musik");
-			sequence.setImage(getResources().getDrawable(R.drawable.steve));
-			sequences.add(sequence);
-		}
-		return sequences;*/
-		return Test.getSequences(this);
-	}
-	
-	private List<Sequence> getSequencesForChild(Child child) {
-		if (child == children.get(0))
-			return new ArrayList();
-		return getSequences();
+	private List<Sequence> getSequences(Child child) {
+		return child.getSequences();
 	}
 
 	private List<Child> getChildren() {
+		
+		List<Profile> profiles = profileHelper.getChildren();
+		
 		ArrayList<Child> children = new ArrayList<Child>();
 		
-		for (int i = 0; i < 20; i++) {
-			Child child = new Child("Sheryl Ann Cole");
-			child.setSequenceCount(23);
-			children.add(child);
+		int i = 3;
+		
+		for (Profile p : profiles) {
+			Child c = new Child(p);
+			children.add(c);
+			
+			c.setSequences(Test.getSequences(c, (i % 4), this));
+			i++;
 		}
+		
 		return children;
 	}
 }

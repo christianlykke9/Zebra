@@ -1,23 +1,46 @@
 package dk.aau.cs.giraf.zebra;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import android.graphics.drawable.Drawable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Represents a ordered collection (sequence) of drawables.
  *
  */
 public class Sequence {
+
 	private String name;
 	private Drawable image;
 	private List<Drawable> pictograms = new ArrayList<Drawable>();
+	private Child child;
+	private int sequenceId;
 	
-	public Sequence(String name) {
+	public Sequence(Child child, String name) {
+		this.child = child;
 		this.name = name;
+	}
+	
+	public int getSequenceId() {
+		return sequenceId;
+	}
+	
+	public void setSequenceId(int sequenceId) {
+		this.sequenceId = sequenceId;
+	}
+
+	public Child getChild() {
+		return child;
+	}
+	
+	public void setChild(Child child) {
+		this.child = child;
 	}
 	
 	public String getName() {

@@ -1,5 +1,8 @@
 package dk.aau.cs.giraf.zebra;
 
+import java.util.List;
+import java.util.Random;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -17,9 +20,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import dk.aau.cs.giraf.oasis.lib.Helper;
+import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
 import dk.aau.cs.giraf.oasis.lib.models.Profile;
 
 public class SequenceActivity extends Activity {
+	
+	private Sequence sequence;
+	
+	private ProfilesHelper profileHelper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,9 +36,22 @@ public class SequenceActivity extends Activity {
 		
 		SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
 		
-		//TODO: At some point use ID from extras to get right sequence
-		final Sequence sequence = Test.getSequences(this).get(0);
+//		sequence = getIntent().getParcelableExtra("sequence");
 		
+//		//TODO: MIDLERTIDIG MÅDE!!!! HENT FRA DATABASE
+//		long profileId = getIntent().getExtras().getLong("profileId");
+//		int sequenceId = getIntent().getExtras().getInt("sequenceId");
+//		
+		Profile p = new Profile();
+		p.setFirstname("Noah");
+		p.setMiddlename("");
+		p.setSurname("Nielsen");
+		
+		Child child = new Child(p);
+		
+		Random r = new Random();
+		sequence = Test.createSequence(child, r.nextInt(2) + 1, this);
+
 		for (Drawable pictogram : sequence.getPictograms()) {
 			SequenceImageView imageView = new SequenceImageView(getApplication());
 			imageView.setImageDrawable(pictogram);
@@ -101,19 +122,9 @@ public class SequenceActivity extends Activity {
 				
 			}
 		});
-		
-		// Get the childID parameter or choose default
-		long childId = 16; // Default child for debugging (Ida Christiansen)
-		Bundle extras = getIntent().getExtras();
-		if (extras != null) {       
-			childId = extras.getLong("currentChildId"); 
-		}
-		
-		// Get the full name from the database
-		String name = getFullNameFromProfileId(childId);
-		
-		TextView childName = (TextView) findViewById(R.id.child_name);
-		childName.setText(name);
+
+		TextView childName = (TextView)findViewById(R.id.child_name);
+		childName.setText(sequence.getChild().getName());
 	}
 	
 	public void hideSoftKeyboardFromView(View view) {
@@ -150,31 +161,5 @@ public class SequenceActivity extends Activity {
 	            createClearFocusListeners(innerView);
 	        }
 	    }
-	}
-	
-	private String addWordToString(String string, String word) {
-		if (word != null) {
-			if (!string.isEmpty())
-			{
-				string += " ";
-			}
-			string += word;
-		}
-		
-		return string;
-	}
-	
-	public String getFullNameFromProfileId(long profileId)
-	{
-        Helper helper = new Helper(SequenceActivity.this);
-		
-		Profile profile = helper.profilesHelper.getProfileById(profileId);
-		
-		String name = "";
-		name = addWordToString(name, profile.getFirstname());
-		name = addWordToString(name, profile.getMiddlename());
-		name = addWordToString(name, profile.getSurname());
-		
-		return name;
 	}
 }
