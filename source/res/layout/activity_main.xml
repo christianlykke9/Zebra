@@ -81,9 +81,9 @@
             android:id="@+id/sequenceViewGroup"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-          	svg:horizontalSpacing="100dp"
-          	svg:itemHeight="225dp"
-          	svg:itemWidth="225dp">
+          	svg:horizontalSpacing="20dp"
+          	svg:itemHeight="300dp"
+          	svg:itemWidth="300dp">
             
         </dk.aau.cs.giraf.zebra.SequenceViewGroup>
 

@@ -383,11 +383,6 @@ public class SequenceViewGroup extends ViewGroup {
 				// Highlight the selected pictogram
 				((PictogramView)dragging).liftUp();
 				
-				EditMode.toggle();
-				
-				for (int i = 0; i < this.getChildCount(); i++) {
-					this.getChildAt(i).invalidate();
-				}
 				
 				
 				requestDisallowInterceptTouchEvent(true);

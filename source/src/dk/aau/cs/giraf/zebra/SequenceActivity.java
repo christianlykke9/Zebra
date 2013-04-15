@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -77,6 +78,23 @@ public class SequenceActivity extends Activity {
 		
 		
 		initializeTopBar();
+		
+
+		
+		ImageButton button = (ImageButton) findViewById(R.id.imageButton1);
+		button.setOnClickListener(new ImageButton.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				EditMode.toggle();
+
+				SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
+				for (int i = 0; i < sequenceGroup.getChildCount(); i++) {
+					sequenceGroup.getChildAt(i).invalidate();
+				}
+			}
+		});
+		
 	}
 
 	@Override
