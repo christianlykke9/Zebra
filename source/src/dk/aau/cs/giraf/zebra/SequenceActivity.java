@@ -34,23 +34,25 @@ public class SequenceActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		profileHelper = new ProfilesHelper(this);
+		
 		SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
 		
 //		sequence = getIntent().getParcelableExtra("sequence");
 		
 //		//TODO: MIDLERTIDIG MÅDE!!!! HENT FRA DATABASE
-//		long profileId = getIntent().getExtras().getLong("profileId");
-//		int sequenceId = getIntent().getExtras().getInt("sequenceId");
+		long profileId = getIntent().getExtras().getLong("profileId");
+		int sequenceId = getIntent().getExtras().getInt("sequenceId");
+		
+		Profile p = profileHelper.getProfileById(profileId);
 //		
-		Profile p = new Profile();
-		p.setFirstname("Noah");
-		p.setMiddlename("");
-		p.setSurname("Nielsen");
+//		Profile p = new Profile();
+//		p.setFirstname("Noah");
+//		p.setMiddlename("");
+//		p.setSurname("Nielsen");
 		
 		Child child = new Child(p);
-		
-		Random r = new Random();
-		sequence = Test.createSequence(child, r.nextInt(2) + 1, this);
+		sequence = Test.createSequence(child, sequenceId, this);
 
 		for (Drawable pictogram : sequence.getPictograms()) {
 			RoundedImageView image = new RoundedImageView(this, 15f);

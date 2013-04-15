@@ -61,6 +61,8 @@ public class MainActivity extends Activity {
 				Intent intent = new Intent(getApplication(), SequenceActivity.class);
 				
 				//TODO: LÆKKER MUSIK
+				intent.putExtra("profileId", sequence.getChild().getProfile().getId());
+				intent.putExtra("sequenceId", sequence.getSequenceId());
 				//intent.putExtra("sequence", sequence);
 				
 				//TODO: Put sequence id in extras.
