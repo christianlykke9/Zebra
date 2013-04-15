@@ -53,10 +53,12 @@ public class SequenceActivity extends Activity {
 		sequence = Test.createSequence(child, r.nextInt(2) + 1, this);
 
 		for (Drawable pictogram : sequence.getPictograms()) {
-			SequenceImageView imageView = new SequenceImageView(getApplication());
-			imageView.setImageDrawable(pictogram);
-			imageView.setDeleteButtonVisibility(View.VISIBLE);
-			sequenceGroup.addView(imageView);
+			RoundedImageView image = new RoundedImageView(this, 15f);
+			image.setImageDrawable(pictogram);
+			
+			PictogramView pictogramView = new PictogramView(this, image, "Testing");
+			
+			sequenceGroup.addView(pictogramView);
 		}
 		
 		sequenceGroup.setOnRearrangeListener(new SequenceViewGroup.OnRearrangeListener() {

@@ -314,7 +314,7 @@ public class SequenceViewGroup extends ViewGroup {
 				handled = true;
 				
 				// Remove the highlight of the pictogram
-				((SequenceImageView)dragging).placeDown();
+				((PictogramView)dragging).placeDown();
 				
 				//Disallow movement when repositioning dragged view.
 				animatingDragReposition = true;
@@ -381,7 +381,7 @@ public class SequenceViewGroup extends ViewGroup {
 				handled = true;
 				
 				// Highlight the selected pictogram
-				((SequenceImageView)dragging).liftUp();
+				((PictogramView)dragging).liftUp();
 				
 				EditMode.toggle();
 				
