@@ -35,8 +35,12 @@ public class SequenceActivity extends Activity {
 			SequenceImageView imageView = new SequenceImageView(getApplication());
 			imageView.setImageDrawable(pictogram);
 			imageView.setDeleteButtonVisibility(View.VISIBLE);
-			sequenceGroup.addView(imageView);
+			//sequenceGroup.addView(imageView);
 		}
+		
+		final SequenceAdapter adapter = new SequenceAdapter(this, sequence);
+		sequenceGroup.setAdapter(adapter);
+		adapter.notifyDataSetChanged();
 		
 		sequenceGroup.setOnRearrangeListener(new SequenceViewGroup.OnRearrangeListener() {
 			@Override

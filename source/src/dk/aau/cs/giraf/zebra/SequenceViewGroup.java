@@ -1,5 +1,7 @@
 package dk.aau.cs.giraf.zebra;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
@@ -60,7 +62,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 	private OnRearrangeListener rearrangeListener = null;
 	
 	private SequenceAdapter adapter;
-	private AdapterDataSetObserver observer;
+	private AdapterDataSetObserver observer = new AdapterDataSetObserver();
 	
 	public SequenceViewGroup(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -78,8 +80,6 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		} finally {
 			a.recycle();
 		}
-		
-		observer = new AdapterDataSetObserver();
 	}
 	
 	private int calcChildLeftPosition(int childIndex) {
@@ -530,12 +530,21 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 
 	@Override
 	public void setAdapter(SequenceAdapter adapter) {
-		if (this.adapter != null) {
-			this.adapter.unregisterDataSetObserver(this.observer);
+		SequenceAdapter oldAdapter = this.adapter;
+		
+		if (oldAdapter == adapter) return;
+		
+		this.adapter = adapter;
+		
+		if (oldAdapter != null) {
+			oldAdapter.unregisterDataSetObserver(this.observer);
 		}
+		
 		if (adapter != null) {
-			adapter.registerDataSetObserver(observer);
+			adapter.registerDataSetObserver(this.observer);
 		}
+		
+		requestLayout();
 	}
 	
 	@Override
@@ -543,6 +552,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		return; //TODO ????
 	}
 	
+	//TODO: Currently ignores edit mode
 	private class AdapterDataSetObserver extends DataSetObserver {
 		
 		@Override
