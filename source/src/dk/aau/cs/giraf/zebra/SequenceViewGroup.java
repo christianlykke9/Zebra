@@ -1,7 +1,5 @@
 package dk.aau.cs.giraf.zebra;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
@@ -9,8 +7,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.Paint.Style;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,7 +18,6 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Transformation;
 import android.view.animation.TranslateAnimation;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 
 /**
@@ -101,7 +98,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		if (isDraggingRight) {
 			int checkIndex = curDragIndexPos + 1;
 			//Don't swap with  new sequence diagram view.
-			while (checkIndex < getDraggableChildCount() && dragCenterX > ((getCenterX(curDragIndexPos) + getCenterX(checkIndex)) / 2)) {
+			while (checkIndex < getCurrentSequenceViewCount() && dragCenterX > ((getCenterX(curDragIndexPos) + getCenterX(checkIndex)) / 2)) {
 				//Animate before swapping indices
 				doAnimateTranslation(checkIndex, curDragIndexPos);
 				swapIndexPositions(checkIndex, curDragIndexPos);
@@ -240,6 +237,10 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 	private void layoutChild(int i) {
 		View child = getChildAt(i);
 		
+		layoutChild(child, i);
+	}
+
+	private void layoutChild(View child, int i) {
 		int x = calcChildLeftPosition(i);
 		int y = calcChildTopPosition();
 		
@@ -248,10 +249,33 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 	
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		final int count = getChildCount();
-		for (int i = 0; i < count; i++) {
-			if (i == draggingIndex) continue;
-			layoutChild(i);
+		if (adapter == null) return;
+		final int adapterCount = adapter.getCount();
+		final int prevViewCount = getCurrentSequenceViewCount();
+		
+		int currentViewCount = prevViewCount;
+		
+		if (prevViewCount > adapterCount) {
+			removeViewsInLayout(adapterCount-1, prevViewCount - adapterCount);
+		}
+		
+		int currentIndex = 0;
+		for (; currentIndex < adapterCount; currentIndex++) {
+			if (currentIndex == draggingIndex) continue;
+			View oldView = null;
+			
+			//TODO: CHECK THIS
+			if (currentIndex < prevViewCount) {
+				oldView = getChildAt(currentIndex);
+			}
+			
+			View newView = adapter.getView(currentIndex, oldView, this);
+			if (oldView == null) {
+				addViewInLayout(newView, currentViewCount, generateDefaultLayoutParams());
+				currentViewCount++;
+			}
+				
+			layoutChild(newView, currentIndex);
 		}
 	}
 
@@ -277,13 +301,16 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		if (offsetY < 0)
 			offsetY = 0;
 
-		int numChildren = getChildCount();
+		//int numChildren = getChildCount();
+		int adapterCount = 0;
+		if (adapter != null)
+			adapterCount = adapter.getCount();
 
 		int width = getPaddingLeft() + getPaddingRight();
 
-		width += numChildren * itemWidth;
-		if (numChildren > 1) {
-			width += (numChildren - 1) * horizontalSpacing;
+		width += adapterCount * itemWidth;
+		if (adapterCount > 1) {
+			width += (adapterCount - 1) * horizontalSpacing;
 		}
 
 		int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(itemWidth,
@@ -291,7 +318,8 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(itemHeight,
 				MeasureSpec.EXACTLY);
 
-		for (int i = 0; i < numChildren; i++) {
+		int numViewChildren = getChildCount();
+		for (int i = 0; i < numViewChildren; i++) {
 			View child = getChildAt(i);
 			child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
 		}
@@ -340,22 +368,14 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 					@Override
 					public void onAnimationEnd(Animation animation) {
 						if (draggingIndex != curDragIndexPos) {
-							if (rearrangeListener != null)
-								rearrangeListener.onRearrange(draggingIndex, curDragIndexPos);
-							
-							//TODO: Something here causes flicker on the index originally moved
-							//Rearrange
-							View[] views = new View[getChildCount()];
-							for (int i = 0; i < newPositions.length; i++) {
-								views[i] = getChildAt(i);
+							final int childViews = getChildCount();
+							for (int i = 0; i < childViews; i++) {
 								getChildAt(i).clearAnimation();
 							}
-							removeAllViews();
-							for (int i = 0; i < newPositions.length; i++) {
-								addView(views[newPositions[i]]);
-							}
+							rearrangeListener.onRearrange(draggingIndex, curDragIndexPos);
+							layout(getLeft(), getTop(), getRight(), getBottom());
 							//This prevents lots of flicker
-							onLayout(true, getLeft(), getTop(), getRight(), getBottom());
+							//onLayout(false, getLeft(), getTop(), getRight(), getBottom());
 						} else {
 							//Must clear animation to prevent flicker - even though it just ended.
 							getChildAt(draggingIndex).clearAnimation();
@@ -397,7 +417,6 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				for (int i = 0; i < this.getChildCount(); i++) {
 					this.getChildAt(i).invalidate();
 				}
-				
 				
 				requestDisallowInterceptTouchEvent(true);
 				
@@ -476,45 +495,18 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		public void onRearrange(int indexFrom, int indexTo);
 	}
 	
-	private int getDraggableChildCount() {
-		return isInEditMode ? getChildCount() - 1 : getChildCount();
+	private int getCurrentSequenceViewCount() {
+		int numChildren = getChildCount();
+		if (numChildren > 0)
+			return isInEditMode ? numChildren - 1 : numChildren;
+		return 0;
 	}
 	
 	public void setEditModeEnabled(boolean editEnabled) {
 		if (isInEditMode != editEnabled) {
-			if (editEnabled) {
-				addNewPictoGramView = new View(getContext()) {
-					Paint paint = new Paint();
-					
-					@Override
-					protected void onDraw(Canvas canvas) {
-						super.onDraw(canvas);
-						paint.setColor(Color.RED);
-						paint.setStyle(Style.STROKE);
-						paint.setStrokeWidth(10f);
-						canvas.drawRect(5, 5, getMeasuredWidth()-5, getMeasuredHeight()-5, paint);
-						paint.setStrokeWidth(1);
-						paint.setColor(Color.BLUE);
-						canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), paint);
-					}
-				};
-				addView(addNewPictoGramView);
-			} else {
-				removeViewAt(getChildCount() - 1);
-				addNewPictoGramView = null;
-			}
-			
 			isInEditMode = editEnabled;
-			invalidate();
-		}
-	}
-	
-	//TODO: Check this for types
-	public void addNewPictogramAtEnd(View view) {
-		if (isInEditMode) {
-			addView(view, getChildCount()-1);
-		} else {
-			addView(view);
+			//TODO: Decice whats to be done here.
+			requestLayout();
 		}
 	}
 
@@ -552,17 +544,15 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		return; //TODO ????
 	}
 	
-	//TODO: Currently ignores edit mode
 	private class AdapterDataSetObserver extends DataSetObserver {
-		
 		@Override
 		public void onChanged() {
-			
+			requestLayout();
 		}
 		
 		@Override
 		public void onInvalidated() {
-			
+			setAdapter(null);
 		}
 	}
 }

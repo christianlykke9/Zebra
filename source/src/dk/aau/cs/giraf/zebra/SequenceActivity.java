@@ -40,12 +40,14 @@ public class SequenceActivity extends Activity {
 		
 		final SequenceAdapter adapter = new SequenceAdapter(this, sequence);
 		sequenceGroup.setAdapter(adapter);
-		adapter.notifyDataSetChanged();
+		
+		//sequenceGroup.setEditModeEnabled(true);
 		
 		sequenceGroup.setOnRearrangeListener(new SequenceViewGroup.OnRearrangeListener() {
 			@Override
 			public void onRearrange(int indexFrom, int indexTo) {
 				sequence.rearrange(indexFrom, indexTo);			
+				adapter.notifyDataSetChanged();
 			}
 		});
 		
