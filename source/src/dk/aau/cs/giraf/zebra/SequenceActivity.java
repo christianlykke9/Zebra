@@ -1,11 +1,7 @@
 package dk.aau.cs.giraf.zebra;
 
-import java.util.List;
-import java.util.Random;
-
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -20,9 +16,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import dk.aau.cs.giraf.oasis.lib.Helper;
 import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
 import dk.aau.cs.giraf.oasis.lib.models.Profile;
+import dk.aau.cs.giraf.zebra.EditMode.EditModeObserver;
 
 public class SequenceActivity extends Activity {
 	
@@ -37,10 +33,10 @@ public class SequenceActivity extends Activity {
 		
 		profileHelper = new ProfilesHelper(this);
 		
-		SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
+		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
 		
 //		sequence = getIntent().getParcelableExtra("sequence");
-		
+
 //		//TODO: MIDLERTIDIG MÅDE!!!! HENT FRA DATABASE
 		long profileId = getIntent().getExtras().getLong("profileId");
 		int sequenceId = getIntent().getExtras().getInt("sequenceId");
@@ -52,22 +48,24 @@ public class SequenceActivity extends Activity {
 //		p.setMiddlename("");
 //		p.setSurname("Nielsen");
 		
-		Child child = new Child(p);
+		final Child child = new Child(p);
 		sequence = Test.createSequence(child, sequenceId, this);
-
-		for (Drawable pictogram : sequence.getPictograms()) {
-			RoundedImageView image = new RoundedImageView(this, 15f);
-			image.setImageDrawable(pictogram);
+		
+		final SequenceAdapter adapter = new SequenceAdapter(this, sequence);
+		sequenceGroup.setAdapter(adapter);
+		EditMode.getInstance().registerObserver(new EditModeObserver() {
 			
-			PictogramView pictogramView = new PictogramView(this, image, "Testing");
-			
-			sequenceGroup.addView(pictogramView);
-		}
+			@Override
+			public void onEditModeChange(boolean editMode) {
+				sequenceGroup.setEditModeEnabled(editMode);				
+			}
+		});
 		
 		sequenceGroup.setOnRearrangeListener(new SequenceViewGroup.OnRearrangeListener() {
 			@Override
 			public void onRearrange(int indexFrom, int indexTo) {
 				sequence.rearrange(indexFrom, indexTo);			
+				adapter.notifyDataSetChanged();
 			}
 		});
 		
@@ -76,12 +74,10 @@ public class SequenceActivity extends Activity {
 		ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
 		sequenceImageView.setImageDrawable(sequence.getPictograms().get(0));
 		
-		
 		initializeTopBar();
 		
-
-		
 		ImageButton button = (ImageButton) findViewById(R.id.imageButton1);
+		
 		button.setOnClickListener(new ImageButton.OnClickListener() {
 			
 			@Override
@@ -104,8 +100,6 @@ public class SequenceActivity extends Activity {
 		
 		return true;
 	}
-	
-	
 	
 	private void initializeTopBar() {
         TextView editText = (TextView) findViewById(R.id.sequence_title);
@@ -132,16 +126,13 @@ public class SequenceActivity extends Activity {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if (!hasFocus)
-				{
-					
+				{	
                     EditText editText = (EditText) findViewById(R.id.sequence_title);
 		        	
-                    
                     hideSoftKeyboardFromView(editText);
                     
                     // TODO Save changes in the title
 				}
-				
 			}
 		});
 

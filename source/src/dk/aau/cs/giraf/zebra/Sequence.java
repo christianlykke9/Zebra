@@ -1,14 +1,10 @@
 package dk.aau.cs.giraf.zebra;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import android.graphics.drawable.Drawable;
-import android.os.Parcel;
-import android.os.Parcelable;
 
 /**
  * Represents a ordered collection (sequence) of drawables.

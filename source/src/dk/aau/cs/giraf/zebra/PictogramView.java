@@ -1,16 +1,13 @@
 package dk.aau.cs.giraf.zebra;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 /**
@@ -26,9 +23,8 @@ public class PictogramView extends RelativeLayout {
 	private ImageView pictogram;
 	private TextView title;
 	private ImageButton deleteButton;
-	private boolean isLifted = false;
 	
-	
+	private boolean isInEditMode = false;
 	
 	public PictogramView(Context context) {
 		super(context);
@@ -41,17 +37,13 @@ public class PictogramView extends RelativeLayout {
 
 	public PictogramView(Context context, ImageView image) {
 		super(context);
-		
 		initialize(context, image, null);
 	}
 	
 	public PictogramView(Context context, ImageView image, String string) {
 		super(context);
-		
 		initialize(context, image, string);
 	}
-	
-	
 	
 	private void initialize(Context context, ImageView image, String string) {
 		this.setWillNotDraw(false);
@@ -60,9 +52,7 @@ public class PictogramView extends RelativeLayout {
 		
 		initializeImageView(image);
 		initializeDeleteButton();
-		//this.addView(topBox);
-		
-		//initializeTextView(string);
+		setDeleteButtonVisible(false);
 	}
 	
 	private void initializeImageView(ImageView image) {
@@ -74,6 +64,7 @@ public class PictogramView extends RelativeLayout {
 		addView(pictogram);
 	}
 	
+	//TODO: What about this
 	private void initializeTextView(String string) {
 		if (string != null) {
 			title = new TextView(getContext());
@@ -93,36 +84,40 @@ public class PictogramView extends RelativeLayout {
 		addView(deleteButton);
 	}
 	
-	
-	
 	public void liftUp() {
-		isLifted = true;
 		pictogram.setScaleX(HIGHLIGHT_SCALE);
         pictogram.setScaleY(HIGHLIGHT_SCALE);
 		this.setAlpha(0.7f);
+		setDeleteButtonVisible(false);
+		invalidate();
 	}
 	
 	public void placeDown() {
-		isLifted = false;
 		pictogram.setScaleX(NORMAL_SCALE);
         pictogram.setScaleY(NORMAL_SCALE);
 		this.setAlpha(1.0f);
+		setDeleteButtonVisible(isInEditMode);
+		invalidate();
 	}
 	
+	private void setDeleteButtonVisible(boolean visible) {
+		deleteButton.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+		invalidate();
+	}
 	
-	
-	@Override
-	protected void onDraw(Canvas canvas) {
-		if (isLifted) {
-			deleteButton.setVisibility(View.INVISIBLE);
-		} else {
-			if (EditMode.get()) {
-				deleteButton.setVisibility(View.VISIBLE);
-			} else {
-				deleteButton.setVisibility(View.INVISIBLE);
-			}
+	public void setEditModeEnabled(boolean editMode) {
+		if (editMode != isInEditMode) {
+			isInEditMode = editMode;
+			setDeleteButtonVisible(editMode);
 		}
-		
-		super.onDraw(canvas);
 	}
+	
+	public boolean getEditModeEnabled() {
+		return isInEditMode;
+	}
+
+	public void setImage(Drawable drawable) {
+		pictogram.setImageDrawable(drawable);
+	}
+	
 }
