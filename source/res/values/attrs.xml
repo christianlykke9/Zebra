@@ -5,4 +5,8 @@
         <attr name="itemHeight" format="dimension" />
         <attr name="itemWidth" format="dimension" />
     </declare-styleable>
+    
+    <declare-styleable name="RoundedImageView">
+        <attr name="cornerRadius" format="dimension" />
+    </declare-styleable>
 </resources>

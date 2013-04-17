@@ -1,6 +1,7 @@
 package dk.aau.cs.giraf.zebra;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -11,6 +12,8 @@ import android.widget.ImageView;
 
 public class RoundedImageView extends ImageView {
 	
+	private static final int DEFAULT_CORNER_RADIUS = 10;
+	
 	private float cornerRadius;
  
     public RoundedImageView(Context context, float radius) {
@@ -19,11 +22,18 @@ public class RoundedImageView extends ImageView {
         cornerRadius = radius;
         ensureClipPathSupport();
     }
+    
+    public RoundedImageView(Context context, AttributeSet attrs) {
+    	super(context, attrs);
+    	
+		cornerRadius = getCornerRadius(context, attrs);
+		ensureClipPathSupport();
+    }
  
     public RoundedImageView(Context context, AttributeSet attrs, float radius) {
-        super(context, attrs);
+        this(context, attrs);
         
-        cornerRadius = radius;
+        cornerRadius = getCornerRadius(context, attrs);
         ensureClipPathSupport();
     }
  
@@ -33,6 +43,21 @@ public class RoundedImageView extends ImageView {
         cornerRadius = radius;
         ensureClipPathSupport();
     }
+    
+	private int getCornerRadius(Context context, AttributeSet attrs) {
+		int cornerRadius = DEFAULT_CORNER_RADIUS;
+		
+		TypedArray a = context.obtainStyledAttributes(attrs,
+				R.styleable.RoundedImageView);
+		try {
+			cornerRadius = a.getDimensionPixelSize(
+					R.styleable.RoundedImageView_cornerRadius, DEFAULT_CORNER_RADIUS);
+		} finally {
+			a.recycle();
+		}
+		
+		return cornerRadius;
+	}
     
     private void ensureClipPathSupport()
     {
