@@ -33,7 +33,7 @@
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_toLeftOf="@+id/imageButton1"
+            android:layout_toLeftOf="@+id/edit_mode_toggle"
             android:layout_toRightOf="@+id/sequence_image" >
             
             <EditText
@@ -44,7 +44,8 @@
                 android:inputType="text"
                 android:singleLine="true"
                 android:textSize="48sp"
-                android:textColor="#624319" />
+                android:textColor="#624319"
+                android:gravity="center" />
             
             <TextView
                 android:id="@+id/child_name"
@@ -53,19 +54,21 @@
                 android:textSize="26sp"
                 android:textIsSelectable="true"
                 android:textColor="#624319"
-                android:alpha="0.4" />
+                android:alpha="0.4"
+                android:gravity="center" />
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/imageButton1"
+        <ToggleButton
+            android:id="@+id/edit_mode_toggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:background="@null"
-            android:paddingLeft="10sp"
-            android:paddingRight="10sp"
-            android:src="@drawable/edit_mode" />
+            android:background="@layout/edit_mode_button"
+            android:textOn=""
+            android:textOff=""
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp" />
 
     </RelativeLayout>
     
@@ -82,8 +85,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
           	svg:horizontalSpacing="20dp"
-          	svg:itemHeight="300dp"
-          	svg:itemWidth="300dp">
+          	svg:itemHeight="@dimen/activity_main_picto_size"
+          	svg:itemWidth="@dimen/activity_main_picto_size">
             
         </dk.aau.cs.giraf.zebra.SequenceViewGroup>
 

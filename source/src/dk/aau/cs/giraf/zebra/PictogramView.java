@@ -1,21 +1,22 @@
 package dk.aau.cs.giraf.zebra;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
 /**
- * Contains a pictogram and a string.
+ * Contains a pictogram and a title.
  * The view will display a delete button in the corner when the application is in editmode.
  * It also adds support for highlighting.
  */
-public class PictogramView extends RelativeLayout {
+public class PictogramView extends LinearLayout {
 	
 	private final float NORMAL_SCALE = 0.8f;
 	private final float HIGHLIGHT_SCALE = 0.9f;
@@ -37,52 +38,68 @@ public class PictogramView extends RelativeLayout {
 
 	public PictogramView(Context context, ImageView image) {
 		super(context);
+		
 		initialize(context, image, null);
 	}
 	
 	public PictogramView(Context context, ImageView image, String string) {
 		super(context);
+		
 		initialize(context, image, string);
 	}
 	
+	
+	
 	private void initialize(Context context, ImageView image, String string) {
 		this.setWillNotDraw(false);
-		
+		this.setOrientation(LinearLayout.VERTICAL);
 		this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		
-		initializeImageView(image);
-		initializeDeleteButton();
-		setDeleteButtonVisible(false);
+		SquaredRelativeLayout square = new SquaredRelativeLayout(context);
+		square.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		
+		square.addView(createImageView(image));
+		square.addView(createDeleteButton());
+		
+		this.addView(square);
+		
+
+		if (string != null) {
+			this.addView(createTextView(string));
+		}
 	}
 	
-	private void initializeImageView(ImageView image) {
+	private View createImageView(ImageView image) {
 		pictogram = image;
 		pictogram.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		pictogram.setScaleX(NORMAL_SCALE);
 		pictogram.setScaleY(NORMAL_SCALE);
 		
-		addView(pictogram);
+		return pictogram;
 	}
 	
-	//TODO: What about this
-	private void initializeTextView(String string) {
-		if (string != null) {
-			title = new TextView(getContext());
-			title.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-			title.setText(string);
-			
-			this.addView(title);
-		}
+	private View createTextView(String string) {
+		title = new TextView(getContext());
+		title.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+		title.setGravity(Gravity.CENTER_HORIZONTAL);
+
+		title.setText(string);
+		title.setTextSize(26f);
+		
+		return title;
 	}
 	
-	private void initializeDeleteButton() {
+	private View createDeleteButton() {
 		deleteButton = new ImageButton(getContext());
 		deleteButton.setImageResource(R.layout.selector_delete_pictogram);
 		deleteButton.setBackgroundColor(Color.TRANSPARENT);
 		deleteButton.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        setDeleteButtonVisible(false);
 		
-		addView(deleteButton);
+		return deleteButton;
 	}
+	
+	
 	
 	public void liftUp() {
 		pictogram.setScaleX(HIGHLIGHT_SCALE);
