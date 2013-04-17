@@ -3,6 +3,8 @@ package dk.aau.cs.giraf.zebra;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.dom.Text;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.TextView;
 import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
 import dk.aau.cs.giraf.oasis.lib.models.Profile;
 
@@ -44,7 +47,9 @@ public class MainActivity extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 								
 				Child child = childAdapter.getItem(arg2);
-								
+				
+				((TextView)findViewById(R.id.child_name)).setText(child.getName());
+
 				sequences.clear();
 				sequences.addAll(getSequences(child));
 				sequenceAdapter.notifyDataSetChanged();

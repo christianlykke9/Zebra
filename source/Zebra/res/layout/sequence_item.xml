@@ -4,12 +4,11 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
  
-    <ImageView
+    <dk.aau.cs.giraf.zebra.RoundedImageView
         android:id="@+id/image"
         android:layout_width="@dimen/activity_overview_picto_size"
         android:layout_height="@dimen/activity_overview_picto_size"
-        android:background="#dddddd"
-        android:padding="5dp"
+        
         android:layout_gravity="center_horizontal" />
     
     <TextView
