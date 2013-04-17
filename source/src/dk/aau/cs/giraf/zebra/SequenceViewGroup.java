@@ -506,7 +506,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		if (isInEditMode != editEnabled) {
 			isInEditMode = editEnabled;
 			
-			//TODO: Decice whats to be done here.
+			//TODO: Decide whats to be done here.
 			requestLayout();
 		}
 	}

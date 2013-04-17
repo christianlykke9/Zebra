@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
 import dk.aau.cs.giraf.oasis.lib.models.Profile;
+import dk.aau.cs.giraf.zebra.EditMode.EditModeObserver;
 
 public class SequenceActivity extends Activity {
 	
@@ -32,7 +33,7 @@ public class SequenceActivity extends Activity {
 		
 		profileHelper = new ProfilesHelper(this);
 		
-		SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
+		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
 		
 //		sequence = getIntent().getParcelableExtra("sequence");
 
@@ -47,11 +48,18 @@ public class SequenceActivity extends Activity {
 //		p.setMiddlename("");
 //		p.setSurname("Nielsen");
 		
-		Child child = new Child(p);
+		final Child child = new Child(p);
 		sequence = Test.createSequence(child, sequenceId, this);
 		
 		final SequenceAdapter adapter = new SequenceAdapter(this, sequence);
 		sequenceGroup.setAdapter(adapter);
+		EditMode.getInstance().registerObserver(new EditModeObserver() {
+			
+			@Override
+			public void onEditModeChange(boolean editMode) {
+				sequenceGroup.setEditModeEnabled(editMode);				
+			}
+		});
 		
 		sequenceGroup.setOnRearrangeListener(new SequenceViewGroup.OnRearrangeListener() {
 			@Override
@@ -69,6 +77,7 @@ public class SequenceActivity extends Activity {
 		initializeTopBar();
 		
 		ImageButton button = (ImageButton) findViewById(R.id.imageButton1);
+		
 		button.setOnClickListener(new ImageButton.OnClickListener() {
 			
 			@Override
@@ -117,16 +126,13 @@ public class SequenceActivity extends Activity {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if (!hasFocus)
-				{
-					
+				{	
                     EditText editText = (EditText) findViewById(R.id.sequence_title);
 		        	
-                    
                     hideSoftKeyboardFromView(editText);
                     
                     // TODO Save changes in the title
 				}
-				
 			}
 		});
 

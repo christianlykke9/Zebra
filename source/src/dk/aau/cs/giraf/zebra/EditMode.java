@@ -17,6 +17,10 @@ public class EditMode extends Observable<EditMode.EditModeObserver> {
 	public static boolean get() {
 		return instance.editMode;
 	}
+	
+	public static EditMode getInstance() {
+		return instance;
+	}
 
 	public static void set(boolean mode) {
 		if (mode != instance.editMode) {
