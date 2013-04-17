@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 import android.widget.TextView.OnEditorActionListener;
 import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
 import dk.aau.cs.giraf.oasis.lib.models.Profile;
@@ -76,7 +77,7 @@ public class SequenceActivity extends Activity {
 		
 		initializeTopBar();
 		
-		ImageButton button = (ImageButton) findViewById(R.id.imageButton1);
+		ToggleButton button = (ToggleButton) findViewById(R.id.edit_mode_toggle);
 		
 		button.setOnClickListener(new ImageButton.OnClickListener() {
 			

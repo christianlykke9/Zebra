@@ -375,9 +375,9 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 								getChildAt(i).clearAnimation();
 							}
 							rearrangeListener.onRearrange(draggingIndex, curDragIndexPos);
-							layout(getLeft(), getTop(), getRight(), getBottom());
+							//layout(getLeft(), getTop(), getRight(), getBottom());
 							//This prevents lots of flicker
-							//onLayout(false, getLeft(), getTop(), getRight(), getBottom());
+							onLayout(true, getLeft(), getTop(), getRight(), getBottom());
 						} else {
 							//Must clear animation to prevent flicker - even though it just ended.
 							getChildAt(draggingIndex).clearAnimation();
