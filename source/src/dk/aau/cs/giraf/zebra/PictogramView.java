@@ -1,9 +1,9 @@
 package dk.aau.cs.giraf.zebra;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -21,7 +21,7 @@ public class PictogramView extends LinearLayout {
 	private final float NORMAL_SCALE = 0.8f;
 	private final float HIGHLIGHT_SCALE = 0.9f;
 	
-	private ImageView pictogram;
+	private RoundedImageView pictogram;
 	private TextView title;
 	private ImageButton deleteButton;
 	
@@ -30,47 +30,37 @@ public class PictogramView extends LinearLayout {
 	public PictogramView(Context context) {
 		super(context);
 		
-		ImageView image = new ImageView(getContext());
-		image.setBackgroundColor(Color.GREEN);
-		
-		initialize(context, image, "Test-pictogram");
+		initialize(context, 0);
 	}
 
-	public PictogramView(Context context, ImageView image) {
+	public PictogramView(Context context, float radius) {
 		super(context);
 		
-		initialize(context, image, null);
-	}
-	
-	public PictogramView(Context context, ImageView image, String string) {
-		super(context);
-		
-		initialize(context, image, string);
+		initialize(context, radius);
 	}
 	
 	
 	
-	private void initialize(Context context, ImageView image, String string) {
+	private void initialize(Context context, float radius) {
 		this.setWillNotDraw(false);
 		this.setOrientation(LinearLayout.VERTICAL);
 		this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		
+		
 		SquaredRelativeLayout square = new SquaredRelativeLayout(context);
 		square.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		
-		square.addView(createImageView(image));
+		square.addView(createImageView(radius));
 		square.addView(createDeleteButton());
+		
 		
 		this.addView(square);
 		
-
-		if (string != null) {
-			this.addView(createTextView(string));
-		}
+		this.addView(createTextView());
 	}
 	
-	private View createImageView(ImageView image) {
-		pictogram = image;
+	private View createImageView(float radius) {
+		pictogram = new RoundedImageView(getContext(), radius);
 		pictogram.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		pictogram.setScaleX(NORMAL_SCALE);
 		pictogram.setScaleY(NORMAL_SCALE);
@@ -78,12 +68,10 @@ public class PictogramView extends LinearLayout {
 		return pictogram;
 	}
 	
-	private View createTextView(String string) {
+	private View createTextView() {
 		title = new TextView(getContext());
 		title.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		title.setGravity(Gravity.CENTER_HORIZONTAL);
-
-		title.setText(string);
 		title.setTextSize(26f);
 		
 		return title;
@@ -137,4 +125,8 @@ public class PictogramView extends LinearLayout {
 		pictogram.setImageDrawable(drawable);
 	}
 	
+	public void setTitle(String newTitle)
+	{
+		title.setText(newTitle);
+	}
 }
