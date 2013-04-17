@@ -31,17 +31,8 @@ public class SequenceActivity extends Activity {
 		//TODO: At some point use ID from extras to get right sequence
 		final Sequence sequence = Test.getSequences(this).get(0);
 		
-		for (Drawable pictogram : sequence.getPictograms()) {
-			SequenceImageView imageView = new SequenceImageView(getApplication());
-			imageView.setImageDrawable(pictogram);
-			imageView.setDeleteButtonVisibility(View.VISIBLE);
-			//sequenceGroup.addView(imageView);
-		}
-		
 		final SequenceAdapter adapter = new SequenceAdapter(this, sequence);
 		sequenceGroup.setAdapter(adapter);
-		
-		//sequenceGroup.setEditModeEnabled(true);
 		
 		sequenceGroup.setOnRearrangeListener(new SequenceViewGroup.OnRearrangeListener() {
 			@Override

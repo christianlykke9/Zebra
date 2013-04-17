@@ -1,7 +1,6 @@
 package dk.aau.cs.giraf.zebra;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.View;
@@ -16,6 +15,7 @@ public class SequenceImageView extends RelativeLayout {
 	
 	private RoundedImageView imageView;
 	private ImageButton deleteButton;
+	private boolean inEditMode = false;
 	
 	public SequenceImageView(Context context) {
 		super(context);
@@ -30,13 +30,8 @@ public class SequenceImageView extends RelativeLayout {
 	
 	private int deleteButtonVisibility = View.INVISIBLE;
 	
-	public void setDeleteButtonVisibility(int visibility) {
-		deleteButtonVisibility = visibility;
-		deleteButton.setVisibility(visibility);
-	}
-	
-	public int getDeleteButtonVisibility() {
-		return deleteButtonVisibility;
+	private void setDeleteButtonVisible(boolean visible) {
+		deleteButton.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
 	}
 	
 	public void liftUp() {
@@ -44,6 +39,7 @@ public class SequenceImageView extends RelativeLayout {
 		imageView.setScaleX(HIGHLIGHT_SCALE);
         imageView.setScaleY(HIGHLIGHT_SCALE);
 		this.setAlpha(0.7f);
+		invalidate();
 	}
 	
 	public void placeDown() {
@@ -51,6 +47,7 @@ public class SequenceImageView extends RelativeLayout {
 		imageView.setScaleX(NORMAL_SCALE);
         imageView.setScaleY(NORMAL_SCALE);
 		this.setAlpha(1.0f);
+		invalidate();
 	}
 	
 	private void initializeDeleteButton() {
@@ -77,14 +74,15 @@ public class SequenceImageView extends RelativeLayout {
 		imageView.setImageDrawable(drawable);
 	}
 	
-	@Override
-	protected void onDraw(Canvas canvas) {
-		if (EditMode.get()) {
-			setDeleteButtonVisibility(View.VISIBLE);
-		} else {
-			setDeleteButtonVisibility(View.INVISIBLE);
+	public void setEditModeEnabled(boolean editMode) {
+		if (editMode != inEditMode) {
+			inEditMode = editMode;
+			setDeleteButtonVisible(editMode);
+			invalidate();
 		}
-		
-		super.onDraw(canvas);
+	}
+	
+	public boolean getEditModeEnabled() {
+		return inEditMode;
 	}
 }
