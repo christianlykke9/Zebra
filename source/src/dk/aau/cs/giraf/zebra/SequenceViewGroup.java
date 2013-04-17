@@ -269,8 +269,8 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			}
 			
 			View newView = adapter.getView(currentIndex, oldView, this);
-			if (newView instanceof SequenceImageView) {
-				((SequenceImageView)newView).setEditModeEnabled(isInEditMode);
+			if (newView instanceof PictogramView) {
+				((PictogramView)newView).setEditModeEnabled(isInEditMode);
 			}
 
 			if (oldView == null) {
@@ -353,7 +353,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				handled = true;
 				
 				// Remove the highlight of the pictogram
-				((SequenceImageView)dragging).placeDown();
+				((PictogramView)dragging).placeDown();
 				
 				//Disallow movement when repositioning dragged view.
 				animatingDragReposition = true;
@@ -412,7 +412,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				handled = true;
 				
 				// Highlight the selected pictogram
-				((SequenceImageView)dragging).liftUp();
+				((PictogramView)dragging).liftUp();
 				
 				for (int i = 0; i < this.getChildCount(); i++) {
 					this.getChildAt(i).invalidate();

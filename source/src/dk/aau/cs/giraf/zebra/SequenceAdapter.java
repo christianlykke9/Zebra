@@ -46,13 +46,14 @@ public class SequenceAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		
-		SequenceImageView view;
+		PictogramView view;
 		
 		if (convertView == null) {
-			view = new SequenceImageView(context);
+			view = new PictogramView(context);
 		} else
-			view = (SequenceImageView)convertView;
-		view.setImageDrawable(sequence.getPictograms().get(position));
+			view = (PictogramView)convertView;
+		
+		view.setImage(sequence.getPictograms().get(position));
 		
 		return view;
 	}

@@ -4,6 +4,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,10 +35,12 @@ public class ChildAdapter extends BaseAdapter {
         ImageView childImage = (ImageView)v.findViewById(R.id.child_image);
  
         Child c = items.get(position);
- 
+
+        Drawable profilePicture = Drawable.createFromPath(c.getProfile().getPicture());
+        
         nameTextView.setText(c.getName());
         countTextView.setText(c.getSequenceCount() + " sekvenser");
-        childImage.setImageDrawable(c.getImage());
+        childImage.setImageDrawable(profilePicture);
         return v;
     }
 
@@ -53,6 +56,6 @@ public class ChildAdapter extends BaseAdapter {
 	
 	@Override
 	public long getItemId(int position) {
-        return position;
+        return getItem(position).getProfile().getId();
     }
 }

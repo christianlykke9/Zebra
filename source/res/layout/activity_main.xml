@@ -5,7 +5,7 @@
     xmlns:svg="http://schemas.android.com/apk/res/dk.aau.cs.giraf.zebra"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_bagground"
+    android:background="@drawable/main_gradient_bg"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -17,16 +17,15 @@
     <RelativeLayout 
         android:id="@+id/sequence_bar"
         android:layout_width="match_parent"
-        android:layout_height="100sp"
+        android:layout_height="140sp"
         android:orientation="horizontal"
-        android:background="#cccccc">
+        android:background="@drawable/main_topbar_gradient_bg">
         
         <ImageView 
             android:id="@+id/sequence_image"
-            android:layout_width="100sp"
-            android:layout_height="100sp"
+            android:layout_width="120sp"
+            android:layout_height="120sp"
             android:layout_centerVertical="true"
-            android:background="#ccccff"
             android:paddingLeft="15sp"
             android:paddingRight="15sp" />
 
@@ -41,30 +40,32 @@
                 android:id="@+id/sequence_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#ffcccc"
-                android:singleLine="true"
-                android:inputType="text"
                 android:imeOptions="actionDone"
-                android:textSize="48sp" />
+                android:inputType="text"
+                android:singleLine="true"
+                android:textSize="48sp"
+                android:textColor="#624319" />
             
             <TextView
                 android:id="@+id/child_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#909090"
-                android:background="#ffdfdf"
-                android:textSize="26sp" />
+                android:textSize="26sp"
+                android:textIsSelectable="true"
+                android:textColor="#624319"
+                android:alpha="0.4" />
         </LinearLayout>
 
         <ImageButton
             android:id="@+id/imageButton1"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_centerVertical="true"
-            android:src="@drawable/btn_delete_pictogram_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:paddingLeft="15sp"
-            android:paddingRight="15sp" />
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp"
+            android:src="@drawable/edit_mode" />
 
     </RelativeLayout>
     
@@ -73,15 +74,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="0dp"
+        android:overScrollMode="always"
         android:padding="0dp" >
 
         <dk.aau.cs.giraf.zebra.SequenceViewGroup
             android:id="@+id/sequenceViewGroup"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-          	svg:horizontalSpacing="100dp"
-          	svg:itemHeight="225dp"
-          	svg:itemWidth="225dp">
+          	svg:horizontalSpacing="20dp"
+          	svg:itemHeight="300dp"
+          	svg:itemWidth="300dp">
             
         </dk.aau.cs.giraf.zebra.SequenceViewGroup>
 

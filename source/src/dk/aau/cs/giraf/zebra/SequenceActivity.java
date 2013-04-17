@@ -12,23 +12,43 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import dk.aau.cs.giraf.oasis.lib.Helper;
+import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
 import dk.aau.cs.giraf.oasis.lib.models.Profile;
 
 public class SequenceActivity extends Activity {
+	
+	private Sequence sequence;
+	
+	private ProfilesHelper profileHelper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		profileHelper = new ProfilesHelper(this);
+		
 		SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
 		
-		//TODO: At some point use ID from extras to get right sequence
-		final Sequence sequence = Test.getSequences(this).get(0);
+//		sequence = getIntent().getParcelableExtra("sequence");
+
+//		//TODO: MIDLERTIDIG MÅDE!!!! HENT FRA DATABASE
+		long profileId = getIntent().getExtras().getLong("profileId");
+		int sequenceId = getIntent().getExtras().getInt("sequenceId");
+		
+		Profile p = profileHelper.getProfileById(profileId);
+//		
+//		Profile p = new Profile();
+//		p.setFirstname("Noah");
+//		p.setMiddlename("");
+//		p.setSurname("Nielsen");
+		
+		Child child = new Child(p);
+		sequence = Test.createSequence(child, sequenceId, this);
 		
 		final SequenceAdapter adapter = new SequenceAdapter(this, sequence);
 		sequenceGroup.setAdapter(adapter);
@@ -46,8 +66,22 @@ public class SequenceActivity extends Activity {
 		ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
 		sequenceImageView.setImageDrawable(sequence.getPictograms().get(0));
 		
-		
 		initializeTopBar();
+		
+		ImageButton button = (ImageButton) findViewById(R.id.imageButton1);
+		button.setOnClickListener(new ImageButton.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				EditMode.toggle();
+
+				SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
+				for (int i = 0; i < sequenceGroup.getChildCount(); i++) {
+					sequenceGroup.getChildAt(i).invalidate();
+				}
+			}
+		});
+		
 	}
 
 	@Override
@@ -57,8 +91,6 @@ public class SequenceActivity extends Activity {
 		
 		return true;
 	}
-	
-	
 	
 	private void initializeTopBar() {
         TextView editText = (TextView) findViewById(R.id.sequence_title);
@@ -97,19 +129,9 @@ public class SequenceActivity extends Activity {
 				
 			}
 		});
-		
-		// Get the childID parameter or choose default
-		long childId = 16; // Default child for debugging (Ida Christiansen)
-		Bundle extras = getIntent().getExtras();
-		if (extras != null) {       
-			childId = extras.getLong("currentChildId"); 
-		}
-		
-		// Get the full name from the database
-		String name = getFullNameFromProfileId(childId);
-		
-		TextView childName = (TextView) findViewById(R.id.child_name);
-		childName.setText(name);
+
+		TextView childName = (TextView)findViewById(R.id.child_name);
+		childName.setText(sequence.getChild().getName());
 	}
 	
 	public void hideSoftKeyboardFromView(View view) {
@@ -146,31 +168,5 @@ public class SequenceActivity extends Activity {
 	            createClearFocusListeners(innerView);
 	        }
 	    }
-	}
-	
-	private String addWordToString(String string, String word) {
-		if (word != null) {
-			if (!string.isEmpty())
-			{
-				string += " ";
-			}
-			string += word;
-		}
-		
-		return string;
-	}
-	
-	public String getFullNameFromProfileId(long profileId)
-	{
-        Helper helper = new Helper(SequenceActivity.this);
-		
-		Profile profile = helper.profilesHelper.getProfileById(profileId);
-		
-		String name = "";
-		name = addWordToString(name, profile.getFirstname());
-		name = addWordToString(name, profile.getMiddlename());
-		name = addWordToString(name, profile.getSurname());
-		
-		return name;
 	}
 }
