@@ -16,9 +16,10 @@
         android:id="@+id/title"
         android:layout_width="@dimen/activity_overview_picto_size"
         android:layout_height="match_parent"
-        android:textSize="14sp"
-        android:layout_gravity="center"
+        android:layout_gravity="center"  
+        android:gravity="center"
         android:textAlignment="center"
-        android:background="#ff00cc" />
+        android:paddingTop="5sp"
+        android:textSize="16sp" />
 
 </LinearLayout>

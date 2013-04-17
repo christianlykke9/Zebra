@@ -21,7 +21,7 @@
         android:orientation="horizontal"
         android:background="@drawable/main_topbar_gradient_bg">
         
-        <ImageView 
+        <dk.aau.cs.giraf.zebra.RoundedImageView 
             android:id="@+id/sequence_image"
             android:layout_width="120sp"
             android:layout_height="120sp"

@@ -3,7 +3,7 @@
  
     <item android:drawable="@drawable/edit_mode_pressed" android:state_checked="true" android:state_pressed="true"/>
     <item android:drawable="@drawable/edit_mode_pressed" android:state_checked="true" android:state_focused="false"/>
-    <item android:drawable="@drawable/edit_mode" android:state_checked="false" android:state_pressed="true"/>
-    <item android:drawable="@drawable/edit_mode" android:state_checked="false" android:state_focused="false"/>
+    <item android:drawable="@drawable/edit_mode_normal" android:state_checked="false" android:state_pressed="true"/>
+    <item android:drawable="@drawable/edit_mode_normal" android:state_checked="false" android:state_focused="false"/>
  
 </selector>

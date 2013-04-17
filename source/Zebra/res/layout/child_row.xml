@@ -3,7 +3,10 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="10dip" >
+    android:paddingTop="12dip"
+    android:paddingBottom="12dip"
+    android:paddingLeft="10dip"
+    android:paddingRight="10dip" >
  
     <LinearLayout
         android:id="@+id/image_layout"
@@ -11,7 +14,8 @@
         android:layout_height="wrap_content"
         android:padding="2dip"
         android:layout_alignParentLeft="true"
-        android:background="#ffffff">
+        android:background="#ffffff"
+        android:layout_marginRight="10dp">
  
         <ImageView
             android:id="@+id/child_image"

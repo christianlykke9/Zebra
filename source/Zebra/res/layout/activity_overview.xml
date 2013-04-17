@@ -15,36 +15,31 @@
         android:orientation="horizontal" >
     </RelativeLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-6dp"
+        android:baselineAligned="false" >
 
-        <LinearLayout
-            android:baselineAligned="false"
-            android:layout_width="match_parent"
+        <ListView
+            android:id="@+id/child_list"
+            android:layout_width="375dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-6dp" >
+            android:background="#28FFFFFF"
+            android:dividerHeight="1dp" >
+        </ListView>
 
-            <ListView
-                android:id="@+id/child_list"
-                android:layout_width="375dp"
-                android:layout_height="wrap_content"
-                android:dividerHeight="1dp"
-                android:background="#28FFFFFF" >
-
-            </ListView>
-
-            <GridView
-                android:id="@+id/sequence_grid"
-                android:layout_width="0dip"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:columnWidth="200dp"
-                android:gravity="center"
-                android:stretchMode="columnWidth"
-                android:numColumns="3"
-                android:padding="20dp" >
-
-            </GridView>
-
-        </LinearLayout>
-
+        <GridView
+            android:id="@+id/sequence_grid"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:columnWidth="200dp"
+            android:gravity="center"
+            android:numColumns="3"
+            android:padding="20dp"
+            android:stretchMode="columnWidth" >
+        </GridView>
+    </LinearLayout>
 
 </LinearLayout>
