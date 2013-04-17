@@ -85,8 +85,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
           	svg:horizontalSpacing="20dp"
-          	svg:itemHeight="300dp"
-          	svg:itemWidth="300dp">
+          	svg:itemHeight="@dimen/activity_main_picto_size"
+          	svg:itemWidth="@dimen/activity_main_picto_size">
             
         </dk.aau.cs.giraf.zebra.SequenceViewGroup>
 

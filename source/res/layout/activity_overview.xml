@@ -1,38 +1,50 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+<LinearLayout 
+	android:id="@+id/parent_container"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical"
+	android:background="@drawable/main_gradient_bg"
+	android:focusableInTouchMode="true" >
 
-   <LinearLayout
-        android:layout_width="350dp"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-	   <ListView
-	       android:id="@+id/child_list"
-	       android:layout_width="fill_parent"
-	       android:layout_height="wrap_content"
-	       android:divider="#dd9639"
-	       android:dividerHeight="2dp"
-	       android:listSelector="@drawable/list_selector" />
-	   
-    </LinearLayout>
-
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/sequence_bar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:layout_height="140sp"
+        android:background="@drawable/main_topbar_gradient_bg"
+        android:orientation="horizontal" >
+    </RelativeLayout>
 
-        <GridView
-	        android:id="@+id/sequence_grid"
-		    android:numColumns="auto_fit"
-		    android:gravity="center"
-		    android:columnWidth="200dp"
-		    android:stretchMode="columnWidth"
+
+        <LinearLayout
+            android:baselineAligned="false"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-        </GridView>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-6dp" >
 
-    </LinearLayout>
+            <ListView
+                android:id="@+id/child_list"
+                android:layout_width="375dp"
+                android:layout_height="wrap_content"
+                android:dividerHeight="1dp"
+                android:background="#28FFFFFF" >
+
+            </ListView>
+
+            <GridView
+                android:id="@+id/sequence_grid"
+                android:layout_width="0dip"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:columnWidth="200dp"
+                android:gravity="center"
+                android:stretchMode="columnWidth"
+                android:numColumns="3"
+                android:padding="20dp" >
+
+            </GridView>
+
+        </LinearLayout>
+
 
 </LinearLayout>
