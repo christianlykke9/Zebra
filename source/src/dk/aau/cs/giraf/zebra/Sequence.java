@@ -1,7 +1,6 @@
 package dk.aau.cs.giraf.zebra;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 

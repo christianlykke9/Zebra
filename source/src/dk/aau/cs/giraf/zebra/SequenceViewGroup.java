@@ -201,6 +201,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			return indexOfChild(child);
 	}
 	
+	@SuppressWarnings("unused")
 	private int getIndexAtX(int x) {
 		return getIndexAtPoint(x, calcChildTopPosition() + itemHeight / 2);
 	}
@@ -213,6 +214,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		return itemWidth;
 	}
 
+	@SuppressWarnings("unused")
 	private int getLeftX(int index) {
 		return calcChildLeftPosition(index);
 	}
@@ -226,6 +228,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		return this.rearrangeListener;
 	}
 	
+	@SuppressWarnings("unused")
 	private int getRightX(int index) {
 		return calcChildLeftPosition(index) + itemWidth;
 	}
@@ -266,6 +269,10 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			}
 			
 			View newView = adapter.getView(currentIndex, oldView, this);
+			if (newView instanceof SequenceImageView) {
+				((SequenceImageView)newView).setEditModeEnabled(isInEditMode);
+			}
+
 			if (oldView == null) {
 				addViewInLayout(newView, currentViewCount, generateDefaultLayoutParams());
 				currentViewCount++;
@@ -297,7 +304,6 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		if (offsetY < 0)
 			offsetY = 0;
 
-		//int numChildren = getChildCount();
 		int adapterCount = 0;
 		if (adapter != null)
 			adapterCount = adapter.getCount();
@@ -408,8 +414,6 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				// Highlight the selected pictogram
 				((SequenceImageView)dragging).liftUp();
 				
-				EditMode.toggle();
-				
 				for (int i = 0; i < this.getChildCount(); i++) {
 					this.getChildAt(i).invalidate();
 				}
@@ -501,6 +505,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 	public void setEditModeEnabled(boolean editEnabled) {
 		if (isInEditMode != editEnabled) {
 			isInEditMode = editEnabled;
+			
 			//TODO: Decice whats to be done here.
 			requestLayout();
 		}
