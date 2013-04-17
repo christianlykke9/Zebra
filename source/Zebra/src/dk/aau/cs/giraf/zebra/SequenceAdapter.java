@@ -49,7 +49,7 @@ public class SequenceAdapter extends BaseAdapter {
 		PictogramView view;
 		
 		if (convertView == null) {
-			view = new PictogramView(context);
+			view = new PictogramView(context, 24f);
 		} else
 			view = (PictogramView)convertView;
 		
