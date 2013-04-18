@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -42,9 +41,8 @@ public class PictogramView extends LinearLayout {
 	
 	
 	private void initialize(Context context, float radius) {
-		this.setWillNotDraw(false);
 		this.setOrientation(LinearLayout.VERTICAL);
-		this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		//this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		
 		
 		SquaredRelativeLayout square = new SquaredRelativeLayout(context);

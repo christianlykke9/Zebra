@@ -2,14 +2,10 @@ package dk.aau.cs.giraf.zebra;
 
 import java.util.List;
 
-import android.app.Activity;
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 /**
  * Adapter for a List of Sequences typically associated with a {@link Child}.
@@ -18,28 +14,26 @@ import android.widget.TextView;
 public class SequenceListAdapter extends BaseAdapter {
 
 	private List<Sequence> items;
-	private LayoutInflater inflater;
+	private Context context;
 	
-	public SequenceListAdapter(Activity activity, List<Sequence> items) {
+	public SequenceListAdapter(Context context, List<Sequence> items) {
 		
 		this.items = items;
-		this.inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		this.context = context;
 	}
 
     public View getView(int position, View convertView, ViewGroup parent) {
-		View v = convertView;
+		PictogramView v = (PictogramView) convertView;
 		
 		if (v == null) {
-			v = inflater.inflate(R.layout.sequence_item, null);
+			v = new PictogramView(context, 16f);
 		}
 		
-        TextView titleTextView = (TextView)v.findViewById(R.id.title);
-        ImageView image = (ImageView)v.findViewById(R.id.image);
- 
         Sequence s = items.get(position);
- 
-        titleTextView.setText(s.getName());
-        image.setImageDrawable(s.getImage());
+        
+        v.setTitle(s.getName());
+        v.setImage(s.getImage());
+
         return v;
     }
 
