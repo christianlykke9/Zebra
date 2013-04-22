@@ -255,13 +255,12 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		if (adapter == null) return;
 		final int adapterCount = adapter.getCount();
-		//final int prevViewCount = getCurrentSequenceViewCount();
-		final int prevViewCount = getChildCount();
+		final int prevViewCount = getCurrentSequenceViewCount();
 		
 		int currentViewCount = prevViewCount;
 		
 		if (prevViewCount > adapterCount) {
-			removeViewsInLayout(adapterCount, prevViewCount - adapterCount);
+			removeViewsInLayout(adapterCount-1, prevViewCount - adapterCount);
 		}
 		
 		int currentIndex = 0;
@@ -269,6 +268,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			if (currentIndex == draggingIndex) continue;
 			View oldView = null;
 			
+			//TODO: CHECK THIS
 			if (currentIndex < prevViewCount) {
 				oldView = getChildAt(currentIndex);
 			}
