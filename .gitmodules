@@ -10,3 +10,6 @@
 [submodule "source/PictoAdmin"]
 	path = source/PictoAdmin
 	url = http://cs-cust06-int.cs.aau.dk/git-ro/pictoadmin
+[submodule "source/PictogramLib"]
+	path = source/PictogramLib
+	url = http://cs-cust06-int.cs.aau.dk/git-ro/pictogram-lib
