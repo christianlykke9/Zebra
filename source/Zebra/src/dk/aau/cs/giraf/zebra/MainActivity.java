@@ -47,10 +47,16 @@ public class MainActivity extends Activity {
 				Child child = childAdapter.getItem(arg2);
 				
 				((TextView)findViewById(R.id.child_name)).setText(child.getName());
-
+								
 				sequences.clear();
 				sequences.addAll(getSequences(child));
 				sequenceAdapter.notifyDataSetChanged();
+				
+				final GridView sequenceGridView = ((GridView)findViewById(R.id.sequence_grid));
+				
+				//TODO: This is ridicilous
+				sequenceGridView.smoothScrollToPositionFromTop(0, 0, 0);
+				
 			}
 		});
 		
