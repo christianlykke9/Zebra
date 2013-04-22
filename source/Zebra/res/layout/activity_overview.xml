@@ -43,13 +43,13 @@
         android:layout_marginTop="-6dp"
         android:baselineAligned="false" >
 
-        <ListView
+        <dk.aau.cs.giraf.zebra.BounceListView
             android:id="@+id/child_list"
             android:layout_width="375dp"
             android:layout_height="wrap_content"
             android:background="#28FFFFFF"
             android:dividerHeight="1dp" >
-        </ListView>
+        </dk.aau.cs.giraf.zebra.BounceListView>
 
         <GridView
             android:id="@+id/sequence_grid"

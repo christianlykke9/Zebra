@@ -2,9 +2,6 @@ package dk.aau.cs.giraf.zebra;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.w3c.dom.Text;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
