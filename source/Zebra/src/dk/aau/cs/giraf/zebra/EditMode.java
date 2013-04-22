@@ -4,6 +4,11 @@ import java.util.ArrayList;
 
 import android.database.Observable;
 
+/**
+ * Observable Singleton representing whether edit mode is enabled or not and allows
+ * changing the mode.
+ *
+ */
 public class EditMode extends Observable<EditMode.EditModeObserver> {
 	
 	private boolean editMode = false;

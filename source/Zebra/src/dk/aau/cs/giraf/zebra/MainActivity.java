@@ -31,6 +31,7 @@ public class MainActivity extends Activity {
 		profileHelper = new ProfilesHelper(this);
 		
 		children = getChildren();
+		//TODO: Make this robust.
 		sequences = getSequences(children.get(0));
 		
 		ListView childList = (ListView)findViewById(R.id.child_list);

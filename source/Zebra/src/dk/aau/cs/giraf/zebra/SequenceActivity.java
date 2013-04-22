@@ -84,11 +84,6 @@ public class SequenceActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				EditMode.toggle();
-
-				SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
-				for (int i = 0; i < sequenceGroup.getChildCount(); i++) {
-					sequenceGroup.getChildAt(i).invalidate();
-				}
 			}
 		});
 		
