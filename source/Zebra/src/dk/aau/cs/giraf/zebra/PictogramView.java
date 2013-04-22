@@ -20,6 +20,7 @@ public class PictogramView extends LinearLayout {
 	
 	private final float NORMAL_SCALE = 0.8f;
 	private final float HIGHLIGHT_SCALE = 0.9f;
+	private final float DEFAULT_TEXT_SIZE = 18f;
 	
 	private RoundedImageView pictogram;
 	private TextView title;
@@ -71,7 +72,7 @@ public class PictogramView extends LinearLayout {
 		title = new TextView(getContext());
 		title.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		title.setGravity(Gravity.CENTER_HORIZONTAL);
-		title.setTextSize(26f);
+		title.setTextSize(DEFAULT_TEXT_SIZE);
 		
 		return title;
 	}
@@ -94,8 +95,6 @@ public class PictogramView extends LinearLayout {
 		
 		return deleteButton;
 	}
-	
-	
 	
 	public void liftUp() {
 		pictogram.setScaleX(HIGHLIGHT_SCALE);
