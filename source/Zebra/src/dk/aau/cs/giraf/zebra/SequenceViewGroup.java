@@ -330,6 +330,14 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			View child = getChildAt(i);
 			child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
 		}
+		
+		//We want to take as much width as possible.
+		if (getParent() instanceof ViewGroup) {
+			ViewGroup parent = (ViewGroup)getParent();
+			int parentSizeNoPadding = parent.getWidth() - parent.getPaddingLeft() - parent.getPaddingRight();
+			if (parentSizeNoPadding > width)
+				width = parentSizeNoPadding;
+		}
 
 		setMeasuredDimension(resolveSize(width, widthMeasureSpec),
 				resolveSize(height, heightMeasureSpec));
