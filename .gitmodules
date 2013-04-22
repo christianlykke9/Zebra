@@ -7,3 +7,6 @@
 [submodule "source/AmbilWarna"]
 	path = source/AmbilWarna
 	url = http://cs-cust06-int.cs.aau.dk/git-ro/ambilwarna.git
+[submodule "source/PictoAdmin"]
+	path = source/PictoAdmin
+	url = http://cs-cust06-int.cs.aau.dk/git-ro/pictoadmin
