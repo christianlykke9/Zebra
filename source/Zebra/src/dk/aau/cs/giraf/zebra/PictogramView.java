@@ -82,15 +82,11 @@ public class PictogramView extends LinearLayout {
 		deleteButton.setImageResource(R.layout.selector_delete_pictogram);
 		
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		params.topMargin = 4;
-		params.rightMargin = 4;
 		params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		deleteButton.setLayoutParams(params);
 		
-		deleteButton.setPadding(10, 10, 10, 10);
+		deleteButton.setPadding(0, 0, 0, 0);
 		deleteButton.setBackgroundColor(Color.TRANSPARENT);
-		deleteButton.setScaleX(1.5f);
-		deleteButton.setScaleY(1.5f);
         setDeleteButtonVisible(false);
 		
 		return deleteButton;
