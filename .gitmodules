@@ -4,3 +4,6 @@
 [submodule "source/CategoryLib"]
 	path = source/CategoryLib
 	url = http://cs-cust06-int.cs.aau.dk/git-ro/category-lib.git
+[submodule "source/AmbilWarna"]
+	path = source/AmbilWarna
+	url = http://cs-cust06-int.cs.aau.dk/git-ro/ambilwarna.git
