@@ -1,3 +1,15 @@
 [submodule "source/OasisLib"]
 	path = source/OasisLib
 	url = http://cs-cust06-int.cs.aau.dk/git-ro/oasis-lib
+[submodule "source/CategoryLib"]
+	path = source/CategoryLib
+	url = http://cs-cust06-int.cs.aau.dk/git-ro/category-lib.git
+[submodule "source/AmbilWarna"]
+	path = source/AmbilWarna
+	url = http://cs-cust06-int.cs.aau.dk/git-ro/ambilwarna.git
+[submodule "source/PictoAdmin"]
+	path = source/PictoAdmin
+	url = http://cs-cust06-int.cs.aau.dk/git-ro/pictoadmin
+[submodule "source/PictogramLib"]
+	path = source/PictogramLib
+	url = http://cs-cust06-int.cs.aau.dk/git-ro/pictogram-lib
