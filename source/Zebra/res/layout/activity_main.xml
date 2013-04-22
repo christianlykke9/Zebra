@@ -21,42 +21,13 @@
         android:orientation="horizontal"
         android:background="@drawable/main_topbar_gradient_bg">
         
-        <ImageView 
+        <dk.aau.cs.giraf.zebra.RoundedImageView 
             android:id="@+id/sequence_image"
-            android:layout_width="120sp"
-            android:layout_height="120sp"
+            android:layout_width="85sp"
+            android:layout_height="85sp"
             android:layout_centerVertical="true"
-            android:paddingLeft="15sp"
-            android:paddingRight="15sp" />
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_toLeftOf="@+id/edit_mode_toggle"
-            android:layout_toRightOf="@+id/sequence_image" >
-            
-            <EditText
-                android:id="@+id/sequence_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:imeOptions="actionDone"
-                android:inputType="text"
-                android:singleLine="true"
-                android:textSize="48sp"
-                android:textColor="#624319"
-                android:gravity="center" />
-            
-            <TextView
-                android:id="@+id/child_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="26sp"
-                android:textIsSelectable="true"
-                android:textColor="#624319"
-                android:alpha="0.4"
-                android:gravity="center" />
-        </LinearLayout>
+            android:layout_marginLeft="15sp"
+            android:layout_marginRight="15sp" />
 
         <ToggleButton
             android:id="@+id/edit_mode_toggle"
@@ -64,11 +35,42 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:background="@layout/edit_mode_button"
-            android:textOn=""
-            android:textOff=""
             android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp" />
+            android:layout_marginRight="15dp"
+            android:background="@layout/edit_mode_button"
+            android:textOff=""
+            android:textOn="" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/edit_mode_toggle"
+            android:layout_toRightOf="@+id/sequence_image"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/sequence_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#00000000"
+                android:gravity="center"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:textColor="#624319"
+                android:textSize="48sp" >
+            </EditText>
+
+            <TextView
+                android:id="@+id/child_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:alpha="0.4"
+                android:gravity="center"
+                android:textColor="#624319"
+                android:textIsSelectable="true"
+                android:textSize="26sp" />
+        </LinearLayout>
 
     </RelativeLayout>
     
