@@ -15,6 +15,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Transformation;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
+import android.widget.HorizontalScrollView;
 
 /**
  * Layouts its children with fixed sizes and fixed spacing between each child in
@@ -48,10 +49,14 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 	private boolean animatingDragReposition = false;
 	private int[] newPositions;
 	
+	private AutoScroller autoScroller;
+	private boolean doAutoScroll = false;
+	
 	//Mode handling
 	private boolean isInEditMode = false;
 	private View addNewPictoGramView = null;
 	
+	//Data and Event handling
 	private OnRearrangeListener rearrangeListener = null;
 	
 	private SequenceAdapter adapter;
@@ -352,6 +357,8 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			if (draggingIndex != -1) {
 				handled = true;
 				
+				stopAutoScroll();
+				
 				// Remove the highlight of the pictogram
 				((PictogramView)dragging).placeDown();
 				
@@ -414,6 +421,8 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				// Highlight the selected pictogram
 				((PictogramView)dragging).liftUp();
 				
+				startAutoScroll();
+			
 				for (int i = 0; i < this.getChildCount(); i++) {
 					this.getChildAt(i).invalidate();
 				}
@@ -441,18 +450,35 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			if (draggingIndex != -1) {
 				handled = true;
 				
-				touchDeltaX = (int) (x - dragStartX);
-				touchX = (int) x;
-				
-				//Layout the dragging element. Is excluded from normal layout			
-				int newLeft = calcChildLeftPosition(draggingIndex) + touchDeltaX;
-				dragging.layout(newLeft, dragging.getTop(), newLeft + dragging.getMeasuredWidth(), dragging.getTop() + dragging.getMeasuredHeight());
-				
-				checkForSwap();
+				handleTouchMove(x);
 			}
 			break;
 		}
 		return handled;
+	}
+
+	private void startAutoScroll() {
+		if (autoScroller == null)
+			autoScroller = new AutoScroller();
+		
+		doAutoScroll = true;
+		autoScroller.reset();
+		post(autoScroller);
+	}
+	
+	private void stopAutoScroll() {
+		doAutoScroll = false;
+		removeCallbacks(autoScroller);
+	}
+
+	private void handleTouchMove(float newTouchX) {
+		touchX = (int) newTouchX;
+		touchDeltaX = (int) (newTouchX - dragStartX);
+		//Layout the dragging element. Is excluded from normal layout			
+		int newLeft = calcChildLeftPosition(draggingIndex) + touchDeltaX;
+		dragging.layout(newLeft, dragging.getTop(), newLeft + dragging.getMeasuredWidth(), dragging.getTop() + dragging.getMeasuredHeight());
+		
+		checkForSwap();
 	}
 
 	public void setHorizontalSpacing(int spacing) {
@@ -554,6 +580,100 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		@Override
 		public void onInvalidated() {
 			setAdapter(null);
+		}
+	}
+	
+	/**
+	 * 
+	 * AutoScrollers scrolls the SequenceViewGroup during a draw if
+	 * the dragged point is near the border.
+	 *
+	 */
+	private class AutoScroller implements Runnable {
+		
+		private final float MAX_SCROLL_SPEED_PER_MS = 0.62f;
+		private final int BORDER_DIST_TO_SCROLL = 380;
+		
+		private int currentScrollX = 0;
+		private int currentScrollY = 0;
+		
+		View scroller;
+		View parent;
+		long timeBefore = -1;
+		
+		public AutoScroller() {
+			this.scroller = (View)SequenceViewGroup.this.getParent();
+			if (! (this.scroller instanceof HorizontalScrollView))
+				throw new IllegalStateException("Parent of SequenceViewGroup must be HorizontalScrollView");
+			timeBefore = AnimationUtils.currentAnimationTimeMillis();
+			reset();
+		}
+		
+		public void reset() {
+			timeBefore = -1;
+			parent = SequenceViewGroup.this;
+			scroller = (View)parent.getParent();
+			currentScrollX = scroller.getScrollX();
+			currentScrollY = scroller.getScrollY();
+		}
+		
+		@Override
+		public void run() {
+			
+			final long timeNow = AnimationUtils.currentAnimationTimeMillis();
+			
+			if (timeBefore == -1)
+				timeBefore = timeNow;
+			
+			final long timeDifference = timeNow - timeBefore;
+			timeBefore = timeNow;
+			
+			if (isDoneScrolling())
+				return;
+			
+			//Find the closest border
+			int borderRightDist = scroller.getWidth() - getRelativePosInSeqViewGrp(touchX);
+			int borderLeftDist = getRelativePosInSeqViewGrp(touchX);
+			
+			int borderDist = Math.min(borderRightDist, borderLeftDist);
+			
+			//Not year border. Maybe next time
+			if (borderDist > BORDER_DIST_TO_SCROLL) {
+				post(this);
+				return;
+			}
+			
+			int scrollAmount = (int) calculateMovement(timeDifference, borderDist);
+			
+			//Scrolling left?
+			if (borderLeftDist < borderRightDist)
+				scrollAmount = -scrollAmount;
+			
+			final int prevScrollX = currentScrollX;
+			
+			//scrollTo, unlike scrollBy, clamps within the child bounds.
+			scroller.scrollTo(currentScrollX + scrollAmount, currentScrollY);
+			currentScrollX = scroller.getScrollX();
+			
+			SequenceViewGroup.this.handleTouchMove(touchX + (currentScrollX - prevScrollX));
+			
+			post(this);
+			
+		}
+		
+		private float calculateMovement(final long timeDifference, int borderDist) {	
+			//Interpolation is: 1 - (1 - x)^2
+			final float x = (float) (BORDER_DIST_TO_SCROLL - borderDist) / BORDER_DIST_TO_SCROLL;
+			final float inv = 1 - x;
+			return (1 - inv * inv) * MAX_SCROLL_SPEED_PER_MS * timeDifference;
+		}
+		
+		private int getRelativePosInSeqViewGrp(int touchX) {
+			return touchX - scroller.getScrollX();
+		}
+		
+		private boolean isDoneScrolling() {
+			return ! doAutoScroll;
 		}
 	}
 }
