@@ -3,7 +3,11 @@ package dk.aau.cs.giraf.zebra;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -54,7 +58,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 	
 	//Mode handling
 	private boolean isInEditMode = false;
-	private View addNewPictoGramView = null;
+	private View addNewPictoGramView;
 	
 	//Data and Event handling
 	private OnRearrangeListener rearrangeListener = null;
@@ -78,6 +82,23 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		} finally {
 			a.recycle();
 		}
+		
+		createNewPictogramView();
+	}
+	
+	private void createNewPictogramView() {
+		addNewPictoGramView = new View(getContext()) {
+			Paint p = new Paint();
+			
+			@Override
+			protected void onDraw(Canvas canvas) {
+				super.onDraw(canvas);
+				p.setColor(Color.RED);
+				p.setStrokeWidth(10);
+				p.setStyle(Style.STROKE);
+				canvas.drawRect(5, 5, getWidth() - 5, getHeight() - 5, p);
+			}
+		};
 	}
 	
 	private int calcChildLeftPosition(int childIndex) {
@@ -259,8 +280,9 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		
 		int currentViewCount = prevViewCount;
 		
+		//Remove Views if too many.
 		if (prevViewCount > adapterCount) {
-			removeViewsInLayout(adapterCount-1, prevViewCount - adapterCount);
+			removeViewsInLayout(adapterCount, prevViewCount - adapterCount);
 		}
 		
 		int currentIndex = 0;
@@ -268,7 +290,6 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			if (currentIndex == draggingIndex) continue;
 			View oldView = null;
 			
-			//TODO: CHECK THIS
 			if (currentIndex < prevViewCount) {
 				oldView = getChildAt(currentIndex);
 			}
@@ -285,6 +306,9 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				
 			layoutChild(newView, currentIndex);
 		}
+		
+		if (isInEditMode)
+			layoutChild(addNewPictoGramView, currentIndex);
 	}
 
 	@Override
@@ -319,6 +343,13 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		if (adapterCount > 1) {
 			width += (adapterCount - 1) * horizontalSpacing;
 		}
+		
+		if (isInEditMode) {
+			width += itemWidth;
+			if (adapterCount > 0) {
+				width += horizontalSpacing;
+			}
+		}	
 
 		int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(itemWidth,
 				MeasureSpec.EXACTLY);
@@ -540,7 +571,11 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		if (isInEditMode != editEnabled) {
 			isInEditMode = editEnabled;
 			
-			//TODO: Decide whats to be done here.
+			if (editEnabled)
+				addViewInLayout(addNewPictoGramView, -1, generateDefaultLayoutParams(), true);
+			else
+				removeViewInLayout(addNewPictoGramView);
+			
 			requestLayout();
 		}
 	}
