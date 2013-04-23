@@ -8,9 +8,9 @@ import android.content.Context;
 public class Test {
 	public static Sequence createWashSequence(Child child, Context context) {
 		
-		Sequence sequence = new Sequence(child, "Vask hænder");
+		Sequence sequence = new Sequence(context, child, "Vask hænder");
 		sequence.setSequenceId(1);
-		sequence.setImage(context.getResources().getDrawable(R.drawable.wash_hands));
+		sequence.setImageId(1);
 		
 		int[] drawableIds = new int[] {
 				R.drawable.sleeven_up,
@@ -48,9 +48,9 @@ public class Test {
 	
 	public static Sequence createHomeworkSequence(Child child, Context context) {
 		
-		Sequence sequence = new Sequence(child, "Lektier før leg");
+		Sequence sequence = new Sequence(context, child, "Lektier før leg");
 		sequence.setSequenceId(2);
-		sequence.setImage(context.getResources().getDrawable(R.drawable.school_work));
+		sequence.setImageId(2);
 		
 		int[] drawableIds = new int[] {
 				R.drawable.school_work,
@@ -68,9 +68,9 @@ public class Test {
 	
 	public static Sequence createPackSequence(Child child, Context context) {
 		
-		Sequence sequence = new Sequence(child, "Pak sammen");
+		Sequence sequence = new Sequence(context, child, "Pak sammen");
 		sequence.setSequenceId(3);
-		sequence.setImage(context.getResources().getDrawable(R.drawable.pack_cloth));
+		sequence.setImageId(3);
 		
 		int[] drawableIds = new int[] {
 				R.drawable.pack_cloth,

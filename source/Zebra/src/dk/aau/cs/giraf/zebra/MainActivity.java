@@ -96,7 +96,7 @@ public class MainActivity extends Activity {
 //				newSequenceIntent.putExtra("profileId", null);
 //				newSequenceIntent.putExtra("sequenceId", 0);
 				 
-				Sequence newSequence = new Sequence(child, "Ny Sekvens");
+				Sequence newSequence = new Sequence(MainActivity.this, child, "Ny Sekvens");
 				//TODO: Fix this id mess.
 				newSequence.setSequenceId(1);
 				
