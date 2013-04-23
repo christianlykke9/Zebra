@@ -1,15 +1,21 @@
 package dk.aau.cs.giraf.zebra;
 
+import java.io.SequenceInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.datatype.Duration;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
 import dk.aau.cs.giraf.oasis.lib.models.Profile;
 
@@ -20,6 +26,8 @@ public class MainActivity extends Activity {
 	
 	private ProfilesHelper profileHelper;
 	
+	Child child;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -29,7 +37,8 @@ public class MainActivity extends Activity {
 		
 		children = getChildren();
 		//TODO: Make this robust.
-		sequences = getSequences(children.get(0));
+		child = children.get(0);
+		sequences = getSequences(child);
 		
 		ListView childList = (ListView)findViewById(R.id.child_list);
 		final ChildAdapter childAdapter = new ChildAdapter(this, children);
@@ -44,7 +53,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 								
-				Child child = childAdapter.getItem(arg2);
+				child = childAdapter.getItem(arg2);
 				
 				((TextView)findViewById(R.id.child_name)).setText(child.getName());
 								
@@ -67,21 +76,42 @@ public class MainActivity extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 				Sequence sequence = sequenceAdapter.getItem(arg2);
 				
-				Intent intent = new Intent(getApplication(), SequenceActivity.class);
-				
-				//TODO: LÆKKER MUSIK
-				intent.putExtra("profileId", sequence.getChild().getProfile().getId());
-				intent.putExtra("sequenceId", sequence.getSequenceId());
-				//intent.putExtra("sequence", sequence);
-				
-				//TODO: Put sequence id in extras.
-				startActivity(intent);
-			}
+				enterSequence(sequence);
+			}		
+		});
+		
+		
+		// Starts a clean sequence activity - ready to add pictograms.
+		((ImageButton)findViewById(R.id.add_button)).setOnClickListener(new OnClickListener() {
 			
+			@Override
+			public void onClick(View v) {
+				//Intent newSequenceIntent = new Intent(getApplication(), SequenceActivity.class);
+//				newSequenceIntent.putExtra("profileId", null);
+//				newSequenceIntent.putExtra("sequenceId", 0);
+				 
+				Sequence newSequence = new Sequence(child, "Ny Sekvens");
+				//TODO: Fix this id mess.
+				newSequence.setSequenceId(1);
+				
+				enterSequence(newSequence);
+			}
 		});
 		
 	}
 
+	private void enterSequence(Sequence sequence) {
+		Intent intent = new Intent(getApplication(), SequenceActivity.class);
+		
+		//TODO: LÆKKER MUSIK
+		intent.putExtra("profileId", sequence.getChild().getProfile().getId());
+		intent.putExtra("sequenceId", sequence.getSequenceId());
+		//intent.putExtra("sequence", sequence);
+		
+		//TODO: Put sequence id in extras.
+		startActivity(intent);
+	}
+	
 	private List<Sequence> getSequences(Child child) {
 		return child.getSequences();
 	}
