@@ -35,6 +35,7 @@ public class SequenceActivity extends Activity {
 		profileHelper = new ProfilesHelper(this);
 		
 		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
+		sequenceGroup.setEditModeEnabled(EditMode.get());
 		
 //		sequence = getIntent().getParcelableExtra("sequence");
 
@@ -77,7 +78,10 @@ public class SequenceActivity extends Activity {
 		
 		initializeTopBar();
 		
+		// Edit mode switcher button
 		ToggleButton button = (ToggleButton) findViewById(R.id.edit_mode_toggle);
+		
+		button.setChecked(EditMode.get());
 		
 		button.setOnClickListener(new ImageButton.OnClickListener() {
 			
@@ -86,7 +90,6 @@ public class SequenceActivity extends Activity {
 				EditMode.toggle();
 			}
 		});
-		
 	}
 
 	@Override
