@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
 import dk.aau.cs.giraf.oasis.lib.models.Profile;
 
@@ -23,6 +24,9 @@ public class MainActivity extends Activity {
 
 	private List<Child> children;
 	private List<Sequence> sequences;
+	private GridView sequenceGrid;
+	
+	private boolean isInEditMode = false;
 	
 	private ProfilesHelper profileHelper;
 	
@@ -44,7 +48,7 @@ public class MainActivity extends Activity {
 		final ChildAdapter childAdapter = new ChildAdapter(this, children);
 		childList.setAdapter(childAdapter);
 		
-		GridView sequenceGrid = (GridView)findViewById(R.id.sequence_grid);
+		sequenceGrid = (GridView)findViewById(R.id.sequence_grid);
 		final SequenceListAdapter sequenceAdapter = new SequenceListAdapter(this, sequences);
 		sequenceGrid.setAdapter(sequenceAdapter);
 		
@@ -74,6 +78,8 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+				((PictogramView)arg1).liftUp();
+				
 				Sequence sequence = sequenceAdapter.getItem(arg2);
 				
 				enterSequence(sequence);
@@ -90,7 +96,7 @@ public class MainActivity extends Activity {
 //				newSequenceIntent.putExtra("profileId", null);
 //				newSequenceIntent.putExtra("sequenceId", 0);
 				 
-				Sequence newSequence = new Sequence(child, "Ny Sekvens");
+				Sequence newSequence = new Sequence(MainActivity.this, child, "Ny Sekvens");
 				//TODO: Fix this id mess.
 				newSequence.setSequenceId(1);
 				
@@ -98,7 +104,60 @@ public class MainActivity extends Activity {
 			}
 		});
 		
+		
+		// Edit mode switcher button
+		ToggleButton button = (ToggleButton) findViewById(R.id.edit_mode_toggle);
+		
+		button.setOnClickListener(new ImageButton.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				EditMode.toggle();
+				setEditModeEnabled(EditMode.get());
+			}
+		});
 	}
+	
+	@Override
+	protected void onResume() {
+		// Remove highlighting from all images
+		for (int i = 0; i < sequenceGrid.getChildCount(); i++)
+		{
+			View view = sequenceGrid.getChildAt(i);
+			
+			if (view instanceof PictogramView)
+			{
+				((PictogramView)view).placeDown();
+			}
+		}
+		
+		this.setEditModeEnabled(EditMode.get());
+		
+		
+		// Update the state of the editmode switcher button
+		ToggleButton button = (ToggleButton) findViewById(R.id.edit_mode_toggle);
+		button.setChecked(EditMode.get());
+		
+		super.onResume();
+	}
+	
+
+	public void setEditModeEnabled(boolean editEnabled) {
+		if (isInEditMode != editEnabled) {
+			isInEditMode = editEnabled;
+			
+			for (int i = 0; i < sequenceGrid.getChildCount(); i++)
+			{
+				View view = sequenceGrid.getChildAt(i);
+				
+				if (view instanceof PictogramView)
+				{
+					((PictogramView)view).setEditModeEnabled(isInEditMode);
+				}
+			}
+		}
+	}
+	
 
 	private void enterSequence(Sequence sequence) {
 		Intent intent = new Intent(getApplication(), SequenceActivity.class);

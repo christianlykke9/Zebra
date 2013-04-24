@@ -1,7 +1,9 @@
 package dk.aau.cs.giraf.zebra;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -15,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.widget.TextView.OnEditorActionListener;
 import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
@@ -35,6 +38,7 @@ public class SequenceActivity extends Activity {
 		profileHelper = new ProfilesHelper(this);
 		
 		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
+		sequenceGroup.setEditModeEnabled(EditMode.get());
 		
 //		sequence = getIntent().getParcelableExtra("sequence");
 
@@ -77,7 +81,20 @@ public class SequenceActivity extends Activity {
 		
 		initializeTopBar();
 		
+		sequenceImageView.setOnClickListener(new ImageView.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent();
+				intent.setComponent(new ComponentName("dk.aau.cs.giraf.pictoadmin", "dk.aau.cs.giraf.pictoadmin.PictoAdminMain"));
+				startActivityForResult(intent, 1);
+			}
+		});
+		
+		// Edit mode switcher button
 		ToggleButton button = (ToggleButton) findViewById(R.id.edit_mode_toggle);
+		
+		button.setChecked(EditMode.get());
 		
 		button.setOnClickListener(new ImageButton.OnClickListener() {
 			
@@ -86,7 +103,36 @@ public class SequenceActivity extends Activity {
 				EditMode.toggle();
 			}
 		});
+	}
+	
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		super.onActivityResult(requestCode, resultCode, data);
 		
+		if (resultCode == RESULT_OK && requestCode == 1) {
+			
+			long[] checkoutIds = data.getExtras().getLongArray("checkoutIds");
+			
+			if (checkoutIds.length == 0) {
+				Toast t = Toast.makeText(SequenceActivity.this, "The checkout contained no pictograms.", Toast.LENGTH_LONG);
+				t.show();
+			}
+			else
+			{
+				if (checkoutIds.length != 1) {
+					Toast t = Toast.makeText(SequenceActivity.this, "The checkout contained more than one pictogram. The first will be used", Toast.LENGTH_LONG);
+					t.show();
+				}
+				
+				// Set the sequence image using the first ID from the checkout.
+				sequence.setImageId(checkoutIds[0]);
+				
+				ImageView sequenceImageView = (ImageView)findViewById(R.id.sequence_image);
+				sequenceImageView.setImageDrawable(sequence.getImage());
+			}
+		}
 	}
 
 	@Override
