@@ -81,9 +81,11 @@ public class SequenceActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent();
-				intent.setComponent(new ComponentName("dk.aau.cs.giraf.pictoadmin", "dk.aau.cs.giraf.pictoadmin.PictoAdminMain"));
-				startActivityForResult(intent, 1);
+				if (EditMode.get()) {
+					Intent intent = new Intent();
+					intent.setComponent(new ComponentName("dk.aau.cs.giraf.pictoadmin", "dk.aau.cs.giraf.pictoadmin.PictoAdminMain"));
+					startActivityForResult(intent, 1);
+				}
 			}
 		});
 		
