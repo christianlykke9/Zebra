@@ -27,7 +27,7 @@ public class ChildAdapter extends BaseAdapter {
 		View v = convertView;
 		
 		if (v == null) {
-			v = inflater.inflate(R.layout.child_row, null);
+			v = inflater.inflate(R.layout.children_list_row, null);
 		}
 		
         TextView nameTextView = (TextView)v.findViewById(R.id.name);
