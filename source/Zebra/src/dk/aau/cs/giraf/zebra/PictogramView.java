@@ -79,7 +79,7 @@ public class PictogramView extends LinearLayout {
 	
 	private View createDeleteButton() {
 		deleteButton = new ImageButton(getContext());
-		deleteButton.setImageResource(R.layout.selector_delete_pictogram);
+		deleteButton.setImageResource(R.drawable.btn_delete_pictogram);
 		
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);

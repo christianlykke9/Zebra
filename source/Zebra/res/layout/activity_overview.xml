@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:background="@layout/edit_mode_button"
+            android:background="@drawable/btn_edit_mode"
             android:textOn=""
             android:textOff=""
             android:layout_marginLeft="15dp"
@@ -43,7 +43,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="87dp"
             android:background="@null"
-            android:src="@drawable/add_sequence_btn" />
+            android:src="@drawable/btn_add_sequence" />
 
     </RelativeLayout>
 
