@@ -1,9 +1,7 @@
 package dk.aau.cs.giraf.zebra;
 
-import java.io.SequenceInputStream;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.datatype.Duration;
 
 import android.app.Activity;
 import android.content.Intent;
