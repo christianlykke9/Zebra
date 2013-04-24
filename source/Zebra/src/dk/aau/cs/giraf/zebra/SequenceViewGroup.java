@@ -3,11 +3,7 @@ package dk.aau.cs.giraf.zebra;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -83,22 +79,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			a.recycle();
 		}
 		
-		createNewPictogramView();
-	}
-	
-	private void createNewPictogramView() {
-		addNewPictoGramView = new View(getContext()) {
-			Paint p = new Paint();
-			
-			@Override
-			protected void onDraw(Canvas canvas) {
-				super.onDraw(canvas);
-				p.setColor(Color.RED);
-				p.setStrokeWidth(10);
-				p.setStyle(Style.STROKE);
-				canvas.drawRect(5, 5, getWidth() - 5, getHeight() - 5, p);
-			}
-		};
+		addNewPictoGramView = ResourceViewFactory.getAddPictogramButton(getContext());
 	}
 	
 	private int calcChildLeftPosition(int childIndex) {
