@@ -38,20 +38,13 @@ public class SequenceActivity extends Activity {
 		profileHelper = new ProfilesHelper(this);
 		
 		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
+		
 		sequenceGroup.setEditModeEnabled(EditMode.get());
 		
-//		sequence = getIntent().getParcelableExtra("sequence");
-
-//		//TODO: MIDLERTIDIG MÅDE!!!! HENT FRA DATABASE
 		long profileId = getIntent().getExtras().getLong("profileId");
 		int sequenceId = getIntent().getExtras().getInt("sequenceId");
 		
 		Profile p = profileHelper.getProfileById(profileId);
-//		
-//		Profile p = new Profile();
-//		p.setFirstname("Noah");
-//		p.setMiddlename("");
-//		p.setSurname("Nielsen");
 		
 		final Child child = new Child(p);
 		sequence = Test.createSequence(child, sequenceId, this);
@@ -62,7 +55,10 @@ public class SequenceActivity extends Activity {
 			
 			@Override
 			public void onEditModeChange(boolean editMode) {
-				sequenceGroup.setEditModeEnabled(editMode);				
+				sequenceGroup.setEditModeEnabled(editMode);
+				
+				TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
+				sequenceTitleView.setEnabled(editMode);
 			}
 		});
 		
@@ -85,9 +81,11 @@ public class SequenceActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent();
-				intent.setComponent(new ComponentName("dk.aau.cs.giraf.pictoadmin", "dk.aau.cs.giraf.pictoadmin.PictoAdminMain"));
-				startActivityForResult(intent, 1);
+				if (EditMode.get()) {
+					Intent intent = new Intent();
+					intent.setComponent(new ComponentName("dk.aau.cs.giraf.pictoadmin", "dk.aau.cs.giraf.pictoadmin.PictoAdminMain"));
+					startActivityForResult(intent, 1);
+				}
 			}
 		});
 		
@@ -145,6 +143,7 @@ public class SequenceActivity extends Activity {
 	
 	private void initializeTopBar() {
         TextView editText = (TextView) findViewById(R.id.sequence_title);
+        editText.setEnabled(EditMode.get());
 		
         // Create listener to remove focus when "Done" is pressed on the keyboard
 		editText.setOnEditorActionListener(new OnEditorActionListener() {        

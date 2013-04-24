@@ -15,7 +15,6 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
 import dk.aau.cs.giraf.oasis.lib.models.Profile;

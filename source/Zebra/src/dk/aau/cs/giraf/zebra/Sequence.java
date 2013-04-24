@@ -23,6 +23,7 @@ public class Sequence {
 	private int sequenceId;
 	
 	private long imageId;
+	private Drawable image;
 	
 	public Sequence(Context context, Child child, String name) {		
 		this.context = context;
@@ -56,14 +57,18 @@ public class Sequence {
 	}
 	
 	public void setImageId(long imageId) {
+		image = null;
 		this.imageId = imageId;
 	}
 	
 	public Drawable getImage() {
-		Pictogram pictogram = PictoFactory.getPictogram(context, imageId);
-		String path = pictogram.getImagePath();
+		if (image == null) {
+			Pictogram pictogram = PictoFactory.getPictogram(context, imageId);
+			String path = pictogram.getImagePath();
+			image = Drawable.createFromPath(path);
+		}
 		
-		return Drawable.createFromPath(path);
+		return image;
 	}
 
 	public List<Drawable> getPictograms() {
