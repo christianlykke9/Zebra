@@ -454,7 +454,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		switch (event.getActionMasked()) {
 		case MotionEvent.ACTION_DOWN:
 			dragging = childAtPoint((int) x, (int) y);
-			if (dragging != null && dragging != addNewPictoGramView) {
+			if (EditMode.get() && dragging != null && dragging != addNewPictoGramView) {
 				handled = true;
 				
 				// Highlight the selected pictogram
