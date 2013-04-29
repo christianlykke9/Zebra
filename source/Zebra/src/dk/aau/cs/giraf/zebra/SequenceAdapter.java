@@ -10,6 +10,8 @@ public class SequenceAdapter extends BaseAdapter {
 	private Sequence sequence;
 	private Context context;
 	
+	private OnCreateViewListener onCreateViewListener;
+	
 	public SequenceAdapter(Context context, Sequence sequence) {
 		this.context = context;
 		this.sequence = sequence;
@@ -55,7 +57,21 @@ public class SequenceAdapter extends BaseAdapter {
 		
 		view.setImage(sequence.getPictograms().get(position));
 		
+		if (onCreateViewListener != null)
+			onCreateViewListener.onCreateView(position, view);
+		
 		return view;
 	}
 	
+	public void setOnCreateViewListener(OnCreateViewListener onCreateViewListener) {
+		this.onCreateViewListener = onCreateViewListener;
+	}
+	
+	public OnCreateViewListener getOnCreateViewListener() {
+		return this.onCreateViewListener;
+	}
+	
+	public interface OnCreateViewListener {
+		public void onCreateView(int position, View view);
+	}
 }

@@ -95,4 +95,8 @@ public class Sequence {
 	public void deletePictogram(Drawable pictogram) {
 		pictograms.remove(pictogram);
 	}
+	
+	public void deletePictogram(int position) {
+		pictograms.remove(position);
+	}
 }

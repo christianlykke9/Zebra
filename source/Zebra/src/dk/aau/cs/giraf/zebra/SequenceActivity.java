@@ -23,6 +23,8 @@ import android.widget.TextView.OnEditorActionListener;
 import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
 import dk.aau.cs.giraf.oasis.lib.models.Profile;
 import dk.aau.cs.giraf.zebra.EditMode.EditModeObserver;
+import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
+import dk.aau.cs.giraf.zebra.SequenceAdapter.OnCreateViewListener;
 
 public class SequenceActivity extends Activity {
 	
@@ -49,7 +51,11 @@ public class SequenceActivity extends Activity {
 		final Child child = new Child(p);
 		sequence = Test.createSequence(child, sequenceId, this);
 		
+		//Create Adapter
 		final SequenceAdapter adapter = new SequenceAdapter(this, sequence);
+		setupAdapter(adapter);
+		
+		//Create Sequence Group
 		sequenceGroup.setAdapter(adapter);
 		EditMode.getInstance().registerObserver(new EditModeObserver() {
 			
@@ -99,6 +105,26 @@ public class SequenceActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				EditMode.toggle();
+			}
+		});
+	}
+	
+	private void setupAdapter(final SequenceAdapter adapter) {
+		
+		//Setup delete handler.
+		adapter.setOnCreateViewListener(new OnCreateViewListener() {		
+			@Override
+			public void onCreateView(final int position, final View view) {
+				if (view instanceof PictogramView) {
+					PictogramView pictoView = (PictogramView) view;
+					pictoView.setOnDeleteClickListener(new OnDeleteClickListener() {
+						@Override
+						public void onDeleteClick() {
+							sequence.deletePictogram(position);
+							adapter.notifyDataSetChanged();
+						}
+					});
+				}
 			}
 		});
 	}

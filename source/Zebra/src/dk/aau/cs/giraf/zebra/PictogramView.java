@@ -28,6 +28,8 @@ public class PictogramView extends LinearLayout {
 	
 	private boolean isInEditMode = false;
 	
+	private OnDeleteClickListener onDeleteClickListener;
+	
 	public PictogramView(Context context) {
 		super(context);
 		
@@ -41,7 +43,6 @@ public class PictogramView extends LinearLayout {
 	}
 	
 	
-	
 	private void initialize(Context context, float radius) {
 		this.setOrientation(LinearLayout.VERTICAL);
 		//this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
@@ -53,6 +54,7 @@ public class PictogramView extends LinearLayout {
 		square.addView(createImageView(radius));
 		square.addView(createDeleteButton());
 		
+		setupOnDeleteClickHandler();
 		
 		this.addView(square);
 		
@@ -131,5 +133,27 @@ public class PictogramView extends LinearLayout {
 	public void setTitle(String newTitle)
 	{
 		title.setText(newTitle);
+	}
+	
+	public void setupOnDeleteClickHandler() {
+		deleteButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (isInEditMode && onDeleteClickListener != null)
+					onDeleteClickListener.onDeleteClick();
+			}
+		});
+	}
+
+	public void setOnDeleteClickListener(OnDeleteClickListener listener) {
+		onDeleteClickListener = listener;
+	}
+	
+	public OnDeleteClickListener getOnDeleteClickListener() {
+		return onDeleteClickListener;
+	}
+	
+	public interface OnDeleteClickListener {
+		public void onDeleteClick();
 	}
 }
