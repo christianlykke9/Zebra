@@ -74,6 +74,8 @@ public class RoundedImageView extends ImageView {
         clipPath.addRoundRect(rect, cornerRadius, cornerRadius, Path.Direction.CW);
         canvas.clipPath(clipPath);
         
+    	canvas.drawColor(0x28FFFFFF);
+        
         super.onDraw(canvas);
         
     }    

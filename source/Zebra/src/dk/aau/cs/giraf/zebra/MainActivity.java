@@ -169,6 +169,7 @@ public class MainActivity extends Activity {
 	}
 	
 	private List<Sequence> getSequences(Child child) {
+		child.preloadSequenceImages();
 		return child.getSequences();
 	}
 

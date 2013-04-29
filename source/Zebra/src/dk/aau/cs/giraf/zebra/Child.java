@@ -38,6 +38,12 @@ public class Child {
 		this.sequences = sequences;
 	}
 	
+	public void preloadSequenceImages() {
+		for (Sequence sequence : sequences) {
+			sequence.preloadImage();
+		}
+	}
+	
 	private String addWordToString(String string, String word) {
 		if (word != null) {
 			if (!string.isEmpty())
