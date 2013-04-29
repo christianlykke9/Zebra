@@ -81,18 +81,20 @@
         android:layout_margin="0dp"
         android:overScrollMode="always"
         android:padding="0dp"
-        android:fadeScrollbars="false" >
+        android:fadeScrollbars="false">
+                   
+            <dk.aau.cs.giraf.zebra.SequenceViewGroup
+	            android:id="@+id/sequenceViewGroup"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	          	svg:horizontalSpacing="20dp"
+	          	svg:itemHeight="@dimen/activity_main_picto_size"
+	          	svg:itemWidth="@dimen/activity_main_picto_size"
+	          	android:background="@drawable/main_picto_container_bg"
+	          	android:layout_gravity="center_vertical">
+        	</dk.aau.cs.giraf.zebra.SequenceViewGroup>
 
-        <dk.aau.cs.giraf.zebra.SequenceViewGroup
-            android:id="@+id/sequenceViewGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-          	svg:horizontalSpacing="20dp"
-          	svg:itemHeight="@dimen/activity_main_picto_size"
-          	svg:itemWidth="@dimen/activity_main_picto_size">
-            
-        </dk.aau.cs.giraf.zebra.SequenceViewGroup>
-
+		
     </HorizontalScrollView>
     
 </LinearLayout>
