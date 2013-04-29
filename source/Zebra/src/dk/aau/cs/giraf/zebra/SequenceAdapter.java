@@ -1,6 +1,7 @@
 package dk.aau.cs.giraf.zebra;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -55,7 +56,8 @@ public class SequenceAdapter extends BaseAdapter {
 		} else
 			view = (PictogramView)convertView;
 		
-		view.setImage(sequence.getPictograms().get(position));
+		Drawable image = sequence.getPictograms().get(position);
+		view.setImage(image);
 		
 		if (onCreateViewListener != null)
 			onCreateViewListener.onCreateView(position, view);

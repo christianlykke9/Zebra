@@ -17,64 +17,46 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import android.widget.TextView.OnEditorActionListener;
 import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
 import dk.aau.cs.giraf.oasis.lib.models.Profile;
 import dk.aau.cs.giraf.zebra.EditMode.EditModeObserver;
 import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
 import dk.aau.cs.giraf.zebra.SequenceAdapter.OnCreateViewListener;
+import dk.aau.cs.giraf.zebra.SequenceViewGroup.OnNewButtonClickedListener;
 
 public class SequenceActivity extends Activity {
 	
 	private Sequence sequence;
+	private Profile profile;
+	private Child child;
 	
-	private ProfilesHelper profileHelper;
+	private long profileId;
+	private int sequenceId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		profileHelper = new ProfilesHelper(this);
+		ProfilesHelper profileHelper = new ProfilesHelper(this);
+			
+		profileId = getIntent().getExtras().getLong("profileId");
+		sequenceId = getIntent().getExtras().getInt("sequenceId");
 		
-		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
+		profile = profileHelper.getProfileById(profileId);
 		
-		sequenceGroup.setEditModeEnabled(EditMode.get());
-		
-		long profileId = getIntent().getExtras().getLong("profileId");
-		int sequenceId = getIntent().getExtras().getInt("sequenceId");
-		
-		Profile p = profileHelper.getProfileById(profileId);
-		
-		final Child child = new Child(p);
+		child = new Child(profile);
 		sequence = Test.createSequence(child, sequenceId, this);
 		
 		//Create Adapter
-		final SequenceAdapter adapter = new SequenceAdapter(this, sequence);
-		setupAdapter(adapter);
+		final SequenceAdapter adapter = setupAdapter();
 		
 		//Create Sequence Group
-		sequenceGroup.setAdapter(adapter);
-		EditMode.getInstance().registerObserver(new EditModeObserver() {
-			
-			@Override
-			public void onEditModeChange(boolean editMode) {
-				sequenceGroup.setEditModeEnabled(editMode);
-				
-				TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
-				sequenceTitleView.setEnabled(editMode);
-			}
-		});
-		
-		sequenceGroup.setOnRearrangeListener(new SequenceViewGroup.OnRearrangeListener() {
-			@Override
-			public void onRearrange(int indexFrom, int indexTo) {
-				sequence.rearrange(indexFrom, indexTo);			
-				adapter.notifyDataSetChanged();
-			}
-		});
+		@SuppressWarnings("unused")
+		final SequenceViewGroup sequenceViewGroup = setupSequenceViewGroup(adapter);
 		
 		TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
 		sequenceTitleView.setText(sequence.getName());
@@ -109,7 +91,47 @@ public class SequenceActivity extends Activity {
 		});
 	}
 	
-	private void setupAdapter(final SequenceAdapter adapter) {
+	private SequenceViewGroup setupSequenceViewGroup(final SequenceAdapter adapter) {
+		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
+		sequenceGroup.setEditModeEnabled(EditMode.get());
+		sequenceGroup.setAdapter(adapter);
+		
+		//Handle edit mode change-
+		EditMode.getInstance().registerObserver(new EditModeObserver() {
+			
+			@Override
+			public void onEditModeChange(boolean editMode) {
+				sequenceGroup.setEditModeEnabled(editMode);
+				
+				TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
+				sequenceTitleView.setEnabled(editMode);
+			}
+		});
+		
+		//Handle rearrange
+		sequenceGroup.setOnRearrangeListener(new SequenceViewGroup.OnRearrangeListener() {
+			@Override
+			public void onRearrange(int indexFrom, int indexTo) {
+				sequence.rearrange(indexFrom, indexTo);			
+				adapter.notifyDataSetChanged();
+			}
+		});
+		
+		//Handle new view
+		sequenceGroup.setOnNewButtonClickedListener(new OnNewButtonClickedListener() {
+			@Override
+			public void onNewButtonClicked() {
+				//TODO: Get proper new pictogram.
+				sequence.addPictogramAtEnd(sequence.getPictograms().get(0));
+				adapter.notifyDataSetChanged();
+			}
+		});
+		
+		return sequenceGroup;
+	}
+
+	private SequenceAdapter setupAdapter() {
+		final SequenceAdapter adapter = new SequenceAdapter(this, sequence);
 		
 		//Setup delete handler.
 		adapter.setOnCreateViewListener(new OnCreateViewListener() {		
@@ -127,6 +149,8 @@ public class SequenceActivity extends Activity {
 				}
 			}
 		});
+		
+		return adapter;
 	}
 	
 

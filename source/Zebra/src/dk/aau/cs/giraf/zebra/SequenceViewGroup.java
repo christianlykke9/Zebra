@@ -21,7 +21,6 @@ import android.widget.HorizontalScrollView;
  * Layouts its children with fixed sizes and fixed spacing between each child in
  * the horizontal dimension.
  * 
- * TODO: Draw dragged on top
  */
 public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 
@@ -57,7 +56,8 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 	private View addNewPictoGramView;
 	
 	//Data and Event handling
-	private OnRearrangeListener rearrangeListener = null;
+	private OnRearrangeListener rearrangeListener;
+	private OnNewButtonClickedListener newButtonClickedListener;
 	
 	private SequenceAdapter adapter;
 	private AdapterDataSetObserver observer = new AdapterDataSetObserver();
@@ -79,7 +79,18 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			a.recycle();
 		}
 		
+		setupNewButton();
+	}
+
+	private void setupNewButton() {
 		addNewPictoGramView = ResourceViewFactory.getAddPictogramButton(getContext());
+		addNewPictoGramView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (isInEditMode && newButtonClickedListener != null)
+					newButtonClickedListener.onNewButtonClicked();
+			}
+		});
 	}
 	
 	private int calcChildLeftPosition(int childIndex) {
@@ -699,5 +710,17 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		private boolean isDoneScrolling() {
 			return ! doAutoScroll;
 		}
+	}
+	
+	public void setOnNewButtonClickedListener(OnNewButtonClickedListener listener) {
+		newButtonClickedListener = listener;
+	}
+	
+	public OnNewButtonClickedListener getOnNewButtonClickedListener() {
+		return newButtonClickedListener;
+	}
+	
+	public interface OnNewButtonClickedListener {
+		public void onNewButtonClicked();
 	}
 }
