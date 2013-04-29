@@ -99,4 +99,10 @@ public class Sequence {
 	public void deletePictogram(int position) {
 		pictograms.remove(position);
 	}
+
+	public void preloadImage() {
+		if (image == null) {
+			getImage();
+		}
+	}
 }
