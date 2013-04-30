@@ -1,10 +1,13 @@
 package dk.aau.cs.giraf.zebra;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -31,6 +34,7 @@ public class SequenceActivity extends Activity {
 	private Sequence sequence;
 	private Child child;
 
+	@SuppressLint("ShowToast")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -73,8 +77,22 @@ public class SequenceActivity extends Activity {
 			}
 		});
 		
-		TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
+		final TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
 		sequenceTitleView.setText(sequence.getTitle());
+		sequenceTitleView.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
+			@Override
+			
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				sequence.setTitle(sequenceTitleView.getText().toString());
+			}
+		});
+		
 		ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
 		
 		//TODO: Get the pictogram from the factory here..
