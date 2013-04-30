@@ -446,35 +446,59 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		switch (event.getActionMasked()) {
 		case MotionEvent.ACTION_DOWN:
 			dragging = childAtPoint((int) x, (int) y);
-			if (EditMode.get() && dragging != null && dragging != addNewPictoGramView) {
-				handled = true;
+			if (dragging != null && dragging != addNewPictoGramView) {
 				
-				// Highlight the selected pictogram
-				((PictogramView)dragging).liftUp();
+				if (EditMode.get()) {
+					handled = true;
+					
+					// Highlight the lifted pictogram
+					((PictogramView)dragging).liftUp();
+					
+					startAutoScroll();
 				
-				startAutoScroll();
-			
-				for (int i = 0; i < this.getChildCount(); i++) {
-					this.getChildAt(i).invalidate();
+					for (int i = 0; i < this.getChildCount(); i++) {
+						this.getChildAt(i).invalidate();
+					}
+					
+					requestDisallowInterceptTouchEvent(true);
+					
+					//Grap original drag position
+					draggingIndex = indexOfChild(dragging);
+					curDragIndexPos = draggingIndex;
+					
+					//Everything is in the right place at the start.
+					newPositions = new int[getChildCount()];
+					for (int i = 0; i < newPositions.length; i++) {
+						newPositions[i] = i;
+					}
+					
+					touchX = (int) x;			
+					dragStartX = touchX;
+					centerOffset = touchX - getCenterX(draggingIndex);
+					
+					dragging.invalidate();
 				}
-				
-				requestDisallowInterceptTouchEvent(true);
-				
-				//Grap original drag position
-				draggingIndex = indexOfChild(dragging);
-				curDragIndexPos = draggingIndex;
-				
-				//Everything is in the right place at the start.
-				newPositions = new int[getChildCount()];
-				for (int i = 0; i < newPositions.length; i++) {
-					newPositions[i] = i;
+				else // When a pictogram is clicked when not in editmode is is selected
+				{
+					int selectedIndex = indexOfChild(dragging);
+					
+					for (int i = 0; i < getCurrentSequenceViewCount(); i++) {
+						PictogramView pictogram = (PictogramView) this.getChildAt(i);
+						
+						if (i < selectedIndex) {
+							pictogram.setLowlighted(true);
+							pictogram.setSelected(false);
+						}
+						else if (i > selectedIndex) {
+							pictogram.setLowlighted(false);
+							pictogram.setSelected(false);
+						}
+						else {
+							pictogram.setLowlighted(false);
+							pictogram.setSelected(true);
+						}
+					}
 				}
-				
-				touchX = (int) x;			
-				dragStartX = touchX;
-				centerOffset = touchX - getCenterX(draggingIndex);
-				
-				dragging.invalidate();
 			}
 			break;
 		case MotionEvent.ACTION_MOVE:

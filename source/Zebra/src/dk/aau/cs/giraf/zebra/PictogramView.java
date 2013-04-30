@@ -113,6 +113,28 @@ public class PictogramView extends LinearLayout {
 		invalidate();
 	}
 	
+	public void setSelected(boolean selected) {
+		if (selected) {
+			pictogram.setScaleX(HIGHLIGHT_SCALE);
+	        pictogram.setScaleY(HIGHLIGHT_SCALE);
+		} else {
+			pictogram.setScaleX(NORMAL_SCALE);
+	        pictogram.setScaleY(NORMAL_SCALE);
+		}
+		
+        this.invalidate();
+	}
+	
+	public void setLowlighted(boolean lowlighted) {
+		if (lowlighted) {
+			this.setAlpha(0.4f);
+		} else {
+			this.setAlpha(1f);
+		}
+		
+		this.invalidate();
+	}
+	
 	private void setDeleteButtonVisible(boolean visible) {
 		deleteButton.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
 		invalidate();
