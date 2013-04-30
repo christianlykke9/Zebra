@@ -20,8 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.widget.TextView.OnEditorActionListener;
-import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
-import dk.aau.cs.giraf.oasis.lib.models.Profile;
 import dk.aau.cs.giraf.zebra.EditMode.EditModeObserver;
 import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
 import dk.aau.cs.giraf.zebra.SequenceAdapter.OnCreateViewListener;
@@ -32,7 +30,7 @@ public class SequenceActivity extends Activity {
 	
 	private Sequence sequence;
 	private Child child;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -42,12 +40,14 @@ public class SequenceActivity extends Activity {
 		
 		sequenceGroup.setEditModeEnabled(EditMode.get());
 		
-		long profileId = getIntent().getExtras().getLong("profileId");
-		int sequenceId = getIntent().getExtras().getInt("sequenceId");
+		Bundle extras = getIntent().getExtras();
+		long profileId = extras.getLong("profileId");
+		long sequenceId = extras.getLong("sequenceId");
+		boolean isNew = extras.getBoolean("new");
 		
-		child = new Child(profileId);
-		sequence = Sequence.fromSequenceId(sequenceId);
-		
+		child = ZebraApplication.getChildFromId(profileId);
+		sequence = child.getSequenceFromId(sequenceId);
+
 		//Create Adapter
 		final SequenceAdapter adapter = new SequenceAdapter(this, sequence);
 		setupAdapter(adapter);
@@ -76,8 +76,15 @@ public class SequenceActivity extends Activity {
 		TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
 		sequenceTitleView.setText(sequence.getTitle());
 		ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
+		
 		//TODO: Get the pictogram from the factory here..
 		//sequenceImageView.setImageDrawable(sequence.getImageId());
+		
+		if (isNew) {
+			EditMode.set(true);
+			sequenceTitleView.requestFocus();
+			Toast.makeText(this, getResources().getString(R.string.help_new_sequence), Toast.LENGTH_LONG);
+		}
 		
 		initializeTopBar();
 		
@@ -152,8 +159,7 @@ public class SequenceActivity extends Activity {
 				sequence.setImageId(checkoutIds[0]);
 				
 				ImageView sequenceImageView = (ImageView)findViewById(R.id.sequence_image);
-				// TODO: GET THE IMAGE ID
-				//sequenceImageView.setImageDrawable(sequence.getImageId()());
+				//sequenceImageView.setImageDrawable(sequence.getImage());
 			}
 		}
 	}

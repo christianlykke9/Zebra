@@ -47,6 +47,22 @@ public class Child {
 		return sequences.size();
 	}
 	
+	public long getNextSequenceId() {
+		if (sequences.size() != 0)
+			return sequences.get(sequences.size() - 1).getSequenceId();
+		
+		return 1;
+	}
+	
+	public Sequence getSequenceFromId(long sequenceId) {
+		for (Sequence sequence : sequences) {
+			if (sequence.getSequenceId() == sequenceId)
+				return sequence;
+		}
+		
+		return null;
+	}
+	
 	public void preloadSequenceImages() {
 		
 		// TODO: Logic goes here :]

@@ -3,6 +3,7 @@ package dk.aau.cs.giraf.zebra;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,56 +14,54 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
-import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
-import dk.aau.cs.giraf.oasis.lib.models.Profile;
 import dk.aau.cs.giraf.zebra.models.Child;
 import dk.aau.cs.giraf.zebra.models.Sequence;
 
+@SuppressLint("ShowToast")
 public class MainActivity extends Activity {
 
-	private List<Child> children;
-	private List<Sequence> sequences;
-	private GridView sequenceGrid;
+	private List<Child> children = ZebraApplication.getChildren();
+	private List<Sequence> sequences = new ArrayList<Sequence>();
 	
+	private GridView sequenceGrid;
 	private boolean isInEditMode = false;
 	
-	private ProfilesHelper profileHelper;
+	private SequenceListAdapter sequenceAdapter;
 	
-	Child child;
+	Child selectedChild;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_overview);
-		
-		profileHelper = new ProfilesHelper(this);
-		
-		children = getChildren();
-		//TODO: Make this robust.
-		child = children.get(0);
-		sequences = getSequences(child);
+
+		final ChildAdapter childAdapter = new ChildAdapter(this, children);
 		
 		ListView childList = (ListView)findViewById(R.id.child_list);
-		final ChildAdapter childAdapter = new ChildAdapter(this, children);
 		childList.setAdapter(childAdapter);
+
+		sequenceAdapter = new SequenceListAdapter(this, sequences);
 		
 		sequenceGrid = (GridView)findViewById(R.id.sequence_grid);
-		final SequenceListAdapter sequenceAdapter = new SequenceListAdapter(this, sequences);
 		sequenceGrid.setAdapter(sequenceAdapter);
 		
-		//Load Child sequences
+		if (children.size() == 0) {
+			Toast.makeText(this, getResources().getString(R.string.no_children), Toast.LENGTH_LONG);
+		}
+		else {
+			selectedChild = children.get(0);
+			refreshSelectedChild();
+		}
+		
+		//Load Child
 		childList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-								
-				child = childAdapter.getItem(arg2);
 				
-				((TextView)findViewById(R.id.child_name)).setText(child.getName());
-								
-				sequences.clear();
-				sequences.addAll(getSequences(child));
-				sequenceAdapter.notifyDataSetChanged();
+				selectedChild = childAdapter.getItem(arg2);
+				refreshSelectedChild();
 				
 				final GridView sequenceGridView = ((GridView)findViewById(R.id.sequence_grid));
 				
@@ -80,8 +79,7 @@ public class MainActivity extends Activity {
 				((PictogramView)arg1).liftUp();
 				
 				Sequence sequence = sequenceAdapter.getItem(arg2);
-				
-				enterSequence(sequence);
+				enterSequence(sequence, false);
 			}		
 		});
 		
@@ -91,15 +89,13 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				//Intent newSequenceIntent = new Intent(getApplication(), SequenceActivity.class);
-//				newSequenceIntent.putExtra("profileId", null);
-//				newSequenceIntent.putExtra("sequenceId", 0);
-				 
-				Sequence newSequence = new Sequence();
-				//TODO: Fix this id mess.
-				newSequence.setSequenceId(1);
 				
-				enterSequence(newSequence);
+				Sequence sequence = new Sequence();
+				sequence.setTitle(getResources().getString(R.string.sequence_default_title));
+				sequence.setSequenceId(selectedChild.getNextSequenceId());
+				selectedChild.getSequences().add(sequence);
+				
+				enterSequence(sequence, true);
 			}
 		});
 		
@@ -117,8 +113,19 @@ public class MainActivity extends Activity {
 		});
 	}
 	
+	public void refreshSelectedChild() {
+		((TextView)findViewById(R.id.child_name)).setText(selectedChild.getName());
+		
+		sequences.clear();
+		sequences.addAll(selectedChild.getSequences());
+		sequenceAdapter.notifyDataSetChanged();
+	}
+	
 	@Override
 	protected void onResume() {
+		
+		refreshSelectedChild();
+		
 		// Remove highlighting from all images
 		for (int i = 0; i < sequenceGrid.getChildCount(); i++)
 		{
@@ -158,27 +165,12 @@ public class MainActivity extends Activity {
 	}
 	
 
-	private void enterSequence(Sequence sequence) {
+	private void enterSequence(Sequence sequence, boolean isNew) {
 		Intent intent = new Intent(getApplication(), SequenceActivity.class);
-		intent.putExtra("profileId", child.getProfileId());
+		intent.putExtra("profileId", selectedChild.getProfileId());
 		intent.putExtra("sequenceId", sequence.getSequenceId());
-		
+		intent.putExtra("new", isNew);
+		//TODO: Put sequence id in extras.
 		startActivity(intent);
-	}
-	
-	private List<Sequence> getSequences(Child child) {
-		child.preloadSequenceImages();
-		return child.getSequences();
-	}
-
-	private List<Child> getChildren() {
-		ArrayList<Child> children = new ArrayList<Child>();
-		
-		Child child = new Child(10);
-		children.add(child);
-		
-		// TODO: ADD TEST DATA
-		
-		return children;
 	}
 }
