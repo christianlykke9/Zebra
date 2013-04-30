@@ -57,7 +57,7 @@
             android:id="@+id/child_list"
             android:layout_width="375dp"
             android:layout_height="wrap_content"
-            android:background="#28FFFFFF"
+            android:background="@drawable/overview_list_bg"
             android:dividerHeight="1dp"
             android:fadeScrollbars="false" >
         </dk.aau.cs.giraf.zebra.BounceListView>
