@@ -14,10 +14,9 @@
         android:layout_height="wrap_content"
         android:padding="2dip"
         android:layout_alignParentLeft="true"
-        android:background="#ffffff"
         android:layout_marginRight="10dp">
  
-        <ImageView
+        <dk.aau.cs.giraf.zebra.RoundedImageView
             android:id="@+id/child_image"
             android:layout_width="50dip"
             android:layout_height="50dip" />

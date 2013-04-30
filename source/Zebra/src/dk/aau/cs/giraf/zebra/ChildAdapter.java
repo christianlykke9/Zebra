@@ -16,11 +16,13 @@ public class ChildAdapter extends BaseAdapter {
 
 	private List<Child> items;
 	private LayoutInflater inflater;
+	private Activity activity;
 	
 	public ChildAdapter(Activity activity, List<Child> items) {
 		
 		this.items = items;
 		this.inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		this.activity = activity;
 	}
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -40,7 +42,13 @@ public class ChildAdapter extends BaseAdapter {
         
         nameTextView.setText(c.getName());
         countTextView.setText(c.getSequenceCount() + " sekvenser");
-        childImage.setImageDrawable(profilePicture);
+        
+        if (profilePicture == null) {
+        	childImage.setImageDrawable(activity.getResources().getDrawable(R.drawable.placeholder));
+        } else {
+        	childImage.setImageDrawable(profilePicture);
+        }
+        
         return v;
     }
 
