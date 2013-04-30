@@ -105,4 +105,8 @@ public class Sequence {
 			getImage();
 		}
 	}
+
+	public long getImageId() {
+		return imageId;
+	}
 }
