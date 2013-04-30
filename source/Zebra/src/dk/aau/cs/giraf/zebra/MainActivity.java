@@ -93,7 +93,7 @@ public class MainActivity extends Activity {
 //				newSequenceIntent.putExtra("profileId", null);
 //				newSequenceIntent.putExtra("sequenceId", 0);
 				 
-				Sequence newSequence = new Sequence(MainActivity.this, child, "Ny Sekvens");
+				Sequence newSequence = new Sequence();
 				//TODO: Fix this id mess.
 				newSequence.setSequenceId(1);
 				
@@ -158,13 +158,9 @@ public class MainActivity extends Activity {
 
 	private void enterSequence(Sequence sequence) {
 		Intent intent = new Intent(getApplication(), SequenceActivity.class);
-		
-		//TODO: LÆKKER MUSIK
-		intent.putExtra("profileId", sequence.getChild().getProfile().getId());
+		intent.putExtra("profileId", child.getProfileId());
 		intent.putExtra("sequenceId", sequence.getSequenceId());
-		//intent.putExtra("sequence", sequence);
 		
-		//TODO: Put sequence id in extras.
 		startActivity(intent);
 	}
 	
@@ -174,20 +170,12 @@ public class MainActivity extends Activity {
 	}
 
 	private List<Child> getChildren() {
-		
-		List<Profile> profiles = profileHelper.getChildren();
-		
 		ArrayList<Child> children = new ArrayList<Child>();
 		
-		int i = 3;
+		Child child = new Child(10);
+		children.add(child);
 		
-		for (Profile p : profiles) {
-			Child c = new Child(p);
-			children.add(c);
-			
-			c.setSequences(Test.getSequences(c, (i % 4), this));
-			i++;
-		}
+		// TODO: ADD TEST DATA
 		
 		return children;
 	}

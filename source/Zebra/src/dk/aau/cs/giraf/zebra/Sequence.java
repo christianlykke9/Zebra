@@ -11,26 +11,28 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 /**
- * Represents a ordered collection (sequence) of drawables.
+ * Represents a ordered collection (sequence) of pictograms.
  *
  */
 public class Sequence {
 
-	private String name;
-	private Context context;
-	private List<Drawable> pictograms = new ArrayList<Drawable>();
-	private Child child;
 	private int sequenceId;
-	
+	private String name;
 	private long imageId;
-	private Drawable image;
 	
-	public Sequence(Context context, Child child, String name) {		
-		this.context = context;
-		
-		this.child = child;
-		this.name = name;
+	public Sequence() {
 	}
+	
+	public static Sequence fromSequenceId(long sequenceId) {
+		Sequence sequence = new Sequence();
+		
+		// TODO: GET FROM DATABASE
+		
+		return sequence;		
+	}
+	
+	// Ordered list of pictograms
+	private List<Pictogram> pictograms = new ArrayList<Pictogram>();
 	
 	public int getSequenceId() {
 		return sequenceId;
@@ -38,14 +40,6 @@ public class Sequence {
 	
 	public void setSequenceId(int sequenceId) {
 		this.sequenceId = sequenceId;
-	}
-
-	public Child getChild() {
-		return child;
-	}
-	
-	public void setChild(Child child) {
-		this.child = child;
 	}
 	
 	public String getName() {
@@ -56,22 +50,15 @@ public class Sequence {
 		this.name = name;
 	}
 	
-	public void setImageId(long imageId) {
-		image = null;
-		this.imageId = imageId;
+	public long getImageId() {
+		return imageId;
 	}
 	
-	public Drawable getImage() {
-		if (image == null) {
-			Pictogram pictogram = PictoFactory.getPictogram(context, imageId);
-			String path = pictogram.getImagePath();
-			image = Drawable.createFromPath(path);
-		}
-		
-		return image;
+	public void setImageId(long imageId) {
+		this.imageId = imageId;
 	}
 
-	public List<Drawable> getPictograms() {
+	public List<Pictogram> getPictograms() {
 		return Collections.unmodifiableList(pictograms);
 	}
 	
@@ -84,25 +71,19 @@ public class Sequence {
 		if (oldIndex < 0 || oldIndex >= pictograms.size()) throw new IllegalArgumentException("oldIndex out of range");
 		if (newIndex < 0 || newIndex >= pictograms.size()) throw new IllegalArgumentException("newIndex out of range");
 		
-		Drawable temp = pictograms.remove(oldIndex);
+		Pictogram temp = pictograms.remove(oldIndex);
 		pictograms.add(newIndex, temp);
 	}
 	
-	public void addPictogramAtEnd(Drawable pictogram) {
+	public void addPictogramAtEnd(Pictogram pictogram) {
 		pictograms.add(pictogram);
 	}
 	
-	public void deletePictogram(Drawable pictogram) {
+	public void deletePictogram(Pictogram pictogram) {
 		pictograms.remove(pictogram);
 	}
 	
 	public void deletePictogram(int position) {
 		pictograms.remove(position);
-	}
-
-	public void preloadImage() {
-		if (image == null) {
-			getImage();
-		}
 	}
 }

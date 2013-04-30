@@ -29,15 +29,12 @@ import dk.aau.cs.giraf.zebra.SequenceAdapter.OnCreateViewListener;
 public class SequenceActivity extends Activity {
 	
 	private Sequence sequence;
+	private Child child;
 	
-	private ProfilesHelper profileHelper;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		profileHelper = new ProfilesHelper(this);
 		
 		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
 		
@@ -46,10 +43,8 @@ public class SequenceActivity extends Activity {
 		long profileId = getIntent().getExtras().getLong("profileId");
 		int sequenceId = getIntent().getExtras().getInt("sequenceId");
 		
-		Profile p = profileHelper.getProfileById(profileId);
-		
-		final Child child = new Child(p);
-		sequence = Test.createSequence(child, sequenceId, this);
+		child = new Child(profileId);
+		sequence = Sequence.fromSequenceId(sequenceId);
 		
 		//Create Adapter
 		final SequenceAdapter adapter = new SequenceAdapter(this, sequence);
@@ -79,7 +74,8 @@ public class SequenceActivity extends Activity {
 		TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
 		sequenceTitleView.setText(sequence.getName());
 		ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
-		sequenceImageView.setImageDrawable(sequence.getPictograms().get(0));
+		//TODO: Get the pictogram from the factory here..
+		//sequenceImageView.setImageDrawable(sequence.getImageId());
 		
 		initializeTopBar();
 		
@@ -154,7 +150,8 @@ public class SequenceActivity extends Activity {
 				sequence.setImageId(checkoutIds[0]);
 				
 				ImageView sequenceImageView = (ImageView)findViewById(R.id.sequence_image);
-				sequenceImageView.setImageDrawable(sequence.getImage());
+				// TODO: GET THE IMAGE ID
+				//sequenceImageView.setImageDrawable(sequence.getImageId()());
 			}
 		}
 	}
@@ -204,7 +201,7 @@ public class SequenceActivity extends Activity {
 		});
 
 		TextView childName = (TextView)findViewById(R.id.child_name);
-		childName.setText(sequence.getChild().getName());
+		childName.setText(child.getName());
 	}
 	
 	public void hideSoftKeyboardFromView(View view) {

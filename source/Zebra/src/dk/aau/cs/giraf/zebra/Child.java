@@ -2,32 +2,36 @@ package dk.aau.cs.giraf.zebra;
 
 import java.util.ArrayList;
 import java.util.List;
-import dk.aau.cs.giraf.oasis.lib.models.Profile;
+
+import android.graphics.drawable.Drawable;
 
 public class Child {
 	
-	private List<Sequence> sequences = new ArrayList<Sequence>();
-	private Profile profile;
+	private long profileId;
+	private String name;
+	private Drawable picture;
 	
-	public Child(Profile profile) {
-		this.profile = profile;
+	private List<Sequence> sequences = new ArrayList<Sequence>();
+	
+	public Child(long profileId) {
+		this.profileId = profileId;
+		
+		//TODO: FOR TESTING ONLY:
+		this.name = "Søren Knudsen";
+		
+		//TODO: Get the name from the database
+	}
+	
+	public long getProfileId() {
+		return profileId;
 	}
 	
 	public String getName() {
-		String name = "";
-		name = addWordToString(name, getProfile().getFirstname());
-		name = addWordToString(name, getProfile().getMiddlename());
-		name = addWordToString(name, getProfile().getSurname());
-		
 		return name;
 	}
 	
-	public Profile getProfile() {
-		return profile;
-	}
-	
-	public int getSequenceCount() {
-		return sequences.size();
+	public Drawable getPicture() {
+		return picture;
 	}
 	
 	public List<Sequence> getSequences() {
@@ -38,21 +42,12 @@ public class Child {
 		this.sequences = sequences;
 	}
 	
-	public void preloadSequenceImages() {
-		for (Sequence sequence : sequences) {
-			sequence.preloadImage();
-		}
+	public int getSequenceCount() {
+		return sequences.size();
 	}
 	
-	private String addWordToString(String string, String word) {
-		if (word != null) {
-			if (!string.isEmpty())
-			{
-				string += " ";
-			}
-			string += word;
-		}
+	public void preloadSequenceImages() {
 		
-		return string;
+		// TODO: Logic goes here :]
 	}
 }

@@ -32,7 +32,8 @@ public class SequenceListAdapter extends BaseAdapter {
         Sequence s = items.get(position);
         
         v.setTitle(s.getName());
-        v.setImage(s.getImage());
+        // TODO: GET THE IMAGE ID
+        //v.setImage(s.getImageId());
 
         return v;
     }
