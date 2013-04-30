@@ -59,7 +59,8 @@
             android:layout_height="wrap_content"
             android:background="@drawable/overview_list_bg"
             android:dividerHeight="1dp"
-            android:fadeScrollbars="false" >
+            android:fadeScrollbars="false"
+            android:listSelector="@drawable/list_selector" >
         </dk.aau.cs.giraf.zebra.BounceListView>
 
         <GridView
