@@ -25,6 +25,8 @@ import dk.aau.cs.giraf.oasis.lib.models.Profile;
 import dk.aau.cs.giraf.zebra.EditMode.EditModeObserver;
 import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
 import dk.aau.cs.giraf.zebra.SequenceAdapter.OnCreateViewListener;
+import dk.aau.cs.giraf.zebra.models.Child;
+import dk.aau.cs.giraf.zebra.models.Sequence;
 
 public class SequenceActivity extends Activity {
 	
@@ -72,7 +74,7 @@ public class SequenceActivity extends Activity {
 		});
 		
 		TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
-		sequenceTitleView.setText(sequence.getName());
+		sequenceTitleView.setText(sequence.getTitle());
 		ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
 		//TODO: Get the pictogram from the factory here..
 		//sequenceImageView.setImageDrawable(sequence.getImageId());

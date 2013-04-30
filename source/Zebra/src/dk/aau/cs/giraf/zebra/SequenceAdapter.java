@@ -1,5 +1,6 @@
 package dk.aau.cs.giraf.zebra;
 
+import dk.aau.cs.giraf.zebra.models.Sequence;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;

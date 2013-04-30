@@ -16,6 +16,8 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
 import dk.aau.cs.giraf.oasis.lib.models.Profile;
+import dk.aau.cs.giraf.zebra.models.Child;
+import dk.aau.cs.giraf.zebra.models.Sequence;
 
 public class MainActivity extends Activity {
 

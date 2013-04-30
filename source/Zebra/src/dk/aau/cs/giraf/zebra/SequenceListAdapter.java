@@ -2,6 +2,9 @@ package dk.aau.cs.giraf.zebra;
 
 import java.util.List;
 
+import dk.aau.cs.giraf.zebra.models.Child;
+import dk.aau.cs.giraf.zebra.models.Sequence;
+
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +34,7 @@ public class SequenceListAdapter extends BaseAdapter {
 		
         Sequence s = items.get(position);
         
-        v.setTitle(s.getName());
+        v.setTitle(s.getTitle());
         // TODO: GET THE IMAGE ID
         //v.setImage(s.getImageId());
 
