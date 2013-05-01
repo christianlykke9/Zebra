@@ -450,7 +450,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			dragging = childAtPoint((int) x, (int) y);
 			if (dragging != null && dragging != addNewPictoGramView) {
 				
-				if (EditMode.get()) {
+				if (isInEditMode) {
 					handled = true;
 					
 					// Highlight the lifted pictogram

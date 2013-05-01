@@ -107,8 +107,16 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				EditMode.toggle();
-				setEditModeEnabled(EditMode.get());
+				ToggleButton button = (ToggleButton)v;
+				isInEditMode = button.isChecked();
+
+				for (int i = 0; i < sequenceGrid.getChildCount(); i++) {
+					View view = sequenceGrid.getChildAt(i);
+					
+					if (view instanceof PictogramView) {
+						((PictogramView)view).setEditModeEnabled(isInEditMode);
+					}
+				}
 			}
 		});
 	}
@@ -137,38 +145,14 @@ public class MainActivity extends Activity {
 			}
 		}
 		
-		this.setEditModeEnabled(EditMode.get());
-		
-		
-		// Update the state of the editmode switcher button
-		ToggleButton button = (ToggleButton) findViewById(R.id.edit_mode_toggle);
-		button.setChecked(EditMode.get());
-		
 		super.onResume();
-	}
-	
-
-	public void setEditModeEnabled(boolean editEnabled) {
-		if (isInEditMode != editEnabled) {
-			isInEditMode = editEnabled;
-			
-			for (int i = 0; i < sequenceGrid.getChildCount(); i++)
-			{
-				View view = sequenceGrid.getChildAt(i);
-				
-				if (view instanceof PictogramView)
-				{
-					((PictogramView)view).setEditModeEnabled(isInEditMode);
-				}
-			}
-		}
-	}
-	
+	}	
 
 	private void enterSequence(Sequence sequence, boolean isNew) {
 		Intent intent = new Intent(getApplication(), SequenceActivity.class);
 		intent.putExtra("profileId", selectedChild.getProfileId());
 		intent.putExtra("sequenceId", sequence.getSequenceId());
+		intent.putExtra("editMode", isInEditMode);
 		intent.putExtra("new", isNew);
 
 		startActivity(intent);

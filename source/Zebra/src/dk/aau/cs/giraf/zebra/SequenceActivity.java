@@ -25,15 +25,10 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import dk.aau.cs.giraf.zebra.EditMode.EditModeObserver;
 import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
 import dk.aau.cs.giraf.zebra.SequenceAdapter.OnCreateViewListener;
 import dk.aau.cs.giraf.zebra.SequenceViewGroup.OnNewButtonClickedListener;
 
-import android.widget.TextView.OnEditorActionListener;
-import dk.aau.cs.giraf.zebra.EditMode.EditModeObserver;
-import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
-import dk.aau.cs.giraf.zebra.SequenceAdapter.OnCreateViewListener;
 import dk.aau.cs.giraf.zebra.models.Child;
 import dk.aau.cs.giraf.zebra.models.Pictogram;
 import dk.aau.cs.giraf.zebra.models.Sequence;
@@ -44,6 +39,9 @@ public class SequenceActivity extends Activity {
 	private Sequence sequence;
 	
 	private Child child;
+	
+	private boolean isInEditMode;
+	private boolean isNew;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,12 +50,16 @@ public class SequenceActivity extends Activity {
 		
 		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
 		
-		sequenceGroup.setEditModeEnabled(EditMode.get());
+		sequenceGroup.setEditModeEnabled(isInEditMode);
 		
 		Bundle extras = getIntent().getExtras();
 		long profileId = extras.getLong("profileId");
 		long sequenceId = extras.getLong("sequenceId");
-		boolean isNew = extras.getBoolean("new");
+		isNew = extras.getBoolean("new");
+		isInEditMode = extras.getBoolean("editMode");
+		
+		// TODO: Fix this in the Main activity so the add button is only available in edit mode.
+		if (isNew) isInEditMode = true;
 
 		child = ZebraApplication.getChildFromId(profileId);
 		originalSequence = child.getSequenceFromId(sequenceId);
@@ -94,7 +96,6 @@ public class SequenceActivity extends Activity {
 		//sequenceImageView.setImageDrawable(sequence.getImageId());
 		
 		if (isNew) {
-			EditMode.set(true);
 			sequenceTitleView.requestFocus();
 			Toast.makeText(this, getResources().getString(R.string.help_new_sequence), Toast.LENGTH_LONG).show();
 		}
@@ -105,7 +106,7 @@ public class SequenceActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				if (EditMode.get()) {
+				if (isInEditMode) {
 					Intent intent = new Intent();
 					intent.setComponent(new ComponentName("dk.aau.cs.giraf.pictoadmin", "dk.aau.cs.giraf.pictoadmin.PictoAdminMain"));
 					startActivityForResult(intent, 1);
@@ -116,11 +117,20 @@ public class SequenceActivity extends Activity {
 		final ImageButton cancelButton = (ImageButton)findViewById(R.id.cancel_button);
 		final ImageButton okButton = (ImageButton)findViewById(R.id.ok_button);
 		
+		if (!isInEditMode) {
+			cancelButton.setVisibility(View.GONE);
+			okButton.setVisibility(View.GONE);
+		}
+		
 		cancelButton.setOnClickListener(new ImageButton.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				Toast.makeText(SequenceActivity.this, "CANCEL", Toast.LENGTH_LONG).show();
+				// Returning to the overview activity
+				finish();
+				
+				// If the sequence is new and the changes are discarded, the sequence will be deleted.
+				child.getSequences().remove(originalSequence);
 			}
 		
 		});
@@ -131,9 +141,15 @@ public class SequenceActivity extends Activity {
 			public void onClick(View v) {
 				cancelButton.setVisibility(View.GONE);
 				okButton.setVisibility(View.GONE);
+
+				isInEditMode = false;
 				
-				EditMode.set(false);
+				sequenceGroup.setEditModeEnabled(isInEditMode);
 				
+				TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
+				sequenceTitleView.setEnabled(isInEditMode);
+				
+				// Changing the pointer to the original sequence
 				originalSequence = sequence;
 				
 				Toast.makeText(SequenceActivity.this, getResources().getString(R.string.changes_saved), Toast.LENGTH_LONG).show();
@@ -158,20 +174,8 @@ public class SequenceActivity extends Activity {
 	
 	private SequenceViewGroup setupSequenceViewGroup(final SequenceAdapter adapter) {
 		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
-		sequenceGroup.setEditModeEnabled(EditMode.get());
+		sequenceGroup.setEditModeEnabled(isInEditMode);
 		sequenceGroup.setAdapter(adapter);
-		
-		//Handle edit mode change-
-		EditMode.getInstance().registerObserver(new EditModeObserver() {
-			
-			@Override
-			public void onEditModeChange(boolean editMode) {
-				sequenceGroup.setEditModeEnabled(editMode);
-				
-				TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
-				sequenceTitleView.setEnabled(editMode);
-			}
-		});
 		
 		//Handle rearrange
 		sequenceGroup.setOnRearrangeListener(new SequenceViewGroup.OnRearrangeListener() {
@@ -261,7 +265,7 @@ public class SequenceActivity extends Activity {
 	
 	private void initializeTopBar() {
         TextView editText = (TextView) findViewById(R.id.sequence_title);
-        editText.setEnabled(EditMode.get());
+        editText.setEnabled(isInEditMode);
 		
         // Create listener to remove focus when "Done" is pressed on the keyboard
 		editText.setOnEditorActionListener(new OnEditorActionListener() {        
