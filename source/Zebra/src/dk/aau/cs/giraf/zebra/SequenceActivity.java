@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -37,11 +38,12 @@ import dk.aau.cs.giraf.zebra.models.Child;
 import dk.aau.cs.giraf.zebra.models.Sequence;
 
 public class SequenceActivity extends Activity {
-	
+
+	private Sequence originalSequence;
 	private Sequence sequence;
+	
 	private Child child;
 
-	@SuppressLint("ShowToast")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -57,7 +59,10 @@ public class SequenceActivity extends Activity {
 		boolean isNew = extras.getBoolean("new");
 
 		child = ZebraApplication.getChildFromId(profileId);
-		sequence = child.getSequenceFromId(sequenceId);
+		originalSequence = child.getSequenceFromId(sequenceId);
+		
+		// Get a clone of the sequence so the original sequence is not modified
+		sequence = originalSequence.getClone();
 
 		//Create Adapter
 		final SequenceAdapter adapter = setupAdapter();
@@ -90,7 +95,7 @@ public class SequenceActivity extends Activity {
 		if (isNew) {
 			EditMode.set(true);
 			sequenceTitleView.requestFocus();
-			Toast.makeText(this, getResources().getString(R.string.help_new_sequence), Toast.LENGTH_LONG);
+			Toast.makeText(this, getResources().getString(R.string.help_new_sequence), Toast.LENGTH_LONG).show();
 		}
 		
 		initializeTopBar();
@@ -106,19 +111,48 @@ public class SequenceActivity extends Activity {
 				}
 			}
 		});
+
+		final ImageButton cancelButton = (ImageButton)findViewById(R.id.cancel_button);
+		final ImageButton okButton = (ImageButton)findViewById(R.id.ok_button);
 		
-		// Edit mode switcher button
-		ToggleButton button = (ToggleButton) findViewById(R.id.edit_mode_toggle);
-		
-		button.setChecked(EditMode.get());
-		
-		button.setOnClickListener(new ImageButton.OnClickListener() {
-			
+		cancelButton.setOnClickListener(new ImageButton.OnClickListener() {
+
 			@Override
 			public void onClick(View v) {
-				EditMode.toggle();
+				Toast.makeText(SequenceActivity.this, "CANCEL", Toast.LENGTH_LONG).show();
 			}
+		
 		});
+		
+		okButton.setOnClickListener(new ImageButton.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				cancelButton.setVisibility(View.GONE);
+				okButton.setVisibility(View.GONE);
+				
+				EditMode.set(false);
+				
+				originalSequence = sequence;
+				
+				Toast.makeText(SequenceActivity.this, getResources().getString(R.string.changes_saved), Toast.LENGTH_LONG).show();
+			}
+		
+		});
+		
+		
+//		// Edit mode switcher button
+//		ToggleButton button = (ToggleButton) findViewById(R.id.edit_mode_toggle);
+//		
+//		button.setChecked(EditMode.get());
+//		
+//		button.setOnClickListener(new ImageButton.OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				EditMode.toggle();
+//			}
+//		});
 	}
 	
 	private SequenceViewGroup setupSequenceViewGroup(final SequenceAdapter adapter) {

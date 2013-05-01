@@ -170,7 +170,7 @@ public class MainActivity extends Activity {
 		intent.putExtra("profileId", selectedChild.getProfileId());
 		intent.putExtra("sequenceId", sequence.getSequenceId());
 		intent.putExtra("new", isNew);
-		//TODO: Put sequence id in extras.
+
 		startActivity(intent);
 	}
 }
