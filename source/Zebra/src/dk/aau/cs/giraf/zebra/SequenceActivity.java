@@ -1,14 +1,10 @@
 package dk.aau.cs.giraf.zebra;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.opengl.Visibility;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -23,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
 import dk.aau.cs.giraf.zebra.SequenceAdapter.OnCreateViewListener;
@@ -73,27 +68,18 @@ public class SequenceActivity extends Activity {
 		
 		final TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
 		sequenceTitleView.setText(sequence.getTitle());
-		sequenceTitleView.addTextChangedListener(new TextWatcher() {
-			
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) { }
-			@Override
-			
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-			
-			@Override
-			public void afterTextChanged(Editable s) {
-				sequence.setTitle(sequenceTitleView.getText().toString());
-			}
-		});
 		
 		ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
 		
-		//TODO: Get the pictogram from the factory here..
-		//sequenceImageView.setImageDrawable(sequence.getImageId());
+		if (sequence.getImage() == null) {
+			sequenceImageView.setImageDrawable(getResources().getDrawable(R.drawable.sequence_placeholder));
+		}
+		else {
+			//TODO: Get the pictogram from the factory here..
+			//sequenceImageView.setImageDrawable(sequence.getImageId());
+		}
 		
 		if (isNew) {
-			sequenceTitleView.requestFocus();
 			Toast.makeText(this, getResources().getString(R.string.help_new_sequence), Toast.LENGTH_LONG).show();
 		}
 		
@@ -123,11 +109,7 @@ public class SequenceActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				// Returning to the overview activity
-				finish();
-				
-				// If the sequence is new and the changes are discarded, the sequence will be deleted.
-				child.getSequences().remove(originalSequence);
+				discardChangesAndReturn();
 			}
 		
 		});
@@ -140,33 +122,27 @@ public class SequenceActivity extends Activity {
 				okButton.setVisibility(View.GONE);
 
 				isInEditMode = false;
-				
 				sequenceGroup.setEditModeEnabled(isInEditMode);
 				
 				TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
 				sequenceTitleView.setEnabled(isInEditMode);
 				
-				// Changing the pointer to the original sequence
+				// Saving the sequence title and changing the pointer to the original sequence
+				sequence.setTitle(sequenceTitleView.getText().toString());
 				originalSequence = sequence;
 				
 				Toast.makeText(SequenceActivity.this, getResources().getString(R.string.changes_saved), Toast.LENGTH_LONG).show();
 			}
 		
 		});
+	}
+	
+	private void discardChangesAndReturn() {
+		// If the sequence is new and the changes are discarded, the sequence will be deleted.
+		child.getSequences().remove(originalSequence);
 		
-		
-//		// Edit mode switcher button
-//		ToggleButton button = (ToggleButton) findViewById(R.id.edit_mode_toggle);
-//		
-//		button.setChecked(EditMode.get());
-//		
-//		button.setOnClickListener(new ImageButton.OnClickListener() {
-//			
-//			@Override
-//			public void onClick(View v) {
-//				EditMode.toggle();
-//			}
-//		});
+		// Returning to the overview activity
+		finish();
 	}
 	
 	private SequenceViewGroup setupSequenceViewGroup(final SequenceAdapter adapter) {
@@ -246,10 +222,16 @@ public class SequenceActivity extends Activity {
 				// Set the sequence image using the first ID from the checkout.
 				sequence.setImageId(checkoutIds[0]);
 				
-				ImageView sequenceImageView = (ImageView)findViewById(R.id.sequence_image);
+				//ImageView sequenceImageView = (ImageView)findViewById(R.id.sequence_image);
 				//sequenceImageView.setImageDrawable(sequence.getImage());
 			}
 		}
+	}
+	
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		//discardChangesAndReturn();
 	}
 
 	@Override
@@ -290,8 +272,6 @@ public class SequenceActivity extends Activity {
                     EditText editText = (EditText) findViewById(R.id.sequence_title);
 		        	
                     hideSoftKeyboardFromView(editText);
-                    
-                    // TODO Save changes in the title
 				}
 			}
 		});

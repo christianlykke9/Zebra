@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import android.graphics.drawable.Drawable;
+
 
 /**
  * Represents a ordered collection (sequence) of pictograms.
@@ -14,6 +16,7 @@ public class Sequence {
 	private long sequenceId;
 	private String title;
 	private long imageId;
+	private Drawable image;
 	
 	public Sequence() {
 	}
@@ -43,6 +46,10 @@ public class Sequence {
 	
 	public void setImageId(long imageId) {
 		this.imageId = imageId;
+	}
+	
+	public Drawable getImage() {
+		return image;
 	}
 
 	public List<Pictogram> getPictograms() {
