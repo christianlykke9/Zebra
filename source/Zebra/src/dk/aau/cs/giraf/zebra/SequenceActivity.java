@@ -1,10 +1,13 @@
 package dk.aau.cs.giraf.zebra;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -20,37 +23,42 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
-import dk.aau.cs.giraf.oasis.lib.models.Profile;
+
 import dk.aau.cs.giraf.zebra.EditMode.EditModeObserver;
 import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
 import dk.aau.cs.giraf.zebra.SequenceAdapter.OnCreateViewListener;
 import dk.aau.cs.giraf.zebra.SequenceViewGroup.OnNewButtonClickedListener;
 
+import android.widget.TextView.OnEditorActionListener;
+import dk.aau.cs.giraf.zebra.EditMode.EditModeObserver;
+import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
+import dk.aau.cs.giraf.zebra.SequenceAdapter.OnCreateViewListener;
+import dk.aau.cs.giraf.zebra.models.Child;
+import dk.aau.cs.giraf.zebra.models.Sequence;
+
 public class SequenceActivity extends Activity {
 	
 	private Sequence sequence;
-	private Profile profile;
 	private Child child;
-	
-	private long profileId;
-	private int sequenceId;
 
+	@SuppressLint("ShowToast")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		ProfilesHelper profileHelper = new ProfilesHelper(this);
-			
-		profileId = getIntent().getExtras().getLong("profileId");
-		sequenceId = getIntent().getExtras().getInt("sequenceId");
+		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
 		
-		profile = profileHelper.getProfileById(profileId);
+		sequenceGroup.setEditModeEnabled(EditMode.get());
 		
-		child = new Child(profile);
-		sequence = Test.createSequence(child, sequenceId, this);
-		
+		Bundle extras = getIntent().getExtras();
+		long profileId = extras.getLong("profileId");
+		long sequenceId = extras.getLong("sequenceId");
+		boolean isNew = extras.getBoolean("new");
+
+		child = ZebraApplication.getChildFromId(profileId);
+		sequence = child.getSequenceFromId(sequenceId);
+
 		//Create Adapter
 		final SequenceAdapter adapter = setupAdapter();
 		
@@ -58,10 +66,32 @@ public class SequenceActivity extends Activity {
 		@SuppressWarnings("unused")
 		final SequenceViewGroup sequenceViewGroup = setupSequenceViewGroup(adapter);
 		
-		TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
-		sequenceTitleView.setText(sequence.getName());
+		final TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
+		sequenceTitleView.setText(sequence.getTitle());
+		sequenceTitleView.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) { }
+			@Override
+			
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				sequence.setTitle(sequenceTitleView.getText().toString());
+			}
+		});
+		
 		ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
-		sequenceImageView.setImageDrawable(sequence.getPictograms().get(0));
+		
+		//TODO: Get the pictogram from the factory here..
+		//sequenceImageView.setImageDrawable(sequence.getImageId());
+		
+		if (isNew) {
+			EditMode.set(true);
+			sequenceTitleView.requestFocus();
+			Toast.makeText(this, getResources().getString(R.string.help_new_sequence), Toast.LENGTH_LONG);
+		}
 		
 		initializeTopBar();
 		
@@ -178,7 +208,7 @@ public class SequenceActivity extends Activity {
 				sequence.setImageId(checkoutIds[0]);
 				
 				ImageView sequenceImageView = (ImageView)findViewById(R.id.sequence_image);
-				sequenceImageView.setImageDrawable(sequence.getImage());
+				//sequenceImageView.setImageDrawable(sequence.getImage());
 			}
 		}
 	}
@@ -228,7 +258,7 @@ public class SequenceActivity extends Activity {
 		});
 
 		TextView childName = (TextView)findViewById(R.id.child_name);
-		childName.setText(sequence.getChild().getName());
+		childName.setText(child.getName());
 	}
 	
 	public void hideSoftKeyboardFromView(View view) {
