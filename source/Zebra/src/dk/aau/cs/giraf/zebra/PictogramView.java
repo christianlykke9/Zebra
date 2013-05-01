@@ -18,9 +18,9 @@ import android.widget.TextView;
  */
 public class PictogramView extends LinearLayout {
 	
-	private final float NORMAL_SCALE = 0.8f;
-	private final float HIGHLIGHT_SCALE = 0.9f;
-	private final float DEFAULT_TEXT_SIZE = 18f;
+	public final static float NORMAL_SCALE = 0.8f;
+	public final static float HIGHLIGHT_SCALE = 0.9f;
+	private final static float DEFAULT_TEXT_SIZE = 18f;
 	
 	private RoundedImageView pictogram;
 	private TextView title;

@@ -84,6 +84,8 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 
 	private void setupNewButton() {
 		addNewPictoGramView = ResourceViewFactory.getAddPictogramButton(getContext());
+		addNewPictoGramView.setScaleX(PictogramView.NORMAL_SCALE);
+		addNewPictoGramView.setScaleY(PictogramView.NORMAL_SCALE);
 		addNewPictoGramView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
