@@ -44,8 +44,11 @@ public class PictogramView extends LinearLayout {
 	
 	
 	private void initialize(Context context, float radius) {
+		// Disable hardware accelleration to improve performance
+		this.setLayerType(LAYER_TYPE_SOFTWARE, null);
+        
+        
 		this.setOrientation(LinearLayout.VERTICAL);
-		//this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		
 		
 		SquaredRelativeLayout square = new SquaredRelativeLayout(context);
@@ -100,6 +103,7 @@ public class PictogramView extends LinearLayout {
 	public void liftUp() {
 		pictogram.setScaleX(HIGHLIGHT_SCALE);
         pictogram.setScaleY(HIGHLIGHT_SCALE);
+		this.setAlpha(0.7f);
 		setDeleteButtonVisible(false);
 		invalidate();
 	}
@@ -107,6 +111,7 @@ public class PictogramView extends LinearLayout {
 	public void placeDown() {
 		pictogram.setScaleX(NORMAL_SCALE);
         pictogram.setScaleY(NORMAL_SCALE);
+		this.setAlpha(1.0f);
 		setDeleteButtonVisible(isInEditMode);
 		invalidate();
 	}

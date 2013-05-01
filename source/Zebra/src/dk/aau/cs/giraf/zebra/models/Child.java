@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.graphics.drawable.Drawable;
-import android.os.Parcel;
-import android.os.Parcelable;
+
 
 public class Child {
 	
