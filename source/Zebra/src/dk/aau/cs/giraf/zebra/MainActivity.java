@@ -94,7 +94,6 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				
 				Sequence sequence = new Sequence();
-				sequence.setTitle(getResources().getString(R.string.sequence_default_title));
 				sequence.setSequenceId(selectedChild.getNextSequenceId());
 				selectedChild.getSequences().add(sequence);
 				

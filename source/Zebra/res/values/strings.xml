@@ -5,8 +5,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="no_children">Der er ingen børn</string>
-    <string name="sequence_default_title">Ny sekvens</string>
     <string name="help_new_sequence">Tryk på plus for at tilføje nye pictogrammer</string>
     <string name="changes_saved">Ændringerne blev gemt</string>
+    <string name="sequence_name_placeholder">Indtast sekvens navn</string>
 
 </resources>

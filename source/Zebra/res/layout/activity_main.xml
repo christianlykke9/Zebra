@@ -67,16 +67,17 @@
                 android:imeOptions="actionDone"
                 android:inputType="text"
                 android:textColor="#624319"
-                android:textSize="48sp" >
+                android:textSize="48sp"
+                android:textColorHint="#55624319"
+                android:hint="@string/sequence_name_placeholder" >
             </EditText>
 
             <TextView
                 android:id="@+id/child_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:alpha="0.4"
                 android:gravity="center"
-                android:textColor="#624319"
+                android:textColor="#28624319"
                 android:textIsSelectable="true"
                 android:textSize="26sp" />
         </LinearLayout>
