@@ -100,7 +100,6 @@ public class PictogramView extends LinearLayout {
 	public void liftUp() {
 		pictogram.setScaleX(HIGHLIGHT_SCALE);
         pictogram.setScaleY(HIGHLIGHT_SCALE);
-		this.setAlpha(0.7f);
 		setDeleteButtonVisible(false);
 		invalidate();
 	}
@@ -108,7 +107,6 @@ public class PictogramView extends LinearLayout {
 	public void placeDown() {
 		pictogram.setScaleX(NORMAL_SCALE);
         pictogram.setScaleY(NORMAL_SCALE);
-		this.setAlpha(1.0f);
 		setDeleteButtonVisible(isInEditMode);
 		invalidate();
 	}
