@@ -1,5 +1,7 @@
 package dk.aau.cs.giraf.zebra;
 
+import org.apache.http.conn.routing.RouteInfo.LayerType;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -134,6 +136,41 @@ public class SequenceActivity extends Activity {
 				Toast.makeText(SequenceActivity.this, getResources().getString(R.string.changes_saved), Toast.LENGTH_LONG).show();
 			}
 		
+		});
+		
+		EditText sequenceTitle = (EditText) findViewById(R.id.sequence_title);		
+		sequenceTitle.setOnFocusChangeListener(new OnFocusChangeListener() {
+			
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					deleteButtonVisable(false);
+				} else {
+					// Closing the keyboard when the text field is not active anymore
+					InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				    in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+				    
+					deleteButtonVisable(true);
+				}
+			}
+			
+			private void deleteButtonVisable(boolean value) {
+				ImageButton okButton = (ImageButton) findViewById(R.id.ok_button);
+				ImageButton cancelButton = (ImageButton) findViewById(R.id.cancel_button);
+				
+				// Make buttons transparent
+				if (value == false) {
+					okButton.setAlpha(0.3f);
+					cancelButton.setAlpha(0.3f);
+				} else {
+					okButton.setAlpha(1.0f);
+					cancelButton.setAlpha(1.0f);
+				}		
+				
+				// Disable/enable buttons 
+				okButton.setEnabled(value);
+				cancelButton.setEnabled(value);
+			}
 		});
 	}
 	

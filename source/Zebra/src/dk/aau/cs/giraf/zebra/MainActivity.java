@@ -9,7 +9,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -83,7 +85,7 @@ public class MainActivity extends Activity {
 			}		
 		});
 		
-		
+			
 		// Starts a clean sequence activity - ready to add pictograms.
 		final ImageButton createButton = (ImageButton)findViewById(R.id.add_button);
 		createButton.setVisibility(isInEditMode ? View.VISIBLE : View.GONE);
@@ -124,6 +126,7 @@ public class MainActivity extends Activity {
 			}
 		});
 	}
+	
 	
 	public void refreshSelectedChild() {
 		((TextView)findViewById(R.id.child_name)).setText(selectedChild.getName());
