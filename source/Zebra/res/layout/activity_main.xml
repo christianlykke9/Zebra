@@ -29,23 +29,32 @@
             android:layout_marginLeft="15sp"
             android:layout_marginRight="15sp" />
 
-        <ToggleButton
-            android:id="@+id/edit_mode_toggle"
+
+         <ImageButton
+            android:id="@+id/cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:background="@drawable/btn_edit_mode"
-            android:textOff=""
-            android:textOn="" />
+            android:background="@null"
+            android:src="@drawable/btn_cancel_sequence" />
+         
+         <ImageButton
+            android:id="@+id/ok_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/cancel_button"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="87dp"
+            android:background="@null"
+            android:src="@drawable/btn_ok_sequence" />
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/edit_mode_toggle"
+            android:layout_toLeftOf="@+id/ok_button"
             android:layout_toRightOf="@+id/sequence_image"
             android:orientation="vertical" >
 
