@@ -2,6 +2,8 @@ package dk.aau.cs.giraf.zebra;
 
 import java.util.List;
 
+import dk.aau.cs.giraf.zebra.models.Child;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -37,16 +39,14 @@ public class ChildAdapter extends BaseAdapter {
         ImageView childImage = (ImageView)v.findViewById(R.id.child_image);
  
         Child c = items.get(position);
-
-        Drawable profilePicture = Drawable.createFromPath(c.getProfile().getPicture());
         
         nameTextView.setText(c.getName());
         countTextView.setText(c.getSequenceCount() + " sekvenser");
-        
-        if (profilePicture == null) {
+
+        if (c.getPicture() == null) {
         	childImage.setImageDrawable(activity.getResources().getDrawable(R.drawable.placeholder));
         } else {
-        	childImage.setImageDrawable(profilePicture);
+        	childImage.setImageDrawable(c.getPicture());
         }
         
         return v;
@@ -64,6 +64,6 @@ public class ChildAdapter extends BaseAdapter {
 	
 	@Override
 	public long getItemId(int position) {
-        return getItem(position).getProfile().getId();
+        return items.get(position).getProfileId();
     }
 }

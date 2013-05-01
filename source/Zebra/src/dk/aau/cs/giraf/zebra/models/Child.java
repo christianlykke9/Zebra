@@ -3,9 +3,6 @@ package dk.aau.cs.giraf.zebra.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import dk.aau.cs.giraf.zebra.Sequence;
-
-
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -54,7 +51,7 @@ public class Child {
 	public long getNextSequenceId() {
 		if (sequences.size() != 0)
 			return sequences.get(sequences.size() - 1).getSequenceId() + 1;
-		
+
 		return 1;
 	}
 	
