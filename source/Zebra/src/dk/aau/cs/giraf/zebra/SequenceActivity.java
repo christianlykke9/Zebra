@@ -35,6 +35,7 @@ import dk.aau.cs.giraf.zebra.EditMode.EditModeObserver;
 import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
 import dk.aau.cs.giraf.zebra.SequenceAdapter.OnCreateViewListener;
 import dk.aau.cs.giraf.zebra.models.Child;
+import dk.aau.cs.giraf.zebra.models.Pictogram;
 import dk.aau.cs.giraf.zebra.models.Sequence;
 
 public class SequenceActivity extends Activity {
@@ -186,7 +187,10 @@ public class SequenceActivity extends Activity {
 			@Override
 			public void onNewButtonClicked() {
 				//TODO: Get proper new pictogram.
-				sequence.addPictogramAtEnd(sequence.getPictograms().get(0));
+				
+				Pictogram test = new Pictogram();
+				
+				sequence.addPictogramAtEnd(test);
 				adapter.notifyDataSetChanged();
 			}
 		});
