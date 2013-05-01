@@ -85,7 +85,10 @@ public class MainActivity extends Activity {
 		
 		
 		// Starts a clean sequence activity - ready to add pictograms.
-		((ImageButton)findViewById(R.id.add_button)).setOnClickListener(new OnClickListener() {
+		final ImageButton createButton = (ImageButton)findViewById(R.id.add_button);
+		createButton.setVisibility(isInEditMode ? View.VISIBLE : View.GONE);
+		
+		createButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -109,6 +112,8 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				ToggleButton button = (ToggleButton)v;
 				isInEditMode = button.isChecked();
+
+				createButton.setVisibility(isInEditMode ? View.VISIBLE : View.GONE);
 
 				for (int i = 0; i < sequenceGrid.getChildCount(); i++) {
 					View view = sequenceGrid.getChildAt(i);
