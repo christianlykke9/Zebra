@@ -57,9 +57,6 @@ public class SequenceActivity extends Activity {
 		long sequenceId = extras.getLong("sequenceId");
 		isNew = extras.getBoolean("new");
 		isInEditMode = extras.getBoolean("editMode");
-		
-		// TODO: Fix this in the Main activity so the add button is only available in edit mode.
-		if (isNew) isInEditMode = true;
 
 		child = ZebraApplication.getChildFromId(profileId);
 		originalSequence = child.getSequenceFromId(sequenceId);
