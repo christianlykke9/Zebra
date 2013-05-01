@@ -10,4 +10,11 @@ public class Pictogram {
 	public void setPictogramId(long pictogramId) {
 		this.pictogramId = pictogramId;
 	}
+	
+	public Pictogram getClone() {
+		Pictogram clone = new Pictogram();
+		clone.pictogramId = this.pictogramId;
+		
+		return clone;
+	}
 }
