@@ -139,7 +139,9 @@ public class SequenceActivity extends Activity {
 	
 	private void discardChangesAndReturn() {
 		// If the sequence is new and the changes are discarded, the sequence will be deleted.
-		child.getSequences().remove(originalSequence);
+		if (isNew) {
+			child.getSequences().remove(originalSequence);
+		}
 		
 		// Returning to the overview activity
 		finish();
