@@ -1,7 +1,5 @@
 package dk.aau.cs.giraf.zebra;
 
-import org.apache.http.conn.routing.RouteInfo.LayerType;
-
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -176,9 +174,7 @@ public class SequenceActivity extends Activity {
 	
 	private void discardChangesAndReturn() {
 		// If the sequence is new and the changes are discarded, the sequence will be deleted.
-		if (isNew) {
-			child.getSequences().remove(originalSequence);
-		}
+		child.getSequences().remove(originalSequence);
 		
 		// Returning to the overview activity
 		finish();
