@@ -9,6 +9,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -19,11 +20,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-
 import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
 import dk.aau.cs.giraf.zebra.SequenceAdapter.OnAdapterGetViewListener;
 import dk.aau.cs.giraf.zebra.SequenceViewGroup.OnNewButtonClickedListener;
-
 import dk.aau.cs.giraf.zebra.models.Child;
 import dk.aau.cs.giraf.zebra.models.Pictogram;
 import dk.aau.cs.giraf.zebra.models.Sequence;
@@ -32,20 +31,22 @@ public class SequenceActivity extends Activity {
 
 	private Sequence originalSequence;
 	private Sequence sequence;
+	private SequenceAdapter adapter;
 	
 	private Child child;
 	
 	private boolean isInEditMode;
 	private boolean isNew;
+	
+	private final int PICTO_SEQUENCE_IMAGE_CALL = 345;
+	private final int PICTO_SEQUENCE_PICTOGRAM_CALL = 456;
+	
+	private int curModifyPictogramPos = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
-		
-		sequenceGroup.setEditModeEnabled(isInEditMode);
 		
 		Bundle extras = getIntent().getExtras();
 		long profileId = extras.getLong("profileId");
@@ -60,16 +61,18 @@ public class SequenceActivity extends Activity {
 		sequence = originalSequence.getClone();
 
 		//Create Adapter
-		final SequenceAdapter adapter = setupAdapter();
+		adapter = setupAdapter();
 		
 		//Create Sequence Group
-		@SuppressWarnings("unused")
 		final SequenceViewGroup sequenceViewGroup = setupSequenceViewGroup(adapter);
+		
 		
 		final TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
 		sequenceTitleView.setText(sequence.getTitle());
 		
-		ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
+		initializeTopBar();
+		
+		final ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
 		
 		if (sequence.getImage() == null) {
 			sequenceImageView.setImageDrawable(getResources().getDrawable(R.drawable.sequence_placeholder));
@@ -78,21 +81,13 @@ public class SequenceActivity extends Activity {
 			//TODO: Get the pictogram from the factory here..
 			//sequenceImageView.setImageDrawable(sequence.getImageId());
 		}
-		
-		if (isNew) {
-			Toast.makeText(this, getResources().getString(R.string.help_new_sequence), Toast.LENGTH_LONG).show();
-		}
-		
-		initializeTopBar();
-		
+	
 		sequenceImageView.setOnClickListener(new ImageView.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				if (isInEditMode) {
-					Intent intent = new Intent();
-					intent.setComponent(new ComponentName("dk.aau.cs.giraf.pictoadmin", "dk.aau.cs.giraf.pictoadmin.PictoAdminMain"));
-					startActivityForResult(intent, 1);
+					callPictoAdmin(PICTO_SEQUENCE_IMAGE_CALL);
 				}
 			}
 		});
@@ -122,7 +117,7 @@ public class SequenceActivity extends Activity {
 				okButton.setVisibility(View.GONE);
 
 				isInEditMode = false;
-				sequenceGroup.setEditModeEnabled(isInEditMode);
+				sequenceViewGroup.setEditModeEnabled(isInEditMode);
 				
 				TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
 				sequenceTitleView.setEnabled(isInEditMode);
@@ -142,17 +137,17 @@ public class SequenceActivity extends Activity {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if (hasFocus) {
-					deleteButtonVisable(false);
+					setDeleteButtonVisible(false);
 				} else {
 					// Closing the keyboard when the text field is not active anymore
 					InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				    in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 				    
-					deleteButtonVisable(true);
+					setDeleteButtonVisible(true);
 				}
 			}
 			
-			private void deleteButtonVisable(boolean value) {
+			private void setDeleteButtonVisible(boolean value) {
 				ImageButton okButton = (ImageButton) findViewById(R.id.ok_button);
 				ImageButton cancelButton = (ImageButton) findViewById(R.id.cancel_button);
 				
@@ -227,6 +222,14 @@ public class SequenceActivity extends Activity {
 							adapter.notifyDataSetChanged();
 						}
 					});
+					
+					pictoView.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							curModifyPictogramPos = position;
+							callPictoAdmin(PICTO_SEQUENCE_PICTOGRAM_CALL);
+						}
+					});
 				}
 			}
 		});
@@ -237,30 +240,55 @@ public class SequenceActivity extends Activity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 		
-		if (resultCode == RESULT_OK && requestCode == 1) {
+		if (resultCode == RESULT_OK) {
+			switch (requestCode) {
 			
-			long[] checkoutIds = data.getExtras().getLongArray("checkoutIds");
-			
-			if (checkoutIds.length == 0) {
-				Toast t = Toast.makeText(SequenceActivity.this, "The checkout contained no pictograms.", Toast.LENGTH_LONG);
+			case PICTO_SEQUENCE_IMAGE_CALL:
+				onPictoImageResult(data);
+				break;
+
+			case PICTO_SEQUENCE_PICTOGRAM_CALL:
+				onPictoPictogramResult(data);
+				break;
+				
+			default:
+				break;
+			}
+		}
+	}
+
+	private void onPictoPictogramResult(Intent data) {
+		if (curModifyPictogramPos < 0) return;
+		
+		long[] checkoutIds = data.getExtras().getLongArray("checkoutIds");
+		
+		if (checkoutIds.length == 0) return;
+		Pictogram pictogram = sequence.getPictograms().get(curModifyPictogramPos);
+		pictogram.setPictogramId(checkoutIds[0]);
+		adapter.notifyDataSetChanged();
+	}
+
+	private void onPictoImageResult(Intent data) {
+		long[] checkoutIds = data.getExtras().getLongArray("checkoutIds");
+		
+		if (checkoutIds.length == 0) {
+			Toast t = Toast.makeText(SequenceActivity.this, "The checkout contained no pictograms.", Toast.LENGTH_LONG);
+			t.show();
+		}
+		else
+		{
+			if (checkoutIds.length != 1) {
+				Toast t = Toast.makeText(SequenceActivity.this, "The checkout contained more than one pictogram. The first will be used", Toast.LENGTH_LONG);
 				t.show();
 			}
-			else
-			{
-				if (checkoutIds.length != 1) {
-					Toast t = Toast.makeText(SequenceActivity.this, "The checkout contained more than one pictogram. The first will be used", Toast.LENGTH_LONG);
-					t.show();
-				}
-				
-				// Set the sequence image using the first ID from the checkout.
-				sequence.setImageId(checkoutIds[0]);
-				
-				//ImageView sequenceImageView = (ImageView)findViewById(R.id.sequence_image);
-				//sequenceImageView.setImageDrawable(sequence.getImage());
-			}
+			
+			// Set the sequence image using the first ID from the checkout.
+			sequence.setImageId(checkoutIds[0]);
+			
+			//ImageView sequenceImageView = (ImageView)findViewById(R.id.sequence_image);
+			//sequenceImageView.setImageDrawable(sequence.getImage());
 		}
 	}
 	
@@ -287,8 +315,7 @@ public class SequenceActivity extends Activity {
 		    @Override
 		    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 		        if(actionId==EditorInfo.IME_ACTION_DONE) {
-		        	EditText editText = (EditText) findViewById(R.id.sequence_title);
-		        	
+		        	EditText editText = (EditText) findViewById(R.id.sequence_title);	
 		            editText.clearFocus();
 		        }
 		        return false;
@@ -342,13 +369,16 @@ public class SequenceActivity extends Activity {
 
 	    // If the view is a container, run the function recursively on the children
 	    if (view instanceof ViewGroup) {
-
 	        for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
-
 	            View innerView = ((ViewGroup) view).getChildAt(i);
-
 	            createClearFocusListeners(innerView);
 	        }
 	    }
+	}
+
+	private void callPictoAdmin(int modeId) {
+		Intent intent = new Intent();
+		intent.setComponent(new ComponentName("dk.aau.cs.giraf.pictoadmin", "dk.aau.cs.giraf.pictoadmin.PictoAdminMain"));
+		startActivityForResult(intent, modeId);
 	}
 }
