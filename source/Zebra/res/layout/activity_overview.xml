@@ -21,7 +21,8 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:text="ZEBRA"
-            android:textSize="60sp" />
+            android:textSize="60sp"
+            android:textColor="@color/text_color" />
         
         <ToggleButton
             android:id="@+id/edit_mode_toggle"

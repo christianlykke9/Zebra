@@ -66,9 +66,9 @@
                 android:gravity="center"
                 android:imeOptions="actionDone"
                 android:inputType="text"
-                android:textColor="#000000"
+                android:textColor="@color/text_color"
                 android:textSize="48sp"
-                android:textColorHint="#55624319"
+                android:textColorHint="@color/text_hint_color"
                 android:hint="@string/sequence_name_placeholder" >
             </EditText>
 
@@ -77,7 +77,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="#46624319"
+                android:textColor="@color/text_color_light"
                 android:textIsSelectable="true"
                 android:textSize="26sp" />
         </LinearLayout>
