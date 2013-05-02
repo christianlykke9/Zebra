@@ -11,7 +11,7 @@ public class SequenceAdapter extends BaseAdapter {
 	private Sequence sequence;
 	private Context context;
 	
-	private OnCreateViewListener onCreateViewListener;
+	private OnAdapterGetViewListener onAdapterGetViewListener;
 	
 	public SequenceAdapter(Context context, Sequence sequence) {
 		this.context = context;
@@ -59,21 +59,21 @@ public class SequenceAdapter extends BaseAdapter {
 		// TODO: GET THE IMAGE ID
 		//view.setImage(sequence.getImageId());
 		
-		if (onCreateViewListener != null)
-			onCreateViewListener.onCreateView(position, view);
+		if (onAdapterGetViewListener != null)
+			onAdapterGetViewListener.onAdapterGetView(position, view);
 		
 		return view;
 	}
 	
-	public void setOnCreateViewListener(OnCreateViewListener onCreateViewListener) {
-		this.onCreateViewListener = onCreateViewListener;
+	public void setOnAdapterGetViewListener(OnAdapterGetViewListener onCreateViewListener) {
+		this.onAdapterGetViewListener = onCreateViewListener;
 	}
 	
-	public OnCreateViewListener getOnCreateViewListener() {
-		return this.onCreateViewListener;
+	public OnAdapterGetViewListener getOnAdapterGetViewListener() {
+		return this.onAdapterGetViewListener;
 	}
 	
-	public interface OnCreateViewListener {
-		public void onCreateView(int position, View view);
+	public interface OnAdapterGetViewListener {
+		public void onAdapterGetView(int position, View view);
 	}
 }

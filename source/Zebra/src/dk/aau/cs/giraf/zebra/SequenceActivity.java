@@ -21,7 +21,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
-import dk.aau.cs.giraf.zebra.SequenceAdapter.OnCreateViewListener;
+import dk.aau.cs.giraf.zebra.SequenceAdapter.OnAdapterGetViewListener;
 import dk.aau.cs.giraf.zebra.SequenceViewGroup.OnNewButtonClickedListener;
 
 import dk.aau.cs.giraf.zebra.models.Child;
@@ -215,9 +215,9 @@ public class SequenceActivity extends Activity {
 		final SequenceAdapter adapter = new SequenceAdapter(this, sequence);
 		
 		//Setup delete handler.
-		adapter.setOnCreateViewListener(new OnCreateViewListener() {		
+		adapter.setOnAdapterGetViewListener(new OnAdapterGetViewListener() {		
 			@Override
-			public void onCreateView(final int position, final View view) {
+			public void onAdapterGetView(final int position, final View view) {
 				if (view instanceof PictogramView) {
 					PictogramView pictoView = (PictogramView) view;
 					pictoView.setOnDeleteClickListener(new OnDeleteClickListener() {
