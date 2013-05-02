@@ -56,7 +56,7 @@ public class SequenceActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_sequence);
 		
 		Bundle extras = getIntent().getExtras();
 		long profileId = extras.getLong("profileId");
