@@ -1,26 +1,29 @@
 package dk.aau.cs.giraf.zebra;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
 import dk.aau.cs.giraf.zebra.SequenceAdapter.OnAdapterGetViewListener;
 import dk.aau.cs.giraf.zebra.SequenceViewGroup.OnNewButtonClickedListener;
@@ -73,9 +76,12 @@ public class SequenceActivity extends Activity {
 		//Create Sequence Group
 		final SequenceViewGroup sequenceViewGroup = setupSequenceViewGroup(adapter);
 		
-		
 		final TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
 		sequenceTitleView.setText(sequence.getTitle());
+		
+		if (!isInEditMode) {
+			sequenceTitleView.setHint(getResources().getString(R.string.unnamed_sequence));
+		}
 		
 		initializeTopBar();
 		
@@ -103,15 +109,15 @@ public class SequenceActivity extends Activity {
 		final ImageButton okButton = (ImageButton)findViewById(R.id.ok_button);
 		
 		if (!isInEditMode) {
-			cancelButton.setVisibility(View.GONE);
-			okButton.setVisibility(View.GONE);
+			cancelButton.setVisibility(View.INVISIBLE);
+			okButton.setVisibility(View.INVISIBLE);
 		}
 		
 		cancelButton.setOnClickListener(new ImageButton.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				discardChangesAndReturn();
+				showDialog();
 			}
 		
 		});
@@ -120,22 +126,15 @@ public class SequenceActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				cancelButton.setVisibility(View.GONE);
-				okButton.setVisibility(View.GONE);
-
+				cancelButton.setVisibility(View.INVISIBLE);
+				okButton.setVisibility(View.INVISIBLE);
+	
 				isInEditMode = false;
 				sequenceViewGroup.setEditModeEnabled(isInEditMode);
+				sequenceTitleView.setHint(getResources().getString(R.string.unnamed_sequence));
 				
-				TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
-				sequenceTitleView.setEnabled(isInEditMode);
-				
-				// Saving the sequence title and changing the pointer to the original sequence
-				sequence.setTitle(sequenceTitleView.getText().toString());
-				originalSequence.copyFromSequence(sequence);
-				
-				Toast.makeText(SequenceActivity.this, getResources().getString(R.string.changes_saved), Toast.LENGTH_LONG).show();
-			}
-		
+				SequenceActivity.this.saveChanges();
+			}		
 		});
 		
 		EditText sequenceTitle = (EditText) findViewById(R.id.sequence_title);		
@@ -173,14 +172,59 @@ public class SequenceActivity extends Activity {
 			}
 		});
 	}
-	
-	private void discardChangesAndReturn() {
-		// If the sequence is new and the changes are discarded, the sequence will be deleted.
-		if (isNew)
-			child.getSequences().remove(originalSequence);
+
+	private void saveChanges() {
+		EditText sequenceTitleView = (EditText)findViewById(R.id.sequence_title); 
+		sequenceTitleView.setEnabled(isInEditMode);
 		
-		// Returning to the overview activity
-		finish();
+		// Saving the sequence title and changing the pointer to the original sequence
+		sequence.setTitle(sequenceTitleView.getText().toString());
+		originalSequence.copyFromSequence(sequence);
+	}
+	
+	private void showDialog() {
+		
+		final Dialog dialog = new Dialog(this);
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setContentView(R.layout.dialog_box);
+		dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+		
+		TextView question = (TextView)dialog.findViewById(R.id.question);
+		question.setText(getResources().getString(R.string.confirm_exit_without_saving));
+		
+		final Button yesButton = (Button)dialog.findViewById(R.id.btn_yes);
+		yesButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+				
+				// If the sequence is new, the sequence will be deleted.
+				if (isNew) child.getSequences().remove(originalSequence);
+				finish();
+			}
+		});
+		
+		final Button noButton = (Button)dialog.findViewById(R.id.btn_no);
+		noButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+			}
+		});
+
+		dialog.show();
+	}
+	
+	@Override
+	public void onBackPressed() {
+		if (isInEditMode) {
+			showDialog();
+		}
+		else {
+			super.onBackPressed();
+		}
 	}
 	
 	private SequenceViewGroup setupSequenceViewGroup(final SequenceAdapter adapter) {
@@ -295,20 +339,6 @@ public class SequenceActivity extends Activity {
 		if (checkoutIds.length == 0) return;
 		sequence.setImageId(checkoutIds[0]);
 		//TODO: Update image on screen
-	}
-	
-	@Override
-	public void onBackPressed() {
-		// TODO: Ask if the changes should be saved..
-		super.onBackPressed();
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		
-		return true;
 	}
 	
 	private void initializeTopBar() {

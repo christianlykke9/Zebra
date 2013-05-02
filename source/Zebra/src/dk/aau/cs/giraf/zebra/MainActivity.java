@@ -3,7 +3,6 @@ package dk.aau.cs.giraf.zebra;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -49,7 +48,8 @@ public class MainActivity extends Activity {
 		sequenceGrid.setAdapter(sequenceAdapter);
 		
 		if (children.size() == 0) {
-			Toast.makeText(this, getResources().getString(R.string.no_children), Toast.LENGTH_LONG);
+			Toast toast = Toast.makeText(this, getResources().getString(R.string.no_children), Toast.LENGTH_LONG);
+			toast.show();
 		}
 		else {
 			selectedChild = children.get(0);
