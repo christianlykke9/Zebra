@@ -267,7 +267,13 @@ public class SequenceActivity extends Activity {
 	private void OnNewPictogramResult(Intent data) {
 		long[] checkoutIds = data.getExtras().getLongArray(PICTO_INTENT_CHECKOUT_ID);
 		
-		//TODO: For each picto id add it to sequence. Then notify adapter.
+		for (long id : checkoutIds) {
+			Pictogram pictogram = new Pictogram();
+			pictogram.setPictogramId(id);
+			sequence.addPictogramAtEnd(pictogram);
+		}
+		
+		adapter.notifyDataSetChanged();
 	}
 
 	private void OnEditPictogramResult(Intent data) {
@@ -284,23 +290,9 @@ public class SequenceActivity extends Activity {
 	private void OnEditSequenceImageResult(Intent data) {
 		long[] checkoutIds = data.getExtras().getLongArray(PICTO_INTENT_CHECKOUT_ID);
 		
-		if (checkoutIds.length == 0) {
-			Toast t = Toast.makeText(SequenceActivity.this, "The checkout contained no pictograms.", Toast.LENGTH_LONG);
-			t.show();
-		}
-		else
-		{
-			if (checkoutIds.length != 1) {
-				Toast t = Toast.makeText(SequenceActivity.this, "The checkout contained more than one pictogram. The first will be used", Toast.LENGTH_LONG);
-				t.show();
-			}
-			
-			// Set the sequence image using the first ID from the checkout.
-			sequence.setImageId(checkoutIds[0]);
-			
-			//ImageView sequenceImageView = (ImageView)findViewById(R.id.sequence_image);
-			//sequenceImageView.setImageDrawable(sequence.getImage());
-		}
+		if (checkoutIds.length == 0) return;
+		sequence.setImageId(checkoutIds[0]);
+		//TODO: Update image on screen
 	}
 	
 	@Override
