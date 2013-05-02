@@ -294,6 +294,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			}
 
 			if (oldView == null) {
+				newView.measure(getChildWidthMeasureSpec(), getChildHeightMeasureSpec());
 				addViewInLayout(newView, currentViewCount, generateDefaultLayoutParams());
 				currentViewCount++;
 			}
@@ -344,11 +345,9 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				width += horizontalSpacing;
 			}
 		}	
-
-		int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(itemWidth,
-				MeasureSpec.EXACTLY);
-		int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(itemHeight,
-				MeasureSpec.EXACTLY);
+		
+		int childWidthMeasureSpec = getChildWidthMeasureSpec();
+		int childHeightMeasureSpec = getChildHeightMeasureSpec();
 
 		int numViewChildren = getChildCount();
 		for (int i = 0; i < numViewChildren; i++) {
@@ -366,6 +365,14 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 
 		setMeasuredDimension(resolveSize(width, widthMeasureSpec),
 				resolveSize(height, heightMeasureSpec));
+	}
+	
+	private int getChildWidthMeasureSpec() {
+		return MeasureSpec.makeMeasureSpec(itemWidth, MeasureSpec.EXACTLY);
+	}
+	
+	private int getChildHeightMeasureSpec() {
+		return MeasureSpec.makeMeasureSpec(itemHeight, MeasureSpec.EXACTLY);
 	}
 
 	@Override
