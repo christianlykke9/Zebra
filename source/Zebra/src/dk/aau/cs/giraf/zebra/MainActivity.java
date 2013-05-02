@@ -86,7 +86,7 @@ public class MainActivity extends Activity {
 		});
 		
 			
-		// Starts a clean sequence activity - ready to add pictograms.
+		// Creates clean sequence and starts the sequence activity - ready to add pictograms.
 		final ImageButton createButton = (ImageButton)findViewById(R.id.add_button);
 		createButton.setVisibility(isInEditMode ? View.VISIBLE : View.GONE);
 		
@@ -98,6 +98,8 @@ public class MainActivity extends Activity {
 				Sequence sequence = new Sequence();
 				sequence.setSequenceId(selectedChild.getNextSequenceId());
 				selectedChild.getSequences().add(sequence);
+				
+				childAdapter.notifyDataSetInvalidated();
 				
 				enterSequence(sequence, true);
 			}
