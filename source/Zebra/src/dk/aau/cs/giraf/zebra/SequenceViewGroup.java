@@ -469,6 +469,9 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			draggingView = childAtPoint((int) x, (int) y);
 			if (draggingView != null && draggingView != addNewPictoGramView) {
 				
+				//Grap original drag position
+				startDragIndex = indexOfChild(draggingView);
+				
 				if (isInEditMode) {
 					handled = true;
 					
@@ -480,8 +483,6 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 					
 					requestDisallowInterceptTouchEvent(true);
 					
-					//Grap original drag position
-					startDragIndex = indexOfChild(draggingView);
 					curDragIndexPos = startDragIndex;
 					
 					//Everything is in the right place at the start.
@@ -494,7 +495,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 					draggingView.invalidate();
 				} else {
 					// When a pictogram is clicked when not in editmode it is selected
-					setLowHighLighting(curDragIndexPos);
+					setLowHighLighting(startDragIndex);
 				}
 			}
 			break;
