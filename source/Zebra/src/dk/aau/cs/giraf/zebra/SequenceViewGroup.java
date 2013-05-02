@@ -29,6 +29,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 	private final int DEFAULT_HORIZONTAL_SPACING = 100;
 	
 	private final int ANIMATION_TIME = 350;
+	private final int DRAG_DISTANCE = 8;
 
 	//Layout
 	private int horizontalSpacing;
@@ -38,8 +39,9 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 	private int offsetY = 0;
 
 	//Dragging data
-	private View dragging = null;
-	private int draggingIndex = -1;
+	private View draggingView = null;
+	private boolean isDragging = false;
+	private int startDragIndex = -1;
 	private int curDragIndexPos = -1;
 	private int dragStartX;
 	private int centerOffset;
@@ -281,7 +283,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		
 		int currentIndex = 0;
 		for (; currentIndex < adapterCount; currentIndex++) {
-			if (currentIndex == draggingIndex) continue;
+			if (currentIndex == startDragIndex) continue;
 			View oldView = null;
 			
 			if (currentIndex < prevViewCount) {
@@ -394,20 +396,20 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			
 			//Be careful with coordinates from the event if getPointerCount != 1
 			
-			if (draggingIndex != -1) {
+			if (isDragging) {
 				handled = true;
 				
 				stopAutoScroll();
 				
 				// Remove the highlight of the pictogram
-				((PictogramView)dragging).placeDown();
+				((PictogramView)draggingView).placeDown();
 				
 				//Disallow movement when repositioning dragged view.
 				animatingDragReposition = true;
 				
 				TranslateAnimation move = new TranslateAnimation(
 						0,
-						calcChildLeftPosition(curDragIndexPos) - dragging.getLeft(), 
+						calcChildLeftPosition(curDragIndexPos) - draggingView.getLeft(), 
 						0, 
 						0);
 				move.setDuration(ANIMATION_TIME);
@@ -416,25 +418,26 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 
 					@Override
 					public void onAnimationEnd(Animation animation) {
-						if (draggingIndex != curDragIndexPos) {
+						if (startDragIndex != curDragIndexPos) {
 							final int childViews = getChildCount();
 							for (int i = 0; i < childViews; i++) {
 								getChildAt(i).clearAnimation();
 							}
-							rearrangeListener.onRearrange(draggingIndex, curDragIndexPos);
+							rearrangeListener.onRearrange(startDragIndex, curDragIndexPos);
 							//layout(getLeft(), getTop(), getRight(), getBottom());
 							//This prevents lots of flicker
 							onLayout(true, getLeft(), getTop(), getRight(), getBottom());
 						} else {
 							//Must clear animation to prevent flicker - even though it just ended.
-							getChildAt(draggingIndex).clearAnimation();
-							layoutChild(draggingIndex);
+							getChildAt(startDragIndex).clearAnimation();
+							layoutChild(startDragIndex);
 						}
 						
-						draggingIndex = -1;
+						startDragIndex = -1;
+						isDragging = false;
 						curDragIndexPos = -1;
 						animatingDragReposition = false;
-						dragging = null;
+						draggingView = null;
 					}
 
 					@Override
@@ -446,22 +449,24 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 					}
 				});
 				
-				dragging.startAnimation(move);
+				draggingView.startAnimation(move);
 				
+			} else {
+				//Not dragging
+				if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+					performItemClick(draggingView, startDragIndex, startDragIndex);
+				}
 			}
 			return handled;
 		}
 		
 		switch (event.getActionMasked()) {
 		case MotionEvent.ACTION_DOWN:
-			dragging = childAtPoint((int) x, (int) y);
-			if (dragging != null && dragging != addNewPictoGramView) {
+			draggingView = childAtPoint((int) x, (int) y);
+			if (draggingView != null && draggingView != addNewPictoGramView) {
 				
 				if (isInEditMode) {
 					handled = true;
-					
-					// Highlight the lifted pictogram
-					((PictogramView)dragging).liftUp();
 					
 					startAutoScroll();
 				
@@ -472,53 +477,63 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 					requestDisallowInterceptTouchEvent(true);
 					
 					//Grap original drag position
-					draggingIndex = indexOfChild(dragging);
-					curDragIndexPos = draggingIndex;
+					startDragIndex = indexOfChild(draggingView);
+					curDragIndexPos = startDragIndex;
 					
 					//Everything is in the right place at the start.
-					newPositions = new int[getChildCount()];
-					for (int i = 0; i < newPositions.length; i++) {
-						newPositions[i] = i;
-					}
+					resetViewPositions();
 					
 					touchX = (int) x;			
 					dragStartX = touchX;
-					centerOffset = touchX - getCenterX(draggingIndex);
+					centerOffset = touchX - getCenterX(startDragIndex);
 					
-					dragging.invalidate();
-				}
-				else // When a pictogram is clicked when not in editmode is is selected
-				{
-					int selectedIndex = indexOfChild(dragging);
-					
-					for (int i = 0; i < getCurrentSequenceViewCount(); i++) {
-						PictogramView pictogram = (PictogramView) this.getChildAt(i);
-						
-						if (i < selectedIndex) {
-							pictogram.setLowlighted(true);
-							pictogram.setSelected(false);
-						}
-						else if (i > selectedIndex) {
-							pictogram.setLowlighted(false);
-							pictogram.setSelected(false);
-						}
-						else {
-							pictogram.setLowlighted(false);
-							pictogram.setSelected(true);
-						}
-					}
+					draggingView.invalidate();
+				} else {
+					// When a pictogram is clicked when not in editmode it is selected
+					setLowHighLighting(curDragIndexPos);
 				}
 			}
 			break;
+			
 		case MotionEvent.ACTION_MOVE:
-			if (draggingIndex != -1) {
+			if (Math.abs(dragStartX - x) >= DRAG_DISTANCE) {
+				isDragging = true;
+				((PictogramView)draggingView).liftUp();
+			}
+			
+			if (isDragging) {
 				handled = true;
-				
 				handleTouchMove(x);
 			}
 			break;
 		}
 		return handled;
+	}
+
+	private void resetViewPositions() {
+		newPositions = new int[getChildCount()];
+		for (int i = 0; i < newPositions.length; i++) {
+			newPositions[i] = i;
+		}
+	}
+
+	private void setLowHighLighting(int selectedIndex) {
+		for (int i = 0; i < getCurrentSequenceViewCount(); i++) {
+			PictogramView pictogram = (PictogramView) this.getChildAt(i);
+			
+			if (i < selectedIndex) {
+				pictogram.setLowlighted(true);
+				pictogram.setSelected(false);
+			}
+			else if (i > selectedIndex) {
+				pictogram.setLowlighted(false);
+				pictogram.setSelected(false);
+			}
+			else {
+				pictogram.setLowlighted(false);
+				pictogram.setSelected(true);
+			}
+		}
 	}
 
 	private void startAutoScroll() {
@@ -536,11 +551,13 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 	}
 
 	private void handleTouchMove(float newTouchX) {
+		if (!isDragging) return;
+		
 		touchX = (int) newTouchX;
 		touchDeltaX = (int) (newTouchX - dragStartX);
 		//Layout the dragging element. Is excluded from normal layout			
-		int newLeft = calcChildLeftPosition(draggingIndex) + touchDeltaX;
-		dragging.layout(newLeft, dragging.getTop(), newLeft + dragging.getMeasuredWidth(), dragging.getTop() + dragging.getMeasuredHeight());
+		int newLeft = calcChildLeftPosition(startDragIndex) + touchDeltaX;
+		draggingView.layout(newLeft, draggingView.getTop(), newLeft + draggingView.getMeasuredWidth(), draggingView.getTop() + draggingView.getMeasuredHeight());
 		
 		checkForSwap();
 	}
@@ -659,8 +676,8 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 	 */
 	private class AutoScroller implements Runnable {
 		
-		private final float MAX_SCROLL_SPEED_PER_MS = 0.62f;
-		private final int BORDER_DIST_TO_SCROLL = 380;
+		private final float MAX_SCROLL_SPEED_PER_MS = 0.52f;
+		private final int BORDER_DIST_TO_SCROLL = 340;
 		
 		private int currentScrollX = 0;
 		private int currentScrollY = 0;

@@ -9,11 +9,12 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -204,6 +205,15 @@ public class SequenceActivity extends Activity {
 			}
 		});
 		
+		sequenceGroup.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapter, View view, int position,
+					long id) {
+				pictogramEditPos = position;
+				callPictoAdmin(PICTO_EDIT_PICTOGRAM_CALL);
+			}
+		});
+		
 		return sequenceGroup;
 	}
 
@@ -221,14 +231,6 @@ public class SequenceActivity extends Activity {
 						public void onDeleteClick() {
 							sequence.deletePictogram(position);
 							adapter.notifyDataSetChanged();
-						}
-					});
-					
-					pictoView.setOnClickListener(new OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							pictogramEditPos = position;
-							callPictoAdmin(PICTO_EDIT_PICTOGRAM_CALL);
 						}
 					});
 				}
