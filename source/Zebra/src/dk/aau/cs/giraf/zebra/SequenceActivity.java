@@ -129,7 +129,7 @@ public class SequenceActivity extends Activity {
 				
 				// Saving the sequence title and changing the pointer to the original sequence
 				sequence.setTitle(sequenceTitleView.getText().toString());
-				originalSequence = sequence;
+				originalSequence.copyFromSequence(sequence);
 				
 				Toast.makeText(SequenceActivity.this, getResources().getString(R.string.changes_saved), Toast.LENGTH_LONG).show();
 			}
@@ -266,8 +266,8 @@ public class SequenceActivity extends Activity {
 	
 	@Override
 	public void onBackPressed() {
+		// TODO: Ask if the changes should be saved..
 		super.onBackPressed();
-		//discardChangesAndReturn();
 	}
 
 	@Override

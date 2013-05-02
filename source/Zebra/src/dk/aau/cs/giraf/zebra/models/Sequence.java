@@ -93,4 +93,15 @@ public class Sequence {
 		
 		return clone;
 	}
+	
+	public void copyFromSequence(Sequence sequence) {
+		this.sequenceId = sequence.sequenceId;
+		this.title = sequence.title;
+		this.imageId = sequence.imageId;
+		
+		this.pictograms.clear();
+		for (Pictogram pictogram : sequence.pictograms) {
+			this.pictograms.add(pictogram);
+		}
+	}
 }
