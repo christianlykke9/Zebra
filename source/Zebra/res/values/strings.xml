@@ -8,5 +8,7 @@
     <string name="discard_changes">Fortryd ændringer</string>
     <string name="save_changes">Gem ændringer</string>
     <string name="unnamed_sequence">Unavngivet sekvens</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nej</string>
 
 </resources>
