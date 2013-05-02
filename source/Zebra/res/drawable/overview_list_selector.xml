@@ -7,9 +7,9 @@
  
     <item
         android:state_pressed="true"
-        android:drawable="@drawable/gradient_bg_hover" />
+        android:drawable="@drawable/dialog_box_bg" />
  
     <item
         android:state_selected="true"
-        android:drawable="@drawable/gradient_bg_hover" />
+        android:drawable="@drawable/dialog_box_bg" />
 </selector>
