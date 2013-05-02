@@ -97,7 +97,7 @@ public class MainActivity extends Activity {
 				sequence.setSequenceId(selectedChild.getNextSequenceId());
 				selectedChild.getSequences().add(sequence);
 				
-				childAdapter.notifyDataSetInvalidated();
+				childAdapter.notifyDataSetChanged();
 				
 				enterSequence(sequence, true);
 			}
