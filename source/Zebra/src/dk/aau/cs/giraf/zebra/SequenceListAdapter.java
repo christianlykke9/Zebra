@@ -18,6 +18,7 @@ public class SequenceListAdapter extends BaseAdapter {
 
 	private List<Sequence> items;
 	private Context context;
+	private boolean isInEditMode;
 	
 	public SequenceListAdapter(Context context, List<Sequence> items) {
 		
@@ -35,6 +36,7 @@ public class SequenceListAdapter extends BaseAdapter {
         Sequence s = items.get(position);
         
         v.setTitle(s.getTitle());
+        v.setEditModeEnabled(isInEditMode);
         // TODO: GET THE IMAGE ID
         //v.setImage(s.getImageId());
 
@@ -56,4 +58,10 @@ public class SequenceListAdapter extends BaseAdapter {
         return position;
     }
 
+	
+	public void setEditModeEnabled(boolean editEnabled) {
+		if (isInEditMode != editEnabled) {
+			isInEditMode = editEnabled;
+		}
+	}
 }

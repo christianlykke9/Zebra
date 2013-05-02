@@ -9,9 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -115,9 +113,13 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				ToggleButton button = (ToggleButton)v;
 				isInEditMode = button.isChecked();
+				
+				// Make sure that all views currently not visible will have the correct editmode when they become visible
+				sequenceAdapter.setEditModeEnabled(isInEditMode);
 
 				createButton.setVisibility(isInEditMode ? View.VISIBLE : View.GONE);
-
+				
+				// Update the editmode of all visible views in the grid
 				for (int i = 0; i < sequenceGrid.getChildCount(); i++) {
 					View view = sequenceGrid.getChildAt(i);
 					
