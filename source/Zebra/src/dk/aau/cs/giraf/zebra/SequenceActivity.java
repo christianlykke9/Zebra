@@ -38,10 +38,16 @@ public class SequenceActivity extends Activity {
 	private boolean isInEditMode;
 	private boolean isNew;
 	
-	private final int PICTO_SEQUENCE_IMAGE_CALL = 345;
-	private final int PICTO_SEQUENCE_PICTOGRAM_CALL = 456;
+	private final String PICTO_ADMIN_PACKAGE = "dk.aau.cs.giraf.pictoadmin";
+	private final String PICTO_ADMIN_CLASS = PICTO_ADMIN_PACKAGE + "." + "PictoAdminMain";
 	
-	private int curModifyPictogramPos = -1;
+	private final int PICTO_SEQUENCE_IMAGE_CALL = 345;
+	private final int PICTO_EDIT_PICTOGRAM_CALL = 456;
+	private final int PICTO_NEW_PICTOGRAM_CALL = 567;
+	
+	private final String PICTO_INTENT_CHECKOUT_ID = "checkoutIds";
+	
+	private int pictogramEditPos = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -194,12 +200,7 @@ public class SequenceActivity extends Activity {
 		sequenceGroup.setOnNewButtonClickedListener(new OnNewButtonClickedListener() {
 			@Override
 			public void onNewButtonClicked() {
-				//TODO: Get proper new pictogram.
-				
-				Pictogram test = new Pictogram();
-				
-				sequence.addPictogramAtEnd(test);
-				adapter.notifyDataSetChanged();
+				callPictoAdmin(PICTO_NEW_PICTOGRAM_CALL);
 			}
 		});
 		
@@ -226,8 +227,8 @@ public class SequenceActivity extends Activity {
 					pictoView.setOnClickListener(new OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							curModifyPictogramPos = position;
-							callPictoAdmin(PICTO_SEQUENCE_PICTOGRAM_CALL);
+							pictogramEditPos = position;
+							callPictoAdmin(PICTO_EDIT_PICTOGRAM_CALL);
 						}
 					});
 				}
@@ -246,11 +247,15 @@ public class SequenceActivity extends Activity {
 			switch (requestCode) {
 			
 			case PICTO_SEQUENCE_IMAGE_CALL:
-				onPictoImageResult(data);
+				OnEditSequenceImageResult(data);
 				break;
 
-			case PICTO_SEQUENCE_PICTOGRAM_CALL:
-				onPictoPictogramResult(data);
+			case PICTO_EDIT_PICTOGRAM_CALL:
+				OnEditPictogramResult(data);
+				break;
+				
+			case PICTO_NEW_PICTOGRAM_CALL:
+				OnNewPictogramResult(data);
 				break;
 				
 			default:
@@ -258,20 +263,26 @@ public class SequenceActivity extends Activity {
 			}
 		}
 	}
-
-	private void onPictoPictogramResult(Intent data) {
-		if (curModifyPictogramPos < 0) return;
+	
+	private void OnNewPictogramResult(Intent data) {
+		long[] checkoutIds = data.getExtras().getLongArray(PICTO_INTENT_CHECKOUT_ID);
 		
-		long[] checkoutIds = data.getExtras().getLongArray("checkoutIds");
+		//TODO: For each picto id add it to sequence. Then notify adapter.
+	}
+
+	private void OnEditPictogramResult(Intent data) {
+		if (pictogramEditPos < 0) return;
+		
+		long[] checkoutIds = data.getExtras().getLongArray(PICTO_INTENT_CHECKOUT_ID);
 		
 		if (checkoutIds.length == 0) return;
-		Pictogram pictogram = sequence.getPictograms().get(curModifyPictogramPos);
+		Pictogram pictogram = sequence.getPictograms().get(pictogramEditPos);
 		pictogram.setPictogramId(checkoutIds[0]);
 		adapter.notifyDataSetChanged();
 	}
 
-	private void onPictoImageResult(Intent data) {
-		long[] checkoutIds = data.getExtras().getLongArray("checkoutIds");
+	private void OnEditSequenceImageResult(Intent data) {
+		long[] checkoutIds = data.getExtras().getLongArray(PICTO_INTENT_CHECKOUT_ID);
 		
 		if (checkoutIds.length == 0) {
 			Toast t = Toast.makeText(SequenceActivity.this, "The checkout contained no pictograms.", Toast.LENGTH_LONG);
@@ -378,7 +389,7 @@ public class SequenceActivity extends Activity {
 
 	private void callPictoAdmin(int modeId) {
 		Intent intent = new Intent();
-		intent.setComponent(new ComponentName("dk.aau.cs.giraf.pictoadmin", "dk.aau.cs.giraf.pictoadmin.PictoAdminMain"));
+		intent.setComponent(new ComponentName(PICTO_ADMIN_PACKAGE, PICTO_ADMIN_CLASS));
 		startActivityForResult(intent, modeId);
 	}
 }
