@@ -346,7 +346,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			if (adapterCount > 0) {
 				width += horizontalSpacing;
 			}
-		}	
+		}
 		
 		int childWidthMeasureSpec = getChildWidthMeasureSpec();
 		int childHeightMeasureSpec = getChildHeightMeasureSpec();
@@ -358,9 +358,13 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		}
 		
 		//We want to take as much width as possible.
-		if (getParent() instanceof ViewGroup) {
-			ViewGroup parent = (ViewGroup)getParent();
-			int parentSizeNoPadding = parent.getWidth() - parent.getPaddingLeft() - parent.getPaddingRight();
+		if (getParent().getParent() instanceof ViewGroup) {
+
+			//TODO: The view group is laying within another framelayout.
+			ViewGroup parent = (ViewGroup)getParent().getParent();
+			MarginLayoutParams params = (MarginLayoutParams)getLayoutParams();
+			
+			int parentSizeNoPadding = parent.getWidth() - params.rightMargin - parent.getPaddingLeft() - parent.getPaddingRight() - params.rightMargin;
 			if (parentSizeNoPadding > width)
 				width = parentSizeNoPadding;
 		}
@@ -686,8 +690,13 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		View parent;
 		long timeBefore = -1;
 		
+		private View getScroller(View viewGroup) {
+			// TODO: This is ridiculous. The viewgroup must lay in a framelayout in order for the scroll view to allow margin.
+			return (View)viewGroup.getParent().getParent();
+		}
+		
 		public AutoScroller() {
-			this.scroller = (View)SequenceViewGroup.this.getParent();
+			this.scroller = getScroller(SequenceViewGroup.this);;
 			if (! (this.scroller instanceof HorizontalScrollView))
 				throw new IllegalStateException("Parent of SequenceViewGroup must be HorizontalScrollView");
 			timeBefore = AnimationUtils.currentAnimationTimeMillis();
@@ -697,7 +706,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		public void reset() {
 			timeBefore = -1;
 			parent = SequenceViewGroup.this;
-			scroller = (View)parent.getParent();
+			scroller = getScroller(parent);
 			currentScrollX = scroller.getScrollX();
 			currentScrollY = scroller.getScrollY();
 		}
