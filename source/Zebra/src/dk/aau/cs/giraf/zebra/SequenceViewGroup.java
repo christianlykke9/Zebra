@@ -501,7 +501,14 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			break;
 			
 		case MotionEvent.ACTION_MOVE:
+			
+			if (draggingView == null) {
+				handled = true;
+				break;
+			}
+			
 			if (Math.abs(dragStartX - x) >= DRAG_DISTANCE) {
+				handled = true;
 				isDragging = true;
 				((PictogramView)draggingView).liftUp();
 			}
