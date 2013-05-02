@@ -19,11 +19,12 @@ import android.widget.ToggleButton;
 import dk.aau.cs.giraf.zebra.models.Child;
 import dk.aau.cs.giraf.zebra.models.Sequence;
 
-@SuppressLint("ShowToast")
 public class MainActivity extends Activity {
 
 	private List<Child> children = ZebraApplication.getChildren();
 	private List<Sequence> sequences = new ArrayList<Sequence>();
+	
+	private ChildAdapter childAdapter;
 	
 	private GridView sequenceGrid;
 	private boolean isInEditMode = false;
@@ -37,7 +38,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_overview);
 
-		final ChildAdapter childAdapter = new ChildAdapter(this, children);
+		childAdapter = new ChildAdapter(this, children);
 		
 		ListView childList = (ListView)findViewById(R.id.child_list);
 		childList.setAdapter(childAdapter);
@@ -97,8 +98,6 @@ public class MainActivity extends Activity {
 				sequence.setSequenceId(selectedChild.getNextSequenceId());
 				selectedChild.getSequences().add(sequence);
 				
-				childAdapter.notifyDataSetChanged();
-				
 				enterSequence(sequence, true);
 			}
 		});
@@ -142,16 +141,15 @@ public class MainActivity extends Activity {
 	
 	@Override
 	protected void onResume() {
-		
+
+		childAdapter.notifyDataSetChanged();
 		refreshSelectedChild();
 		
 		// Remove highlighting from all images
-		for (int i = 0; i < sequenceGrid.getChildCount(); i++)
-		{
+		for (int i = 0; i < sequenceGrid.getChildCount(); i++) {
 			View view = sequenceGrid.getChildAt(i);
 			
-			if (view instanceof PictogramView)
-			{
+			if (view instanceof PictogramView) {
 				((PictogramView)view).placeDown();
 			}
 		}
