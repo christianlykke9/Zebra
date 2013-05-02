@@ -18,15 +18,17 @@ import android.widget.TextView;
  */
 public class PictogramView extends LinearLayout {
 	
-	private final float NORMAL_SCALE = 0.8f;
-	private final float HIGHLIGHT_SCALE = 0.9f;
-	private final float DEFAULT_TEXT_SIZE = 18f;
+	public final static float NORMAL_SCALE = 0.8f;
+	public final static float HIGHLIGHT_SCALE = 0.9f;
+	private final static float DEFAULT_TEXT_SIZE = 18f;
 	
 	private RoundedImageView pictogram;
 	private TextView title;
 	private ImageButton deleteButton;
 	
 	private boolean isInEditMode = false;
+	
+	private OnDeleteClickListener onDeleteClickListener;
 	
 	public PictogramView(Context context) {
 		super(context);
@@ -41,10 +43,12 @@ public class PictogramView extends LinearLayout {
 	}
 	
 	
-	
 	private void initialize(Context context, float radius) {
+		// Disable hardware accelleration to improve performance
+		this.setLayerType(LAYER_TYPE_SOFTWARE, null);
+        
+        
 		this.setOrientation(LinearLayout.VERTICAL);
-		//this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		
 		
 		SquaredRelativeLayout square = new SquaredRelativeLayout(context);
@@ -53,6 +57,7 @@ public class PictogramView extends LinearLayout {
 		square.addView(createImageView(radius));
 		square.addView(createDeleteButton());
 		
+		setupOnDeleteClickHandler();
 		
 		this.addView(square);
 		
@@ -85,8 +90,11 @@ public class PictogramView extends LinearLayout {
 		params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		deleteButton.setLayoutParams(params);
 		
-		deleteButton.setPadding(0, 0, 0, 0);
+		deleteButton.setPadding(4, 4, 4, 4);
 		deleteButton.setBackgroundColor(Color.TRANSPARENT);
+		
+		deleteButton.setFocusable(false);
+		
         setDeleteButtonVisible(false);
 		
 		return deleteButton;
@@ -106,6 +114,28 @@ public class PictogramView extends LinearLayout {
 		this.setAlpha(1.0f);
 		setDeleteButtonVisible(isInEditMode);
 		invalidate();
+	}
+	
+	public void setSelected(boolean selected) {
+		if (selected) {
+			pictogram.setScaleX(HIGHLIGHT_SCALE);
+	        pictogram.setScaleY(HIGHLIGHT_SCALE);
+		} else {
+			pictogram.setScaleX(NORMAL_SCALE);
+	        pictogram.setScaleY(NORMAL_SCALE);
+		}
+		
+        this.invalidate();
+	}
+	
+	public void setLowlighted(boolean lowlighted) {
+		if (lowlighted) {
+			this.setAlpha(0.4f);
+		} else {
+			this.setAlpha(1f);
+		}
+		
+		this.invalidate();
 	}
 	
 	private void setDeleteButtonVisible(boolean visible) {
@@ -131,5 +161,27 @@ public class PictogramView extends LinearLayout {
 	public void setTitle(String newTitle)
 	{
 		title.setText(newTitle);
+	}
+	
+	public void setupOnDeleteClickHandler() {
+		deleteButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (isInEditMode && onDeleteClickListener != null)
+					onDeleteClickListener.onDeleteClick();
+			}
+		});
+	}
+
+	public void setOnDeleteClickListener(OnDeleteClickListener listener) {
+		onDeleteClickListener = listener;
+	}
+	
+	public OnDeleteClickListener getOnDeleteClickListener() {
+		return onDeleteClickListener;
+	}
+	
+	public interface OnDeleteClickListener {
+		public void onDeleteClick();
 	}
 }

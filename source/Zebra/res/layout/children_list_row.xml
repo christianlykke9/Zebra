@@ -14,10 +14,9 @@
         android:layout_height="wrap_content"
         android:padding="2dip"
         android:layout_alignParentLeft="true"
-        android:background="#ffffff"
         android:layout_marginRight="10dp">
  
-        <ImageView
+        <dk.aau.cs.giraf.zebra.RoundedImageView
             android:id="@+id/child_image"
             android:layout_width="50dip"
             android:layout_height="50dip" />
@@ -32,14 +31,15 @@
         android:layout_alignTop="@+id/image_layout"
         android:layout_toRightOf="@+id/image_layout"
         android:textSize="24sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:textColor="@color/text_color"/>
  
     <TextView
         android:id="@+id/count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/name"
-        android:textColor="#808080"
+        android:textColor="@color/text_color_light"
         android:textSize="13sp"
         android:paddingLeft="5dip"
         android:layout_marginTop="1dip"

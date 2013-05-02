@@ -1,5 +1,6 @@
 package dk.aau.cs.giraf.zebra;
 
+import dk.aau.cs.giraf.zebra.models.Sequence;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,8 @@ public class SequenceAdapter extends BaseAdapter {
 	
 	private Sequence sequence;
 	private Context context;
+	
+	private OnAdapterGetViewListener onAdapterGetViewListener;
 	
 	public SequenceAdapter(Context context, Sequence sequence) {
 		this.context = context;
@@ -53,9 +56,24 @@ public class SequenceAdapter extends BaseAdapter {
 		} else
 			view = (PictogramView)convertView;
 		
-		view.setImage(sequence.getPictograms().get(position));
+		// TODO: GET THE IMAGE ID
+		//view.setImage(sequence.getImageId());
+		
+		if (onAdapterGetViewListener != null)
+			onAdapterGetViewListener.onAdapterGetView(position, view);
 		
 		return view;
 	}
 	
+	public void setOnAdapterGetViewListener(OnAdapterGetViewListener onCreateViewListener) {
+		this.onAdapterGetViewListener = onCreateViewListener;
+	}
+	
+	public OnAdapterGetViewListener getOnAdapterGetViewListener() {
+		return this.onAdapterGetViewListener;
+	}
+	
+	public interface OnAdapterGetViewListener {
+		public void onAdapterGetView(int position, View view);
+	}
 }

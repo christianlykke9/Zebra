@@ -1,8 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="app_name">Zebra</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="no_children">Der er ingen børn</string>
+    <string name="changes_saved">Ændringerne blev gemt</string>
+    <string name="sequence_name_placeholder">Indtast sekvens navn</string>
+    <string name="confirm_exit_without_saving">Er du sikker på, at du vil afslutte uden at gemme?</string>
+    <string name="discard_changes">Fortryd ændringer</string>
+    <string name="save_changes">Gem ændringer</string>
+    <string name="unnamed_sequence">Unavngivet sekvens</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nej</string>
 
 </resources>

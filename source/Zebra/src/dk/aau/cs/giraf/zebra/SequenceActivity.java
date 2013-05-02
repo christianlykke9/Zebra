@@ -1,67 +1,238 @@
 package dk.aau.cs.giraf.zebra;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ToggleButton;
 import android.widget.TextView.OnEditorActionListener;
-import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
-import dk.aau.cs.giraf.oasis.lib.models.Profile;
-import dk.aau.cs.giraf.zebra.EditMode.EditModeObserver;
+import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
+import dk.aau.cs.giraf.zebra.SequenceAdapter.OnAdapterGetViewListener;
+import dk.aau.cs.giraf.zebra.SequenceViewGroup.OnNewButtonClickedListener;
+import dk.aau.cs.giraf.zebra.models.Child;
+import dk.aau.cs.giraf.zebra.models.Pictogram;
+import dk.aau.cs.giraf.zebra.models.Sequence;
 
 public class SequenceActivity extends Activity {
-	
+
+	private Sequence originalSequence;
 	private Sequence sequence;
+	private SequenceAdapter adapter;
 	
-	private ProfilesHelper profileHelper;
+	private Child child;
+	
+	private boolean isInEditMode;
+	private boolean isNew;
+	
+	private final String PICTO_ADMIN_PACKAGE = "dk.aau.cs.giraf.pictoadmin";
+	private final String PICTO_ADMIN_CLASS = PICTO_ADMIN_PACKAGE + "." + "PictoAdminMain";
+	
+	private final int PICTO_SEQUENCE_IMAGE_CALL = 345;
+	private final int PICTO_EDIT_PICTOGRAM_CALL = 456;
+	private final int PICTO_NEW_PICTOGRAM_CALL = 567;
+	
+	private final String PICTO_INTENT_CHECKOUT_ID = "checkoutIds";
+	
+	private int pictogramEditPos = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_sequence);
 		
-		profileHelper = new ProfilesHelper(this);
+		Bundle extras = getIntent().getExtras();
+		long profileId = extras.getLong("profileId");
+		long sequenceId = extras.getLong("sequenceId");
+		isNew = extras.getBoolean("new");
+		isInEditMode = extras.getBoolean("editMode");
+
+		child = ZebraApplication.getChildFromId(profileId);
+		originalSequence = child.getSequenceFromId(sequenceId);
 		
-		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
+		// Get a clone of the sequence so the original sequence is not modified
+		sequence = originalSequence.getClone();
+
+		//Create Adapter
+		adapter = setupAdapter();
 		
-		sequenceGroup.setEditModeEnabled(EditMode.get());
+		//Create Sequence Group
+		final SequenceViewGroup sequenceViewGroup = setupSequenceViewGroup(adapter);
 		
-		long profileId = getIntent().getExtras().getLong("profileId");
-		int sequenceId = getIntent().getExtras().getInt("sequenceId");
+		final TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
+		sequenceTitleView.setText(sequence.getTitle());
 		
-		Profile p = profileHelper.getProfileById(profileId);
+		if (!isInEditMode) {
+			sequenceTitleView.setHint(getResources().getString(R.string.unnamed_sequence));
+		}
 		
-		final Child child = new Child(p);
-		sequence = Test.createSequence(child, sequenceId, this);
+		initializeTopBar();
 		
-		final SequenceAdapter adapter = new SequenceAdapter(this, sequence);
-		sequenceGroup.setAdapter(adapter);
-		EditMode.getInstance().registerObserver(new EditModeObserver() {
+		final ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
+		
+		if (sequence.getImage() == null) {
+			sequenceImageView.setImageDrawable(getResources().getDrawable(R.drawable.sequence_placeholder));
+		}
+		else {
+			//TODO: Get the pictogram from the factory here..
+			//sequenceImageView.setImageDrawable(sequence.getImageId());
+		}
+	
+		sequenceImageView.setOnClickListener(new ImageView.OnClickListener() {
 			
 			@Override
-			public void onEditModeChange(boolean editMode) {
-				sequenceGroup.setEditModeEnabled(editMode);
+			public void onClick(View v) {
+				if (isInEditMode) {
+					callPictoAdmin(PICTO_SEQUENCE_IMAGE_CALL);
+				}
+			}
+		});
+
+		final ImageButton cancelButton = (ImageButton)findViewById(R.id.cancel_button);
+		final ImageButton okButton = (ImageButton)findViewById(R.id.ok_button);
+		
+		if (!isInEditMode) {
+			cancelButton.setVisibility(View.INVISIBLE);
+			okButton.setVisibility(View.INVISIBLE);
+		}
+		
+		cancelButton.setOnClickListener(new ImageButton.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				showDialog();
+			}
+		
+		});
+		
+		okButton.setOnClickListener(new ImageButton.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				cancelButton.setVisibility(View.INVISIBLE);
+				okButton.setVisibility(View.INVISIBLE);
+	
+				isInEditMode = false;
+				sequenceViewGroup.setEditModeEnabled(isInEditMode);
+				sequenceTitleView.setHint(getResources().getString(R.string.unnamed_sequence));
 				
-				TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
-				sequenceTitleView.setEnabled(editMode);
+				SequenceActivity.this.saveChanges();
+			}		
+		});
+		
+		EditText sequenceTitle = (EditText) findViewById(R.id.sequence_title);		
+		sequenceTitle.setOnFocusChangeListener(new OnFocusChangeListener() {
+			
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					setDeleteButtonVisible(false);
+				} else {
+					// Closing the keyboard when the text field is not active anymore
+					InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				    in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+				    
+					setDeleteButtonVisible(true);
+				}
+			}
+			
+			private void setDeleteButtonVisible(boolean value) {
+				ImageButton okButton = (ImageButton) findViewById(R.id.ok_button);
+				ImageButton cancelButton = (ImageButton) findViewById(R.id.cancel_button);
+				
+				// Make buttons transparent
+				if (value == false) {
+					okButton.setAlpha(0.3f);
+					cancelButton.setAlpha(0.3f);
+				} else {
+					okButton.setAlpha(1.0f);
+					cancelButton.setAlpha(1.0f);
+				}		
+				
+				// Disable/enable buttons 
+				okButton.setEnabled(value);
+				cancelButton.setEnabled(value);
+			}
+		});
+	}
+
+	private void saveChanges() {
+		EditText sequenceTitleView = (EditText)findViewById(R.id.sequence_title); 
+		sequenceTitleView.setEnabled(isInEditMode);
+		
+		// Saving the sequence title and changing the pointer to the original sequence
+		sequence.setTitle(sequenceTitleView.getText().toString());
+		originalSequence.copyFromSequence(sequence);
+	}
+	
+	private void showDialog() {
+		
+		final Dialog dialog = new Dialog(this);
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setContentView(R.layout.dialog_box);
+		dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+		
+		TextView question = (TextView)dialog.findViewById(R.id.question);
+		question.setText(getResources().getString(R.string.confirm_exit_without_saving));
+		
+		final Button yesButton = (Button)dialog.findViewById(R.id.btn_yes);
+		yesButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+				
+				// If the sequence is new, the sequence will be deleted.
+				if (isNew) child.getSequences().remove(originalSequence);
+				finish();
 			}
 		});
 		
+		final Button noButton = (Button)dialog.findViewById(R.id.btn_no);
+		noButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+			}
+		});
+
+		dialog.show();
+	}
+	
+	@Override
+	public void onBackPressed() {
+		if (isInEditMode) {
+			showDialog();
+		}
+		else {
+			super.onBackPressed();
+		}
+	}
+	
+	private SequenceViewGroup setupSequenceViewGroup(final SequenceAdapter adapter) {
+		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
+		sequenceGroup.setEditModeEnabled(isInEditMode);
+		sequenceGroup.setAdapter(adapter);
+		
+		//Handle rearrange
 		sequenceGroup.setOnRearrangeListener(new SequenceViewGroup.OnRearrangeListener() {
 			@Override
 			public void onRearrange(int indexFrom, int indexTo) {
@@ -70,88 +241,116 @@ public class SequenceActivity extends Activity {
 			}
 		});
 		
-		TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
-		sequenceTitleView.setText(sequence.getName());
-		ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
-		sequenceImageView.setImageDrawable(sequence.getPictograms().get(0));
-		
-		initializeTopBar();
-		
-		sequenceImageView.setOnClickListener(new ImageView.OnClickListener() {
-			
+		//Handle new view
+		sequenceGroup.setOnNewButtonClickedListener(new OnNewButtonClickedListener() {
 			@Override
-			public void onClick(View v) {
-				if (EditMode.get()) {
-					Intent intent = new Intent();
-					intent.setComponent(new ComponentName("dk.aau.cs.giraf.pictoadmin", "dk.aau.cs.giraf.pictoadmin.PictoAdminMain"));
-					startActivityForResult(intent, 1);
+			public void onNewButtonClicked() {
+				callPictoAdmin(PICTO_NEW_PICTOGRAM_CALL);
+			}
+		});
+		
+		sequenceGroup.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapter, View view, int position,
+					long id) {
+				pictogramEditPos = position;
+				callPictoAdmin(PICTO_EDIT_PICTOGRAM_CALL);
+			}
+		});
+		
+		return sequenceGroup;
+	}
+
+	private SequenceAdapter setupAdapter() {
+		final SequenceAdapter adapter = new SequenceAdapter(this, sequence);
+		
+		//Setup delete handler.
+		adapter.setOnAdapterGetViewListener(new OnAdapterGetViewListener() {		
+			@Override
+			public void onAdapterGetView(final int position, final View view) {
+				if (view instanceof PictogramView) {
+					PictogramView pictoView = (PictogramView) view;
+					pictoView.setOnDeleteClickListener(new OnDeleteClickListener() {
+						@Override
+						public void onDeleteClick() {
+							sequence.deletePictogram(position);
+							adapter.notifyDataSetChanged();
+						}
+					});
 				}
 			}
 		});
 		
-		// Edit mode switcher button
-		ToggleButton button = (ToggleButton) findViewById(R.id.edit_mode_toggle);
-		
-		button.setChecked(EditMode.get());
-		
-		button.setOnClickListener(new ImageButton.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				EditMode.toggle();
-			}
-		});
+		return adapter;
 	}
 	
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 		
-		if (resultCode == RESULT_OK && requestCode == 1) {
+		if (resultCode == RESULT_OK) {
+			switch (requestCode) {
 			
-			long[] checkoutIds = data.getExtras().getLongArray("checkoutIds");
-			
-			if (checkoutIds.length == 0) {
-				Toast t = Toast.makeText(SequenceActivity.this, "The checkout contained no pictograms.", Toast.LENGTH_LONG);
-				t.show();
-			}
-			else
-			{
-				if (checkoutIds.length != 1) {
-					Toast t = Toast.makeText(SequenceActivity.this, "The checkout contained more than one pictogram. The first will be used", Toast.LENGTH_LONG);
-					t.show();
-				}
+			case PICTO_SEQUENCE_IMAGE_CALL:
+				OnEditSequenceImageResult(data);
+				break;
+
+			case PICTO_EDIT_PICTOGRAM_CALL:
+				OnEditPictogramResult(data);
+				break;
 				
-				// Set the sequence image using the first ID from the checkout.
-				sequence.setImageId(checkoutIds[0]);
+			case PICTO_NEW_PICTOGRAM_CALL:
+				OnNewPictogramResult(data);
+				break;
 				
-				ImageView sequenceImageView = (ImageView)findViewById(R.id.sequence_image);
-				sequenceImageView.setImageDrawable(sequence.getImage());
+			default:
+				break;
 			}
 		}
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+	
+	private void OnNewPictogramResult(Intent data) {
+		long[] checkoutIds = data.getExtras().getLongArray(PICTO_INTENT_CHECKOUT_ID);
 		
-		return true;
+		for (long id : checkoutIds) {
+			Pictogram pictogram = new Pictogram();
+			pictogram.setPictogramId(id);
+			sequence.addPictogramAtEnd(pictogram);
+		}
+		
+		adapter.notifyDataSetChanged();
+	}
+
+	private void OnEditPictogramResult(Intent data) {
+		if (pictogramEditPos < 0) return;
+		
+		long[] checkoutIds = data.getExtras().getLongArray(PICTO_INTENT_CHECKOUT_ID);
+		
+		if (checkoutIds.length == 0) return;
+		Pictogram pictogram = sequence.getPictograms().get(pictogramEditPos);
+		pictogram.setPictogramId(checkoutIds[0]);
+		adapter.notifyDataSetChanged();
+	}
+
+	private void OnEditSequenceImageResult(Intent data) {
+		long[] checkoutIds = data.getExtras().getLongArray(PICTO_INTENT_CHECKOUT_ID);
+		
+		if (checkoutIds.length == 0) return;
+		sequence.setImageId(checkoutIds[0]);
+		//TODO: Update image on screen
 	}
 	
 	private void initializeTopBar() {
         TextView editText = (TextView) findViewById(R.id.sequence_title);
-        editText.setEnabled(EditMode.get());
+        editText.setEnabled(isInEditMode);
 		
         // Create listener to remove focus when "Done" is pressed on the keyboard
 		editText.setOnEditorActionListener(new OnEditorActionListener() {        
 		    @Override
 		    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 		        if(actionId==EditorInfo.IME_ACTION_DONE) {
-		        	EditText editText = (EditText) findViewById(R.id.sequence_title);
-		        	
+		        	EditText editText = (EditText) findViewById(R.id.sequence_title);	
 		            editText.clearFocus();
 		        }
 		        return false;
@@ -171,14 +370,12 @@ public class SequenceActivity extends Activity {
                     EditText editText = (EditText) findViewById(R.id.sequence_title);
 		        	
                     hideSoftKeyboardFromView(editText);
-                    
-                    // TODO Save changes in the title
 				}
 			}
 		});
 
 		TextView childName = (TextView)findViewById(R.id.child_name);
-		childName.setText(sequence.getChild().getName());
+		childName.setText(child.getName());
 	}
 	
 	public void hideSoftKeyboardFromView(View view) {
@@ -207,13 +404,16 @@ public class SequenceActivity extends Activity {
 
 	    // If the view is a container, run the function recursively on the children
 	    if (view instanceof ViewGroup) {
-
 	        for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
-
 	            View innerView = ((ViewGroup) view).getChildAt(i);
-
 	            createClearFocusListeners(innerView);
 	        }
 	    }
+	}
+
+	private void callPictoAdmin(int modeId) {
+		Intent intent = new Intent();
+		intent.setComponent(new ComponentName(PICTO_ADMIN_PACKAGE, PICTO_ADMIN_CLASS));
+		startActivityForResult(intent, modeId);
 	}
 }

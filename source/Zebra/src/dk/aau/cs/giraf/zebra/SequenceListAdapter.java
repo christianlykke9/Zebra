@@ -2,6 +2,9 @@ package dk.aau.cs.giraf.zebra;
 
 import java.util.List;
 
+import dk.aau.cs.giraf.zebra.models.Child;
+import dk.aau.cs.giraf.zebra.models.Sequence;
+
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,7 @@ public class SequenceListAdapter extends BaseAdapter {
 
 	private List<Sequence> items;
 	private Context context;
+	private boolean isInEditMode;
 	
 	public SequenceListAdapter(Context context, List<Sequence> items) {
 		
@@ -31,8 +35,10 @@ public class SequenceListAdapter extends BaseAdapter {
 		
         Sequence s = items.get(position);
         
-        v.setTitle(s.getName());
-        v.setImage(s.getImage());
+        v.setTitle(s.getTitle());
+        v.setEditModeEnabled(isInEditMode);
+        // TODO: GET THE IMAGE ID
+        //v.setImage(s.getImageId());
 
         return v;
     }
@@ -52,4 +58,10 @@ public class SequenceListAdapter extends BaseAdapter {
         return position;
     }
 
+	
+	public void setEditModeEnabled(boolean editEnabled) {
+		if (isInEditMode != editEnabled) {
+			isInEditMode = editEnabled;
+		}
+	}
 }

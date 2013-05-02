@@ -2,9 +2,10 @@ package dk.aau.cs.giraf.zebra;
 
 import java.util.List;
 
+import dk.aau.cs.giraf.zebra.models.Child;
+
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +17,13 @@ public class ChildAdapter extends BaseAdapter {
 
 	private List<Child> items;
 	private LayoutInflater inflater;
+	private Activity activity;
 	
 	public ChildAdapter(Activity activity, List<Child> items) {
 		
 		this.items = items;
 		this.inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		this.activity = activity;
 	}
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -35,12 +38,16 @@ public class ChildAdapter extends BaseAdapter {
         ImageView childImage = (ImageView)v.findViewById(R.id.child_image);
  
         Child c = items.get(position);
-
-        Drawable profilePicture = Drawable.createFromPath(c.getProfile().getPicture());
         
         nameTextView.setText(c.getName());
         countTextView.setText(c.getSequenceCount() + " sekvenser");
-        childImage.setImageDrawable(profilePicture);
+
+        if (c.getPicture() == null) {
+        	childImage.setImageDrawable(activity.getResources().getDrawable(R.drawable.placeholder));
+        } else {
+        	childImage.setImageDrawable(c.getPicture());
+        }
+        
         return v;
     }
 
@@ -56,6 +63,6 @@ public class ChildAdapter extends BaseAdapter {
 	
 	@Override
 	public long getItemId(int position) {
-        return getItem(position).getProfile().getId();
+        return items.get(position).getProfileId();
     }
 }

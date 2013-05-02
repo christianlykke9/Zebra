@@ -13,54 +13,56 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
-import dk.aau.cs.giraf.oasis.lib.controllers.ProfilesHelper;
-import dk.aau.cs.giraf.oasis.lib.models.Profile;
+import dk.aau.cs.giraf.zebra.models.Child;
+import dk.aau.cs.giraf.zebra.models.Sequence;
 
 public class MainActivity extends Activity {
 
-	private List<Child> children;
-	private List<Sequence> sequences;
-	private GridView sequenceGrid;
+	private List<Child> children = ZebraApplication.getChildren();
+	private List<Sequence> sequences = new ArrayList<Sequence>();
 	
+	private ChildAdapter childAdapter;
+	
+	private GridView sequenceGrid;
 	private boolean isInEditMode = false;
 	
-	private ProfilesHelper profileHelper;
+	private SequenceListAdapter sequenceAdapter;
 	
-	Child child;
+	Child selectedChild;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_overview);
-		
-		profileHelper = new ProfilesHelper(this);
-		
-		children = getChildren();
-		//TODO: Make this robust.
-		child = children.get(0);
-		sequences = getSequences(child);
+		setContentView(R.layout.activity_main);
+
+		childAdapter = new ChildAdapter(this, children);
 		
 		ListView childList = (ListView)findViewById(R.id.child_list);
-		final ChildAdapter childAdapter = new ChildAdapter(this, children);
 		childList.setAdapter(childAdapter);
+
+		sequenceAdapter = new SequenceListAdapter(this, sequences);
 		
 		sequenceGrid = (GridView)findViewById(R.id.sequence_grid);
-		final SequenceListAdapter sequenceAdapter = new SequenceListAdapter(this, sequences);
 		sequenceGrid.setAdapter(sequenceAdapter);
 		
-		//Load Child sequences
+		if (children.size() == 0) {
+			Toast toast = Toast.makeText(this, getResources().getString(R.string.no_children), Toast.LENGTH_LONG);
+			toast.show();
+		}
+		else {
+			selectedChild = children.get(0);
+			refreshSelectedChild();
+		}
+		
+		//Load Child
 		childList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-								
-				child = childAdapter.getItem(arg2);
 				
-				((TextView)findViewById(R.id.child_name)).setText(child.getName());
-								
-				sequences.clear();
-				sequences.addAll(getSequences(child));
-				sequenceAdapter.notifyDataSetChanged();
+				selectedChild = childAdapter.getItem(arg2);
+				refreshSelectedChild();
 				
 				final GridView sequenceGridView = ((GridView)findViewById(R.id.sequence_grid));
 				
@@ -78,26 +80,25 @@ public class MainActivity extends Activity {
 				((PictogramView)arg1).liftUp();
 				
 				Sequence sequence = sequenceAdapter.getItem(arg2);
-				
-				enterSequence(sequence);
+				enterSequence(sequence, false);
 			}		
 		});
 		
+			
+		// Creates clean sequence and starts the sequence activity - ready to add pictograms.
+		final ImageButton createButton = (ImageButton)findViewById(R.id.add_button);
+		createButton.setVisibility(isInEditMode ? View.VISIBLE : View.GONE);
 		
-		// Starts a clean sequence activity - ready to add pictograms.
-		((ImageButton)findViewById(R.id.add_button)).setOnClickListener(new OnClickListener() {
+		createButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				//Intent newSequenceIntent = new Intent(getApplication(), SequenceActivity.class);
-//				newSequenceIntent.putExtra("profileId", null);
-//				newSequenceIntent.putExtra("sequenceId", 0);
-				 
-				Sequence newSequence = new Sequence(MainActivity.this, child, "Ny Sekvens");
-				//TODO: Fix this id mess.
-				newSequence.setSequenceId(1);
 				
-				enterSequence(newSequence);
+				Sequence sequence = new Sequence();
+				sequence.setSequenceId(selectedChild.getNextSequenceId());
+				selectedChild.getSequences().add(sequence);
+				
+				enterSequence(sequence, true);
 			}
 		});
 		
@@ -109,85 +110,60 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				EditMode.toggle();
-				setEditModeEnabled(EditMode.get());
+				ToggleButton button = (ToggleButton)v;
+				isInEditMode = button.isChecked();
+				
+				// Make sure that all views currently not visible will have the correct editmode when they become visible
+				sequenceAdapter.setEditModeEnabled(isInEditMode);
+
+				createButton.setVisibility(isInEditMode ? View.VISIBLE : View.GONE);
+				
+				// Update the editmode of all visible views in the grid
+				for (int i = 0; i < sequenceGrid.getChildCount(); i++) {
+					View view = sequenceGrid.getChildAt(i);
+					
+					if (view instanceof PictogramView) {
+						((PictogramView)view).setEditModeEnabled(isInEditMode);
+					}
+				}
 			}
 		});
 	}
 	
+	
+	public void refreshSelectedChild() {
+		((TextView)findViewById(R.id.child_name)).setText(selectedChild.getName());
+		
+		sequences.clear();
+		sequences.addAll(selectedChild.getSequences());
+		sequenceAdapter.notifyDataSetChanged();
+	}
+	
 	@Override
 	protected void onResume() {
+
+		childAdapter.notifyDataSetChanged();
+		refreshSelectedChild();
+		
 		// Remove highlighting from all images
-		for (int i = 0; i < sequenceGrid.getChildCount(); i++)
-		{
+		for (int i = 0; i < sequenceGrid.getChildCount(); i++) {
 			View view = sequenceGrid.getChildAt(i);
 			
-			if (view instanceof PictogramView)
-			{
+			if (view instanceof PictogramView) {
 				((PictogramView)view).placeDown();
 			}
 		}
 		
-		this.setEditModeEnabled(EditMode.get());
-		
-		
-		// Update the state of the editmode switcher button
-		ToggleButton button = (ToggleButton) findViewById(R.id.edit_mode_toggle);
-		button.setChecked(EditMode.get());
-		
 		super.onResume();
-	}
-	
+	}	
 
-	public void setEditModeEnabled(boolean editEnabled) {
-		if (isInEditMode != editEnabled) {
-			isInEditMode = editEnabled;
-			
-			for (int i = 0; i < sequenceGrid.getChildCount(); i++)
-			{
-				View view = sequenceGrid.getChildAt(i);
-				
-				if (view instanceof PictogramView)
-				{
-					((PictogramView)view).setEditModeEnabled(isInEditMode);
-				}
-			}
-		}
-	}
-	
-
-	private void enterSequence(Sequence sequence) {
+	private void enterSequence(Sequence sequence, boolean isNew) {
 		Intent intent = new Intent(getApplication(), SequenceActivity.class);
-		
-		//TODO: LÆKKER MUSIK
-		intent.putExtra("profileId", sequence.getChild().getProfile().getId());
+		intent.putExtra("profileId", selectedChild.getProfileId());
 		intent.putExtra("sequenceId", sequence.getSequenceId());
-		//intent.putExtra("sequence", sequence);
-		
-		//TODO: Put sequence id in extras.
-		startActivity(intent);
-	}
-	
-	private List<Sequence> getSequences(Child child) {
-		return child.getSequences();
-	}
+		intent.putExtra("editMode", isInEditMode);
+		intent.putExtra("new", isNew);
 
-	private List<Child> getChildren() {
-		
-		List<Profile> profiles = profileHelper.getChildren();
-		
-		ArrayList<Child> children = new ArrayList<Child>();
-		
-		int i = 3;
-		
-		for (Profile p : profiles) {
-			Child c = new Child(p);
-			children.add(c);
-			
-			c.setSequences(Test.getSequences(c, (i % 4), this));
-			i++;
-		}
-		
-		return children;
+		startActivity(intent);
 	}
 }

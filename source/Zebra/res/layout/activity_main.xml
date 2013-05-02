@@ -1,97 +1,79 @@
 <LinearLayout 
-    android:id="@+id/parent_container"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:svg="http://schemas.android.com/apk/res/dk.aau.cs.giraf.zebra"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/main_gradient_bg"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".SequenceActivity"
-    android:focusableInTouchMode="true" >
+	android:id="@+id/parent_container"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical"
+	android:background="@drawable/main_gradient_bg"
+	android:focusableInTouchMode="true" >
 
-    <RelativeLayout 
+    <RelativeLayout
         android:id="@+id/sequence_bar"
         android:layout_width="match_parent"
         android:layout_height="140sp"
-        android:orientation="horizontal"
-        android:background="@drawable/main_topbar_gradient_bg">
-        
-        <dk.aau.cs.giraf.zebra.RoundedImageView 
-            android:id="@+id/sequence_image"
-            android:layout_width="85sp"
-            android:layout_height="85sp"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="15sp"
-            android:layout_marginRight="15sp" />
+        android:background="@drawable/main_topbar_gradient_bg"
+        android:orientation="horizontal" >
 
+        <TextView
+            android:id="@+id/child_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="ZEBRA"
+            android:textSize="60sp"
+            android:textColor="@color/text_color" />
+        
         <ToggleButton
             android:id="@+id/edit_mode_toggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
             android:background="@drawable/btn_edit_mode"
+            android:textOn=""
             android:textOff=""
-            android:textOn="" />
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp" />
 
-        <LinearLayout
-            android:layout_width="fill_parent"
+        <ImageButton
+            android:id="@+id/add_button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/edit_mode_toggle"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/edit_mode_toggle"
-            android:layout_toRightOf="@+id/sequence_image"
-            android:orientation="vertical" >
-
-            <EditText
-                android:id="@+id/sequence_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#00000000"
-                android:gravity="center"
-                android:imeOptions="actionDone"
-                android:inputType="text"
-                android:textColor="#624319"
-                android:textSize="48sp" >
-            </EditText>
-
-            <TextView
-                android:id="@+id/child_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:alpha="0.4"
-                android:gravity="center"
-                android:textColor="#624319"
-                android:textIsSelectable="true"
-                android:textSize="26sp" />
-        </LinearLayout>
+            android:layout_marginRight="87dp"
+            android:background="@null"
+            android:src="@drawable/btn_add_sequence" />
 
     </RelativeLayout>
-    
-    <HorizontalScrollView
-        android:id="@+id/horizontalScrollView"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="0dp"
-        android:overScrollMode="always"
-        android:padding="0dp" >
+        android:layout_marginTop="-6dp"
+        android:baselineAligned="false" >
 
-        <dk.aau.cs.giraf.zebra.SequenceViewGroup
-            android:id="@+id/sequenceViewGroup"
-            android:layout_width="wrap_content"
+        <dk.aau.cs.giraf.zebra.BounceListView
+            android:id="@+id/child_list"
+            android:layout_width="375dp"
             android:layout_height="match_parent"
-          	svg:horizontalSpacing="20dp"
-          	svg:itemHeight="@dimen/activity_main_picto_size"
-          	svg:itemWidth="@dimen/activity_main_picto_size">
-            
-        </dk.aau.cs.giraf.zebra.SequenceViewGroup>
+            android:background="@drawable/overview_list_bg"
+            android:dividerHeight="1dp"
+            android:fadeScrollbars="false"
+            android:listSelector="@drawable/list_selector" >
+        </dk.aau.cs.giraf.zebra.BounceListView>
 
-    </HorizontalScrollView>
-    
+        <GridView
+            android:id="@+id/sequence_grid"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:numColumns="4"
+            android:listSelector="#00000000"
+            android:fadeScrollbars="false">
+        </GridView>
+    </LinearLayout>
+
 </LinearLayout>
