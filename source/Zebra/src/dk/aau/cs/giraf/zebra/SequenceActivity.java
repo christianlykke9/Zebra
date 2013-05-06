@@ -37,6 +37,12 @@ public class SequenceActivity extends Activity {
 	private Sequence sequence;
 	private SequenceAdapter adapter;
 	
+	private ImageButton okButton;
+	private ImageButton cancelButton;
+	
+	private SequenceViewGroup sequenceViewGroup;
+	private EditText sequenceTitleView;
+	
 	private Child child;
 	
 	private boolean isInEditMode;
@@ -74,14 +80,11 @@ public class SequenceActivity extends Activity {
 		adapter = setupAdapter();
 		
 		//Create Sequence Group
-		final SequenceViewGroup sequenceViewGroup = setupSequenceViewGroup(adapter);
-		
-		final TextView sequenceTitleView = (TextView) findViewById(R.id.sequence_title);
-		sequenceTitleView.setText(sequence.getTitle());
-		
-		if (!isInEditMode) {
-			sequenceTitleView.setHint(getResources().getString(R.string.unnamed_sequence));
-		}
+		sequenceViewGroup = setupSequenceViewGroup(adapter);
+		sequenceTitleView = (EditText)findViewById(R.id.sequence_title);
+
+		okButton = (ImageButton)findViewById(R.id.ok_button);
+		cancelButton = (ImageButton)findViewById(R.id.cancel_button);
 		
 		initializeTopBar();
 		
@@ -104,41 +107,8 @@ public class SequenceActivity extends Activity {
 				}
 			}
 		});
-
-		final ImageButton cancelButton = (ImageButton)findViewById(R.id.cancel_button);
-		final ImageButton okButton = (ImageButton)findViewById(R.id.ok_button);
-		
-		if (!isInEditMode) {
-			cancelButton.setVisibility(View.INVISIBLE);
-			okButton.setVisibility(View.INVISIBLE);
-		}
-		
-		cancelButton.setOnClickListener(new ImageButton.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				showDialog();
-			}
-		
-		});
-		
-		okButton.setOnClickListener(new ImageButton.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				cancelButton.setVisibility(View.INVISIBLE);
-				okButton.setVisibility(View.INVISIBLE);
 	
-				isInEditMode = false;
-				sequenceViewGroup.setEditModeEnabled(isInEditMode);
-				sequenceTitleView.setHint(getResources().getString(R.string.unnamed_sequence));
-				
-				SequenceActivity.this.saveChanges();
-			}		
-		});
-		
-		EditText sequenceTitle = (EditText) findViewById(R.id.sequence_title);		
-		sequenceTitle.setOnFocusChangeListener(new OnFocusChangeListener() {
+		sequenceTitleView.setOnFocusChangeListener(new OnFocusChangeListener() {
 			
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -154,9 +124,6 @@ public class SequenceActivity extends Activity {
 			}
 			
 			private void setDeleteButtonVisible(boolean value) {
-				ImageButton okButton = (ImageButton) findViewById(R.id.ok_button);
-				ImageButton cancelButton = (ImageButton) findViewById(R.id.cancel_button);
-				
 				// Make buttons transparent
 				if (value == false) {
 					okButton.setAlpha(0.3f);
@@ -172,17 +139,36 @@ public class SequenceActivity extends Activity {
 			}
 		});
 	}
+	
+	private void discardChanges() {
+		setEditModeEnabled(false);
+		
+		// Discarding changes
+		sequence = originalSequence.getClone();
+		sequenceTitleView.setText(sequence.getTitle());
+		adapter.notifyDataSetChanged();
+	}
 
 	private void saveChanges() {
-		EditText sequenceTitleView = (EditText)findViewById(R.id.sequence_title); 
-		sequenceTitleView.setEnabled(isInEditMode);
+		setEditModeEnabled(false);
 		
-		// Saving the sequence title and changing the pointer to the original sequence
+		// Saving changes
 		sequence.setTitle(sequenceTitleView.getText().toString());
 		originalSequence.copyFromSequence(sequence);
 	}
 	
-	private void showDialog() {
+	private void setEditModeEnabled(boolean isInEditMode) {
+		this.isInEditMode = isInEditMode;
+		
+		sequenceTitleView.setEnabled(isInEditMode);
+		
+		cancelButton.setVisibility(isInEditMode ? View.VISIBLE : View.INVISIBLE);
+		okButton.setVisibility(isInEditMode ? View.VISIBLE : View.INVISIBLE);
+
+		sequenceViewGroup.setEditModeEnabled(isInEditMode);
+	}
+	
+	private void showBackDialog() {
 		
 		final Dialog dialog = new Dialog(this);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -190,7 +176,7 @@ public class SequenceActivity extends Activity {
 		dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 		
 		TextView question = (TextView)dialog.findViewById(R.id.question);
-		question.setText(getResources().getString(R.string.confirm_exit_without_saving));
+		question.setText(getResources().getString(R.string.confirm_go_back));
 		
 		final Button yesButton = (Button)dialog.findViewById(R.id.btn_yes);
 		yesButton.setOnClickListener(new View.OnClickListener() {
@@ -200,7 +186,9 @@ public class SequenceActivity extends Activity {
 				dialog.dismiss();
 				
 				// If the sequence is new, the sequence will be deleted.
-				if (isNew) child.getSequences().remove(originalSequence);
+				if (isNew) {
+					child.getSequences().remove(originalSequence);
+				}
 				finish();
 			}
 		});
@@ -217,10 +205,51 @@ public class SequenceActivity extends Activity {
 		dialog.show();
 	}
 	
+	private void showDiscardDialog() {
+		
+		final Dialog dialog = new Dialog(this);
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setContentView(R.layout.dialog_box);
+		dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+		
+		TextView question = (TextView)dialog.findViewById(R.id.question);
+		question.setText(getResources().getString(R.string.confirm_discarding_changes));
+		
+		final Button yesButton = (Button)dialog.findViewById(R.id.btn_yes);
+		yesButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+				
+				// If the sequence is new, the sequence will be deleted.
+				if (isNew) {
+					child.getSequences().remove(originalSequence);
+					finish();
+				}
+				else {
+					discardChanges();
+				}
+			}
+		});
+		
+		final Button noButton = (Button)dialog.findViewById(R.id.btn_no);
+		noButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+			}
+		});
+
+		dialog.show();
+	}
+	
+	
 	@Override
 	public void onBackPressed() {
 		if (isInEditMode) {
-			showDialog();
+			showBackDialog();			
 		}
 		else {
 			super.onBackPressed();
@@ -342,11 +371,11 @@ public class SequenceActivity extends Activity {
 	}
 	
 	private void initializeTopBar() {
-        TextView editText = (TextView) findViewById(R.id.sequence_title);
-        editText.setEnabled(isInEditMode);
-		
+        sequenceTitleView.setEnabled(isInEditMode);
+        sequenceTitleView.setText(sequence.getTitle());
+        
         // Create listener to remove focus when "Done" is pressed on the keyboard
-		editText.setOnEditorActionListener(new OnEditorActionListener() {        
+        sequenceTitleView.setOnEditorActionListener(new OnEditorActionListener() {        
 		    @Override
 		    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 		        if(actionId==EditorInfo.IME_ACTION_DONE) {
@@ -362,20 +391,39 @@ public class SequenceActivity extends Activity {
 		createClearFocusListeners(findViewById(R.id.parent_container));
 		
 		// Create listener to hide the keyboard and save when the EditText loses focus
-		editText.setOnFocusChangeListener(new OnFocusChangeListener() {
+		sequenceTitleView.setOnFocusChangeListener(new OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
-				if (!hasFocus)
-				{	
-                    EditText editText = (EditText) findViewById(R.id.sequence_title);
-		        	
-                    hideSoftKeyboardFromView(editText);
+				if (!hasFocus) {
+                    hideSoftKeyboardFromView(sequenceTitleView);
 				}
 			}
 		});
 
 		TextView childName = (TextView)findViewById(R.id.child_name);
 		childName.setText(child.getName());
+		
+		if (!isInEditMode) {
+			cancelButton.setVisibility(View.INVISIBLE);
+			okButton.setVisibility(View.INVISIBLE);
+		}
+		
+		cancelButton.setOnClickListener(new ImageButton.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				showDiscardDialog();
+			}
+		
+		});
+		
+		okButton.setOnClickListener(new ImageButton.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				SequenceActivity.this.saveChanges();
+			}		
+		});
 	}
 	
 	public void hideSoftKeyboardFromView(View view) {

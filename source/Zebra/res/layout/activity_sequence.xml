@@ -72,7 +72,7 @@
                 android:textColor="@color/text_color"
                 android:textSize="48sp"
                 android:textColorHint="@color/text_hint_color"
-                android:hint="@string/sequence_name_placeholder" >
+                android:hint="@string/unnamed_sequence" >
             </EditText>
 
             <TextView
