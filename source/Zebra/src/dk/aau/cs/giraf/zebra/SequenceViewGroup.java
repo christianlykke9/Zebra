@@ -779,6 +779,20 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 		}
 	}
 	
+	public void liftUpAddNewButton()
+	{
+		addNewPictoGramView.setScaleX(PictogramView.HIGHLIGHT_SCALE);
+		addNewPictoGramView.setScaleY(PictogramView.HIGHLIGHT_SCALE);
+		addNewPictoGramView.setAlpha(0.7f);
+	}
+	
+	public void placeDownAddNewButton()
+	{
+		addNewPictoGramView.setScaleX(PictogramView.NORMAL_SCALE);
+		addNewPictoGramView.setScaleY(PictogramView.NORMAL_SCALE);
+		addNewPictoGramView.setAlpha(1f);
+	}
+	
 	public void setOnNewButtonClickedListener(OnNewButtonClickedListener listener) {
 		newButtonClickedListener = listener;
 	}

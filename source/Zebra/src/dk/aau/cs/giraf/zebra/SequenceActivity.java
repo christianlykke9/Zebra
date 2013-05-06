@@ -245,6 +245,9 @@ public class SequenceActivity extends Activity {
 		sequenceGroup.setOnNewButtonClickedListener(new OnNewButtonClickedListener() {
 			@Override
 			public void onNewButtonClicked() {
+				final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
+				sequenceGroup.liftUpAddNewButton();
+				
 				callPictoAdmin(PICTO_NEW_PICTOGRAM_CALL);
 			}
 		});
@@ -288,6 +291,10 @@ public class SequenceActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		
+		//Remove the highlight from the add pictogram button
+		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
+		sequenceGroup.placeDownAddNewButton();
 		
 		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
