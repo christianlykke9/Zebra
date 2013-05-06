@@ -30,6 +30,7 @@ import dk.aau.cs.giraf.zebra.SequenceViewGroup.OnNewButtonClickedListener;
 import dk.aau.cs.giraf.zebra.models.Child;
 import dk.aau.cs.giraf.zebra.models.Pictogram;
 import dk.aau.cs.giraf.zebra.models.Sequence;
+import dk.aau.cs.giraf.zebra.serialization.SequenceFileStore;
 
 public class SequenceActivity extends Activity {
 
@@ -155,6 +156,8 @@ public class SequenceActivity extends Activity {
 		// Saving changes
 		sequence.setTitle(sequenceTitleView.getText().toString());
 		originalSequence.copyFromSequence(sequence);
+		
+		SequenceFileStore.writeSequences(this, child, child.getSequences());		
 	}
 	
 	private void setEditModeEnabled(boolean isInEditMode) {

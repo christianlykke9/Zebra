@@ -17,6 +17,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 import dk.aau.cs.giraf.zebra.models.Child;
 import dk.aau.cs.giraf.zebra.models.Sequence;
+import dk.aau.cs.giraf.zebra.serialization.SequenceFileStore;
 
 public class MainActivity extends Activity {
 
@@ -46,6 +47,8 @@ public class MainActivity extends Activity {
 		
 		sequenceGrid = (GridView)findViewById(R.id.sequence_grid);
 		sequenceGrid.setAdapter(sequenceAdapter);
+		
+		loadSequences();
 		
 		if (children.size() == 0) {
 			Toast toast = Toast.makeText(this, getResources().getString(R.string.no_children), Toast.LENGTH_LONG);
@@ -81,7 +84,7 @@ public class MainActivity extends Activity {
 				
 				Sequence sequence = sequenceAdapter.getItem(arg2);
 				enterSequence(sequence, false);
-			}		
+			}
 		});
 		
 			
@@ -129,7 +132,13 @@ public class MainActivity extends Activity {
 			}
 		});
 	}
-	
+
+	private void loadSequences() {
+		for (Child child : children) {
+			List<Sequence> list = SequenceFileStore.getSequences(this, child);
+			child.setSequences(list);
+		}
+	}
 	
 	public void refreshSelectedChild() {
 		((TextView)findViewById(R.id.child_name)).setText(selectedChild.getName());

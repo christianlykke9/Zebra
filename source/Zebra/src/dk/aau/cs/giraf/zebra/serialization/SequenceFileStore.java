@@ -39,11 +39,12 @@ public class SequenceFileStore {
 			FileInputStream fis = context.openFileInput(filename);
 			InputStreamReader isr = new InputStreamReader(fis, "UTF8");
 			br = new BufferedReader(isr);
-			
+						
 			StringBuilder sb = new StringBuilder();
 			CharBuffer charBuffer = CharBuffer.allocate(1024);
+						
 			while (br.read(charBuffer) != -1) {
-				sb.append(charBuffer);
+				sb.append(charBuffer.flip());
 			}
 			
 			JSONSerializer jsonSerializer = new JSONSerializer();
