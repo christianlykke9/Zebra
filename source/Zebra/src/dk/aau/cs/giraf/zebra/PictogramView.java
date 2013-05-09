@@ -20,6 +20,7 @@ public class PictogramView extends LinearLayout {
 	
 	public final static float NORMAL_SCALE = 0.8f;
 	public final static float HIGHLIGHT_SCALE = 0.9f;
+	public final static float LOWLIGHT_SCALE = 0.7f;
 	private final static float DEFAULT_TEXT_SIZE = 18f;
 	
 	private RoundedImageView pictogram;
@@ -116,24 +117,26 @@ public class PictogramView extends LinearLayout {
 		invalidate();
 	}
 	
-	public void setSelected(boolean selected) {
-		if (selected) {
-			pictogram.setScaleX(HIGHLIGHT_SCALE);
-	        pictogram.setScaleY(HIGHLIGHT_SCALE);
-		} else {
-			pictogram.setScaleX(NORMAL_SCALE);
-	        pictogram.setScaleY(NORMAL_SCALE);
-		}
+	public void setSelected() {
+		pictogram.setScaleX(HIGHLIGHT_SCALE);
+        pictogram.setScaleY(HIGHLIGHT_SCALE);
+		this.setAlpha(1f);
 		
         this.invalidate();
 	}
 	
-	public void setLowlighted(boolean lowlighted) {
-		if (lowlighted) {
-			this.setAlpha(0.4f);
-		} else {
-			this.setAlpha(1f);
-		}
+	public void setLowlighted() {
+		pictogram.setScaleX(LOWLIGHT_SCALE);
+		pictogram.setScaleY(LOWLIGHT_SCALE);
+		this.setAlpha(0.4f);
+		
+		this.invalidate();
+	}
+	
+	public void setNormal() {
+		pictogram.setScaleX(NORMAL_SCALE);
+		pictogram.setScaleY(NORMAL_SCALE);
+		this.setAlpha(1f);
 		
 		this.invalidate();
 	}
