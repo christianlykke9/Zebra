@@ -175,7 +175,15 @@ public class MainActivity extends Activity {
 		
 		TextView questionField = (TextView)dialog.findViewById(R.id.question);
 		String sequenceName = selectedChild.getSequences().get(position).getTitle();
-		String question = "Vil du slette \"" + sequenceName + "\" ?"; 
+		String question;
+		
+		
+		if (sequenceName.length() == 0) {
+			question = "Vil du slette denne sekvens?";
+		} else {
+			question = "Vil du slette \"" + sequenceName + "\" ?";
+		}
+		
 		questionField.setText(question);
 		
 		final Button yesButton = (Button)dialog.findViewById(R.id.btn_yes);
