@@ -16,6 +16,7 @@ import android.view.animation.Transformation;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.HorizontalScrollView;
+import android.widget.Toast;
 
 /**
  * Layouts its children with fixed sizes and fixed spacing between each child in
@@ -455,8 +456,8 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				
 				draggingView.startAnimation(move);
 				
-			} else {
-				//Not dragging
+			} else { //Not dragging
+				
 				if (event.getActionMasked() == MotionEvent.ACTION_UP) {
 					performItemClick(draggingView, startDragIndex, startDragIndex);
 				}
@@ -474,8 +475,6 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				
 				if (isInEditMode) {
 					handled = true;
-					
-					startAutoScroll();
 				
 					for (int i = 0; i < this.getChildCount(); i++) {
 						this.getChildAt(i).invalidate();
@@ -502,18 +501,18 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			
 		case MotionEvent.ACTION_MOVE:
 			
-			if (draggingView == null) {
+			if (draggingView == null) {  // The user is not touching a pictogram
 				handled = true;
-				break;
 			}
 			
-			if (Math.abs(dragStartX - x) >= DRAG_DISTANCE) {
-				handled = true;
-				isDragging = true;
-				((PictogramView)draggingView).liftUp();
-			}
-			
-			if (isDragging) {
+			else {  // The user is touching a pictogram
+				
+				if (!isDragging && Math.abs(dragStartX - x) >= DRAG_DISTANCE) {  // The user is starting to move a pictogram
+					isDragging = true;
+					((PictogramView)draggingView).liftUp();
+					startAutoScroll();
+				}
+				
 				handled = true;
 				handleTouchMove(x);
 			}
