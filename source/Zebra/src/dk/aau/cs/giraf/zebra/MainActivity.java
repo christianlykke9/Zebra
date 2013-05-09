@@ -173,17 +173,21 @@ public class MainActivity extends Activity {
 		dialog.setContentView(R.layout.dialog_box);
 		dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 		
-		TextView question = (TextView)dialog.findViewById(R.id.question);
-		question.setText(getResources().getString(R.string.confirm_discarding_changes));
+		TextView questionField = (TextView)dialog.findViewById(R.id.question);
+		String sequenceName = selectedChild.getSequences().get(position).getTitle();
+		String question = "Vil du slette \"" + sequenceName + "\" ?"; 
+		questionField.setText(question);
 		
 		final Button yesButton = (Button)dialog.findViewById(R.id.btn_yes);
 		yesButton.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
+								
 				dialog.dismiss();
-				sequences.remove(position);
-				sequenceAdapter.notifyDataSetChanged();
+				selectedChild.getSequences().remove(position);
+				SequenceFileStore.writeSequences(MainActivity.this, selectedChild, selectedChild.getSequences());
+				refreshSelectedChild();
 
 			}
 		});
