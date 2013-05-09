@@ -69,26 +69,26 @@ public class RoundedImageView extends ImageView {
         }
     }
  
-    @Override
-    protected void onDraw(Canvas canvas) {
-    	int width = getWidth() - getPaddingLeft() - getPaddingRight();
-    	int height = getHeight() - getPaddingTop() - getPaddingBottom();
-    	
-    	float fCornerRadius = cornerRadius;
-    	if (cornerRadius == -1) 
-    		fCornerRadius = Math.min(width, height) / 11.f;
-
-    	imageRect.set(0, 0, width, height);
-    	
-    	opacity.setFlags(Paint.ANTI_ALIAS_FLAG);
-        opacity.setColor(Color.RED);
-        
-        canvas.drawRoundRect(imageRect, fCornerRadius, fCornerRadius, opacity);
-        opacity.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.saveLayer(imageRect, opacity, Canvas.ALL_SAVE_FLAG);
-        
-        super.onDraw(canvas);
-        
-        canvas.restore();
-    }    
+//    @Override
+//    protected void onDraw(Canvas canvas) {
+//    	int width = getWidth() - getPaddingLeft() - getPaddingRight();
+//    	int height = getHeight() - getPaddingTop() - getPaddingBottom();
+//    	
+//    	float fCornerRadius = cornerRadius;
+//    	if (cornerRadius == -1) 
+//    		fCornerRadius = Math.min(width, height) / 11.f;
+//
+//    	imageRect.set(0, 0, width, height);
+//    	
+//    	opacity.setFlags(Paint.ANTI_ALIAS_FLAG);
+//        opacity.setColor(Color.RED);
+//        
+//        canvas.drawRoundRect(imageRect, fCornerRadius, fCornerRadius, opacity);
+//        opacity.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+//        canvas.saveLayer(imageRect, opacity, Canvas.ALL_SAVE_FLAG);
+//        
+//        super.onDraw(canvas);
+//        
+//        canvas.restore();
+//    }    
 }

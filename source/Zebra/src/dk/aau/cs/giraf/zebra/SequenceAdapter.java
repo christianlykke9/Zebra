@@ -1,10 +1,8 @@
 package dk.aau.cs.giraf.zebra;
 
-import dk.aau.cs.giraf.pictogram.PictoFactory;
 import dk.aau.cs.giraf.zebra.models.Pictogram;
 import dk.aau.cs.giraf.zebra.models.Sequence;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -60,14 +58,7 @@ public class SequenceAdapter extends BaseAdapter {
 		} else
 			view = (PictogramView)convertView;
 		
-		if (pictogram.getImage() == null) {
-			String path = PictoFactory.getPictogram(context, pictogram.getPictogramId()).getImagePath();
-			Drawable drawable = Drawable.createFromPath(path);
-			
-			pictogram.setImage(drawable);
-		}
-		
-		view.setImage(pictogram.getImage());
+		view.setImage(pictogram.getImage(context));
 		
 		if (onAdapterGetViewListener != null)
 			onAdapterGetViewListener.onAdapterGetView(position, view);

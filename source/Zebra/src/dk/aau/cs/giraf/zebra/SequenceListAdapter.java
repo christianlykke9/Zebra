@@ -2,12 +2,10 @@ package dk.aau.cs.giraf.zebra;
 
 import java.util.List;
 
-import dk.aau.cs.giraf.pictogram.PictoFactory;
 import dk.aau.cs.giraf.zebra.models.Child;
 import dk.aau.cs.giraf.zebra.models.Sequence;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -41,14 +39,7 @@ public class SequenceListAdapter extends BaseAdapter {
         
         v.setTitle(sequence.getTitle());
         v.setEditModeEnabled(isInEditMode);
-
-		if (sequence.getImage() == null) {
-			String path = PictoFactory.getPictogram(context, sequence.getImageId()).getImagePath();
-			Drawable drawable = Drawable.createFromPath(path);
-			
-			sequence.setImage(drawable);
-		}
-		v.setImage(sequence.getImage());
+		v.setImage(sequence.getImage(context));
         
         
         if (onAdapterGetViewListener != null)

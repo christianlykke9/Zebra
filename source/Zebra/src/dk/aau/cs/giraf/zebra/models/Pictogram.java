@@ -1,10 +1,12 @@
 package dk.aau.cs.giraf.zebra.models;
 
+import dk.aau.cs.giraf.pictogram.PictoFactory;
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 public class Pictogram {
 	private long pictogramId;
-	private Drawable image;
+	private String imagePath;
 	
 	public long getPictogramId() {
 		return pictogramId;
@@ -12,7 +14,7 @@ public class Pictogram {
 	
 	public void setPictogramId(long pictogramId) {
 		this.pictogramId = pictogramId;
-		this.image = null;
+		this.imagePath = null;
 	}
 	
 	public Pictogram getClone() {
@@ -21,12 +23,13 @@ public class Pictogram {
 		
 		return clone;
 	}
-
-	public void setImage(Drawable image) {
-		this.image = image;		
-	}
-
-	public Drawable getImage() {
-		return image;
+	
+	public Drawable getImage(Context context) {
+		
+		if (imagePath == null) {
+			imagePath = PictoFactory.getPictogram(context, pictogramId).getImagePath();
+		}
+		
+		return Drawable.createFromPath(imagePath);
 	}
 }
