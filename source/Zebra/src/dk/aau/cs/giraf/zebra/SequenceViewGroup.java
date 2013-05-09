@@ -456,9 +456,14 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				draggingView.startAnimation(move);
 				
 			} else { //Not dragging
-				
+
 				if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+					handled = true;
+					
 					performItemClick(draggingView, startDragIndex, startDragIndex);
+					
+					// Remove the highlight of the pictogram
+					((PictogramView)draggingView).placeDown();
 				}
 			}
 			return handled;
@@ -474,6 +479,8 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				
 				if (isInEditMode) {
 					handled = true;
+					
+					((PictogramView)draggingView).liftUp();
 				
 					for (int i = 0; i < this.getChildCount(); i++) {
 						this.getChildAt(i).invalidate();
@@ -508,7 +515,6 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				
 				if (!isDragging && Math.abs(dragStartX - x) >= DRAG_DISTANCE) {  // The user is starting to move a pictogram
 					isDragging = true;
-					((PictogramView)draggingView).liftUp();
 					startAutoScroll();
 				}
 				
