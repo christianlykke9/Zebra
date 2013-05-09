@@ -66,8 +66,7 @@ public class PictogramView extends LinearLayout {
 	}
 	
 	private View createImageView(float radius) {
-		pictogram = new RoundedImageView(getContext());
-		pictogram.setCornerRadius(radius);
+		pictogram = new RoundedImageView(getContext(), radius);
 		pictogram.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		pictogram.setScaleX(NORMAL_SCALE);
 		pictogram.setScaleY(NORMAL_SCALE);
