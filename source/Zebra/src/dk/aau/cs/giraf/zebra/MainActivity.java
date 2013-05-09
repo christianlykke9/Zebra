@@ -195,6 +195,7 @@ public class MainActivity extends Activity {
 				dialog.dismiss();
 				selectedChild.getSequences().remove(position);
 				SequenceFileStore.writeSequences(MainActivity.this, selectedChild, selectedChild.getSequences());
+				childAdapter.notifyDataSetChanged();
 				refreshSelectedChild();
 
 			}
