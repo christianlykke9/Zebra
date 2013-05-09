@@ -464,6 +464,10 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 					
 					// Remove the highlight of the pictogram
 					((PictogramView)draggingView).placeDown();
+					
+					// Reset the dragging parameters
+					startDragIndex = -1;
+					draggingView = null;
 				}
 			}
 			return handled;
