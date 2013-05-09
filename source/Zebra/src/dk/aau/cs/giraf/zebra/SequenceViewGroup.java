@@ -16,7 +16,6 @@ import android.view.animation.Transformation;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.HorizontalScrollView;
-import android.widget.Toast;
 
 /**
  * Layouts its children with fixed sizes and fixed spacing between each child in
