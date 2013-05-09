@@ -1,6 +1,8 @@
 package dk.aau.cs.giraf.zebra;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import android.app.Activity;
@@ -8,6 +10,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -20,6 +23,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import dk.aau.cs.giraf.oasis.lib.Helper;
+import dk.aau.cs.giraf.oasis.lib.models.Profile;
 import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
 import dk.aau.cs.giraf.zebra.SequenceListAdapter.OnAdapterGetViewListener;
 import dk.aau.cs.giraf.zebra.models.Child;
@@ -55,18 +60,9 @@ public class MainActivity extends Activity {
 		sequenceGrid = (GridView)findViewById(R.id.sequence_grid);
 		sequenceGrid.setAdapter(sequenceAdapter);
 		
-		loadSequences();
+		// Load children from the guardian
+		getChildren();
 		
-		if (children.size() == 0) {
-			Toast toast = Toast.makeText(this, getResources().getString(R.string.no_children), Toast.LENGTH_LONG);
-			toast.show();
-		}
-		else {
-			selectedChild = children.get(0);
-			refreshSelectedChild();
-		}
-		
-		//Load Child
 		childList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
@@ -139,6 +135,52 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
+	}
+
+	private void getChildren() {
+		children.clear();
+		sequences.clear();
+
+		Bundle extras = getIntent().getExtras();
+        if (extras != null) {        	
+        	long guardianId = extras.getLong("currentGuardianID");
+        	long childId = extras.getLong("currentChildID");
+        	
+    		Helper helper = new Helper(this);
+    		Profile guardian = helper.profilesHelper.getProfileById(guardianId);
+    		
+    		List<Profile> childProfiles = helper.profilesHelper.getChildrenByGuardian(guardian);
+    		Collections.sort(childProfiles, new Comparator<Profile>() {
+    	        @Override
+    	        public int compare(Profile p1, Profile p2) {
+    	            return p1.getFirstname().compareToIgnoreCase(p2.getFirstname());
+    	        }
+    		});
+    		
+    		for (Profile p : childProfiles) {
+    			
+    			String name = p.getFirstname() + " " + p.getSurname();
+    			Drawable picture = Drawable.createFromPath(p.getPicture());
+    			
+    			// TODO: FIX?
+    			if (picture == null) picture = this.getResources().getDrawable(R.drawable.placeholder);
+    			
+    			Child c = new Child(p.getId(), name, picture);
+    			children.add(c);
+    			
+    			if (childId == p.getId()) {
+    				selectedChild = c;
+    			}
+    		}
+    		loadSequences();
+    		refreshSelectedChild();
+        }
+        else {
+        	Toast toast = Toast.makeText(this, "Zebra must be started from the GIRAF Launcher", Toast.LENGTH_LONG);
+        	toast.show();
+        	
+        	finish();
+        }
 	}
 	
 	private SequenceListAdapter setupAdapter() {

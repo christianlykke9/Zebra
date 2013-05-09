@@ -11,21 +11,7 @@ public class ZebraApplication extends Application {
 
 	private static List<Child> children = new ArrayList<Child>();
 	
-	private static List<Child> getTestChildren() {
-		ArrayList<Child> children = new ArrayList<Child>();
-		
-		Child child = new Child(10);
-		children.add(child);
-		
-		return children;
-	}
-	
 	public static List<Child> getChildren() {
-		
-		// TODO: Remove ME
-		if (children.size() == 0)
-			children = getTestChildren();
-		
 		return children;
 	}
 	
