@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -24,6 +25,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import dk.aau.cs.giraf.pictogram.PictoFactory;
 import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
 import dk.aau.cs.giraf.zebra.SequenceAdapter.OnAdapterGetViewListener;
 import dk.aau.cs.giraf.zebra.SequenceViewGroup.OnNewButtonClickedListener;
@@ -43,6 +45,8 @@ public class SequenceActivity extends Activity {
 	
 	private SequenceViewGroup sequenceViewGroup;
 	private EditText sequenceTitleView;
+	
+	private ImageView sequenceImageView;
 	
 	private Child child;
 	
@@ -89,14 +93,13 @@ public class SequenceActivity extends Activity {
 		
 		initializeTopBar();
 		
-		final ImageView sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
+		sequenceImageView = (ImageView) findViewById(R.id.sequence_image);
 		
-		if (sequence.getImage() == null) {
+		if (sequence.getImageId() == 0) {
 			sequenceImageView.setImageDrawable(getResources().getDrawable(R.drawable.sequence_placeholder));
 		}
 		else {
-			//TODO: Get the pictogram from the factory here..
-			//sequenceImageView.setImageDrawable(sequence.getImageId());
+			refreshImage();
 		}
 	
 		sequenceImageView.setOnClickListener(new ImageView.OnClickListener() {
@@ -359,6 +362,11 @@ public class SequenceActivity extends Activity {
 			sequence.addPictogramAtEnd(pictogram);
 		}
 		
+		if (sequence.getImageId() == 0 && checkoutIds.length > 0) {
+			sequence.setImageId(checkoutIds[0]);
+			refreshImage();
+		}
+		
 		adapter.notifyDataSetChanged();
 	}
 
@@ -378,7 +386,18 @@ public class SequenceActivity extends Activity {
 		
 		if (checkoutIds.length == 0) return;
 		sequence.setImageId(checkoutIds[0]);
-		//TODO: Update image on screen
+		refreshImage();
+	}
+	
+	private void refreshImage() {
+		if (sequence.getImage() == null) {
+			String path = PictoFactory.getPictogram(this, sequence.getImageId()).getImagePath();
+			Drawable drawable = Drawable.createFromPath(path);
+			
+			sequence.setImage(drawable);
+		}
+		
+		sequenceImageView.setImageDrawable(sequence.getImage());
 	}
 	
 	private void initializeTopBar() {

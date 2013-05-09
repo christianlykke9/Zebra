@@ -46,6 +46,7 @@ public class Sequence {
 	
 	public void setImageId(long imageId) {
 		this.imageId = imageId;
+		this.image = null;
 	}
 	
 	public Drawable getImage() {
@@ -103,5 +104,9 @@ public class Sequence {
 		for (Pictogram pictogram : sequence.pictograms) {
 			this.pictograms.add(pictogram);
 		}
+	}
+
+	public void setImage(Drawable image) {
+		this.image = image;
 	}
 }
