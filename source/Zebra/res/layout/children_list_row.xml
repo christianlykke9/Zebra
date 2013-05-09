@@ -7,7 +7,7 @@
     android:paddingBottom="12dip"
     android:paddingLeft="10dip"
     android:paddingRight="10dip"
-    android:paddingTop="12dip" >
+    android:paddingTop="12dip" xmlns:app="http://schemas.android.com/apk/res/dk.aau.cs.giraf.zebra">
 
     <LinearLayout
         android:id="@+id/image_layout"
@@ -20,7 +20,8 @@
         <dk.aau.cs.giraf.zebra.RoundedImageView
             android:id="@+id/child_image"
             android:layout_width="50dip"
-            android:layout_height="50dip" />
+            android:layout_height="50dip"
+            app:cornerRadius="10dp" />
     </LinearLayout>
 
     <TextView
