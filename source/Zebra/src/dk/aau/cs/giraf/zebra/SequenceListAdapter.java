@@ -2,7 +2,6 @@ package dk.aau.cs.giraf.zebra;
 
 import java.util.List;
 
-import dk.aau.cs.giraf.zebra.SequenceAdapter.OnAdapterGetViewListener;
 import dk.aau.cs.giraf.zebra.models.Child;
 import dk.aau.cs.giraf.zebra.models.Sequence;
 
