@@ -2,6 +2,7 @@ package dk.aau.cs.giraf.zebra;
 
 import java.util.List;
 
+import dk.aau.cs.giraf.zebra.SequenceAdapter.OnAdapterGetViewListener;
 import dk.aau.cs.giraf.zebra.models.Child;
 import dk.aau.cs.giraf.zebra.models.Sequence;
 
@@ -16,9 +17,11 @@ import android.widget.BaseAdapter;
  */
 public class SequenceListAdapter extends BaseAdapter {
 
+	
 	private List<Sequence> items;
 	private Context context;
 	private boolean isInEditMode;
+	private OnAdapterGetViewListener onAdapterGetViewListener;
 	
 	public SequenceListAdapter(Context context, List<Sequence> items) {
 		
@@ -39,6 +42,9 @@ public class SequenceListAdapter extends BaseAdapter {
         v.setEditModeEnabled(isInEditMode);
         // TODO: GET THE IMAGE ID
         //v.setImage(s.getImageId());
+        
+        if (onAdapterGetViewListener != null)
+			onAdapterGetViewListener.onAdapterGetView(position, v);
 
         return v;
     }
@@ -57,11 +63,22 @@ public class SequenceListAdapter extends BaseAdapter {
 	public long getItemId(int position) {
         return position;
     }
-
 	
 	public void setEditModeEnabled(boolean editEnabled) {
 		if (isInEditMode != editEnabled) {
 			isInEditMode = editEnabled;
 		}
+	}
+	
+	public void setOnAdapterGetViewListener(OnAdapterGetViewListener onCreateViewListener) {
+		this.onAdapterGetViewListener = onCreateViewListener;
+	}
+	
+	public OnAdapterGetViewListener getOnAdapterGetViewListener() {
+		return this.onAdapterGetViewListener;
+	}
+	
+	public interface OnAdapterGetViewListener {
+		public void onAdapterGetView(int position, View view);
 	}
 }

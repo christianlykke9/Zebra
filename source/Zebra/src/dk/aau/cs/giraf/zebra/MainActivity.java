@@ -15,6 +15,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
+import dk.aau.cs.giraf.zebra.SequenceListAdapter.OnAdapterGetViewListener;
 import dk.aau.cs.giraf.zebra.models.Child;
 import dk.aau.cs.giraf.zebra.models.Sequence;
 import dk.aau.cs.giraf.zebra.serialization.SequenceFileStore;
@@ -43,7 +45,7 @@ public class MainActivity extends Activity {
 		ListView childList = (ListView)findViewById(R.id.child_list);
 		childList.setAdapter(childAdapter);
 
-		sequenceAdapter = new SequenceListAdapter(this, sequences);
+		sequenceAdapter = setupAdapter();
 		
 		sequenceGrid = (GridView)findViewById(R.id.sequence_grid);
 		sequenceGrid.setAdapter(sequenceAdapter);
@@ -106,6 +108,7 @@ public class MainActivity extends Activity {
 		});
 		
 		
+		
 		// Edit mode switcher button
 		ToggleButton button = (ToggleButton) findViewById(R.id.edit_mode_toggle);
 		
@@ -131,6 +134,32 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
+	}
+	
+	private SequenceListAdapter setupAdapter() {
+		final SequenceListAdapter adapter = new SequenceListAdapter(this, sequences);
+		
+		adapter.setOnAdapterGetViewListener(new OnAdapterGetViewListener() {
+			
+			@Override
+			public void onAdapterGetView(final int position, View view) {
+				if (view instanceof PictogramView) {
+					PictogramView pictoView = (PictogramView) view;
+					
+					pictoView.setOnDeleteClickListener(new OnDeleteClickListener() {
+						
+						@Override
+						public void onDeleteClick() {
+							sequences.remove(position);
+							adapter.notifyDataSetChanged();
+						}
+					});
+				}
+				
+			}
+		});
+		
+		return adapter;
 	}
 
 	private void loadSequences() {
