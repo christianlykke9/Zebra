@@ -52,14 +52,17 @@ public class JSONSerializer {
 	private JSONArray writePictograms(List<Pictogram> pictograms) throws JSONException {
 		final JSONArray jsonPictograms = new JSONArray();
 		for (Pictogram p : pictograms) {
-			writePictogram(p);
+			final JSONObject jsonPictogram = writePictogram(p);
+			jsonPictograms.put(jsonPictogram);
 		}
 		return jsonPictograms;
 	}
 
-	private void writePictogram(Pictogram p) throws JSONException {
-		final JSONObject jsonObject = new JSONObject();
-		jsonObject.put(KEY_PICTOGRAM_ID, p.getPictogramId());
+	private JSONObject writePictogram(Pictogram p) throws JSONException {
+		final JSONObject jsonPictogram = new JSONObject();
+		jsonPictogram.put(KEY_PICTOGRAM_ID, p.getPictogramId());
+		
+		return jsonPictogram;
 	}
 
 	public List<Sequence> deserialize(String jsonData) throws JSONException {
