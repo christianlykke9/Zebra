@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -150,8 +155,7 @@ public class MainActivity extends Activity {
 						
 						@Override
 						public void onDeleteClick() {
-							sequences.remove(position);
-							adapter.notifyDataSetChanged();
+							deleteSequenceDialog(position);
 						}
 					});
 				}
@@ -161,6 +165,43 @@ public class MainActivity extends Activity {
 		
 		return adapter;
 	}
+	
+	private boolean deleteSequenceDialog(final int position) {
+		
+		final Dialog dialog = new Dialog(this);
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setContentView(R.layout.dialog_box);
+		dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+		
+		TextView question = (TextView)dialog.findViewById(R.id.question);
+		question.setText(getResources().getString(R.string.confirm_discarding_changes));
+		
+		final Button yesButton = (Button)dialog.findViewById(R.id.btn_yes);
+		yesButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+				sequences.remove(position);
+				sequenceAdapter.notifyDataSetChanged();
+
+			}
+		});
+		
+		final Button noButton = (Button)dialog.findViewById(R.id.btn_no);
+		noButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+			}
+		});
+
+		dialog.show();
+		
+		return true;
+	}
+	
 
 	private void loadSequences() {
 		for (Child child : children) {
