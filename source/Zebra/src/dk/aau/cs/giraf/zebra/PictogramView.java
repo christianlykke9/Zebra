@@ -117,28 +117,26 @@ public class PictogramView extends LinearLayout {
 		invalidate();
 	}
 	
-	public void setSelected(boolean selected) {
-		if (selected) {
-			pictogram.setScaleX(HIGHLIGHT_SCALE);
-	        pictogram.setScaleY(HIGHLIGHT_SCALE);
-		} else {
-			pictogram.setScaleX(NORMAL_SCALE);
-	        pictogram.setScaleY(NORMAL_SCALE);
-		}
+	public void setSelected() {
+		pictogram.setScaleX(HIGHLIGHT_SCALE);
+        pictogram.setScaleY(HIGHLIGHT_SCALE);
+		this.setAlpha(1f);
 		
         this.invalidate();
 	}
 	
-	public void setLowlighted(boolean lowlighted) {
-		if (lowlighted) {
-			pictogram.setScaleX(LOWLIGHT_SCALE);
-			pictogram.setScaleY(LOWLIGHT_SCALE);
-			this.setAlpha(0.4f);
-		} else {
-			pictogram.setScaleX(NORMAL_SCALE);
-			pictogram.setScaleY(NORMAL_SCALE);
-			this.setAlpha(1f);
-		}
+	public void setLowlighted() {
+		pictogram.setScaleX(LOWLIGHT_SCALE);
+		pictogram.setScaleY(LOWLIGHT_SCALE);
+		this.setAlpha(0.4f);
+		
+		this.invalidate();
+	}
+	
+	public void setNormal() {
+		pictogram.setScaleX(NORMAL_SCALE);
+		pictogram.setScaleY(NORMAL_SCALE);
+		this.setAlpha(1f);
 		
 		this.invalidate();
 	}

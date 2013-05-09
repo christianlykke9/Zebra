@@ -532,16 +532,13 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			PictogramView pictogram = (PictogramView) this.getChildAt(i);
 			
 			if (i < selectedIndex) {
-				pictogram.setLowlighted(true);
-				pictogram.setSelected(false);
+				pictogram.setLowlighted();
 			}
 			else if (i > selectedIndex) {
-				pictogram.setLowlighted(false);
-				pictogram.setSelected(false);
+				pictogram.setNormal();
 			}
 			else {
-				pictogram.setLowlighted(false);
-				pictogram.setSelected(true);
+				pictogram.setSelected();
 			}
 		}
 	}
