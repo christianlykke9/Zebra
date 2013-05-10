@@ -8,6 +8,9 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.graphics.Xfermode;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
@@ -69,26 +72,48 @@ public class RoundedImageView extends ImageView {
         }
     }
  
-//    @Override
-//    protected void onDraw(Canvas canvas) {
-//    	int width = getWidth() - getPaddingLeft() - getPaddingRight();
-//    	int height = getHeight() - getPaddingTop() - getPaddingBottom();
-//    	
-//    	float fCornerRadius = cornerRadius;
-//    	if (cornerRadius == -1) 
-//    		fCornerRadius = Math.min(width, height) / 11.f;
-//
-//    	imageRect.set(0, 0, width, height);
-//    	
-//    	opacity.setFlags(Paint.ANTI_ALIAS_FLAG);
-//        opacity.setColor(Color.RED);
+    @Override
+    protected void onDraw(Canvas canvas) {
+    	int width = getWidth() - getPaddingLeft() - getPaddingRight();
+    	int height = getHeight() - getPaddingTop() - getPaddingBottom();
+    	
+    	float fCornerRadius = cornerRadius;
+    	if (cornerRadius == -1) 
+    		fCornerRadius = Math.min(width, height) / 11.f;
+
+    	Drawable maiDrawable = getDrawable();
+    	Paint paint = ((BitmapDrawable)maiDrawable).getPaint();
+    	final int color = 0xff000000;
+    	
+    	imageRect.set(0, 0, width, height);
+    	
+    	int saveCount = canvas.saveLayer(imageRect, null,
+                Canvas.MATRIX_SAVE_FLAG |
+                Canvas.CLIP_SAVE_FLAG |
+                Canvas.HAS_ALPHA_LAYER_SAVE_FLAG |
+                Canvas.FULL_COLOR_LAYER_SAVE_FLAG |
+                Canvas.CLIP_TO_LAYER_SAVE_FLAG);
+    	
+    	paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
 //        
-//        canvas.drawRoundRect(imageRect, fCornerRadius, fCornerRadius, opacity);
-//        opacity.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-//        canvas.saveLayer(imageRect, opacity, Canvas.ALL_SAVE_FLAG);
-//        
-//        super.onDraw(canvas);
-//        
-//        canvas.restore();
-//    }    
+//        // Bagground
+//        RectF bg = new RectF();
+//        bg.set(0, 0, width, height);
+//        Paint bgPaint = new Paint();
+//        bgPaint.setColor(Color.GREEN);
+        
+        //canvas.drawRoundRect(bg, fCornerRadius, fCornerRadius, bgPaint);
+        canvas.drawRoundRect(imageRect, fCornerRadius, fCornerRadius, paint);
+        
+        Xfermode oldMode = paint.getXfermode();
+        
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));   
+        
+        super.onDraw(canvas);
+        
+        paint.setXfermode(oldMode);
+        canvas.restoreToCount(saveCount);
+    }    
 }
