@@ -34,6 +34,8 @@ import dk.aau.cs.giraf.zebra.serialization.SequenceFileStore;
 
 public class SequenceActivity extends Activity {
 
+	private long guardianId;
+	
 	private Sequence originalSequence;
 	private Sequence sequence;
 	private SequenceAdapter adapter;
@@ -51,9 +53,8 @@ public class SequenceActivity extends Activity {
 	private boolean isInEditMode;
 	private boolean isNew;
 
-	private final String PICTO_ADMIN_PACKAGE = "dk.aau.cs.giraf.pictoadmin";
-	private final String PICTO_ADMIN_CLASS = PICTO_ADMIN_PACKAGE + "."
-			+ "PictoAdminMain";
+	private final String PICTO_ADMIN_PACKAGE = "dk.aau.cs.giraf.pictosearch";
+	private final String PICTO_ADMIN_CLASS = PICTO_ADMIN_PACKAGE + "." + "PictoAdminMain";
 
 	private final int PICTO_SEQUENCE_IMAGE_CALL = 345;
 	private final int PICTO_EDIT_PICTOGRAM_CALL = 456;
@@ -71,6 +72,7 @@ public class SequenceActivity extends Activity {
 		Bundle extras = getIntent().getExtras();
 		long profileId = extras.getLong("profileId");
 		long sequenceId = extras.getLong("sequenceId");
+		guardianId = extras.getLong("guardianId");
 		isNew = extras.getBoolean("new");
 		isInEditMode = extras.getBoolean("editMode");
 
@@ -500,8 +502,15 @@ public class SequenceActivity extends Activity {
 
 	private void callPictoAdmin(int modeId) {
 		Intent intent = new Intent();
-		intent.setComponent(new ComponentName(PICTO_ADMIN_PACKAGE,
-				PICTO_ADMIN_CLASS));
+		intent.setComponent(new ComponentName(PICTO_ADMIN_PACKAGE, PICTO_ADMIN_CLASS));
+		intent.putExtra("currentChildID", child.getProfileId());
+		intent.putExtra("currentGuardianID", guardianId);
+		
+		if (modeId == PICTO_NEW_PICTOGRAM_CALL)
+			intent.putExtra("purpose", "multiple");
+		else
+			intent.putExtra("purpose", "single");
+		
 		startActivityForResult(intent, modeId);
 	}
 }

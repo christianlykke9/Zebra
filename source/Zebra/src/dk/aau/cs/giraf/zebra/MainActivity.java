@@ -41,6 +41,8 @@ public class MainActivity extends Activity {
 	private GridView sequenceGrid;
 	private boolean isInEditMode = false;
 	
+	private long guardianId;
+	
 	private SequenceListAdapter sequenceAdapter;
 	
 	Child selectedChild;
@@ -143,7 +145,7 @@ public class MainActivity extends Activity {
 
 		Bundle extras = getIntent().getExtras();
         if (extras != null) {        	
-        	long guardianId = extras.getLong("currentGuardianID");
+        	guardianId = extras.getLong("currentGuardianID");
         	long childId = extras.getLong("currentChildID");
         	
     		Helper helper = new Helper(this);
@@ -162,9 +164,6 @@ public class MainActivity extends Activity {
     			String name = p.getFirstname() + " " + p.getSurname();
     			Drawable picture = Drawable.createFromPath(p.getPicture());
     			
-    			// TODO: FIX?
-    			if (picture == null) picture = this.getResources().getDrawable(R.drawable.placeholder);
-    			
     			Child c = new Child(p.getId(), name, picture);
     			children.add(c);
     			
@@ -176,10 +175,38 @@ public class MainActivity extends Activity {
     		refreshSelectedChild();
         }
         else {
-        	Toast toast = Toast.makeText(this, "Zebra must be started from the GIRAF Launcher", Toast.LENGTH_LONG);
-        	toast.show();
+        	//TODO: REMOVE COMMENT
+//        	Toast toast = Toast.makeText(this, "Zebra must be started from the GIRAF Launcher", Toast.LENGTH_LONG);
+//        	toast.show();
+//        	
+//        	finish();
         	
-        	finish();
+        	//TODO: REMOVE THE FOLLOWING
+    		Helper helper = new Helper(this);
+    		
+    		Profile guardian = helper.profilesHelper.getGuardians().get(0);
+    		guardianId = guardian.getId();
+    		
+    		List<Profile> childProfiles = helper.profilesHelper.getChildrenByGuardian(guardian);
+    		Collections.sort(childProfiles, new Comparator<Profile>() {
+    	        @Override
+    	        public int compare(Profile p1, Profile p2) {
+    	            return p1.getFirstname().compareToIgnoreCase(p2.getFirstname());
+    	        }
+    		});
+    		
+    		for (Profile p : childProfiles) {
+    			
+    			String name = p.getFirstname() + " " + p.getSurname();
+    			Drawable picture = Drawable.createFromPath(p.getPicture());
+    			
+    			Child c = new Child(p.getId(), name, picture);
+    			children.add(c);
+    		}
+    		selectedChild = children.get(0);
+    		loadSequences();
+    		refreshSelectedChild();
+        	
         }
 	}
 	
@@ -295,6 +322,7 @@ public class MainActivity extends Activity {
 		Intent intent = new Intent(getApplication(), SequenceActivity.class);
 		intent.putExtra("profileId", selectedChild.getProfileId());
 		intent.putExtra("sequenceId", sequence.getSequenceId());
+		intent.putExtra("guardianId", guardianId);
 		intent.putExtra("editMode", isInEditMode);
 		intent.putExtra("new", isNew);
 
