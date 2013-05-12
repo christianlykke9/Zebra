@@ -107,7 +107,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
-                android:background="@drawable/main_picto_container_bg"
                 svg:horizontalSpacing="20dp"
                 svg:itemHeight="@dimen/activity_main_picto_size"
                 svg:itemWidth="@dimen/activity_main_picto_size"

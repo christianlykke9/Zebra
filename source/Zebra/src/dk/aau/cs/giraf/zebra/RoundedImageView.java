@@ -89,54 +89,58 @@ public class RoundedImageView extends ImageView {
     	int height = getHeight() - getPaddingTop() - getPaddingBottom();
     	Drawable maiDrawable = getDrawable();
     	
-    	
-    	if (width != this.width || height != this.height || cornerRadius != this.radius || maiDrawable != this.image)
-    	{
-    		this.width = width;
-    		this.height = height;
-    		this.radius = cornerRadius;
-    		this.image = maiDrawable;
-    		
-    		//Create proper bitmap
-    		bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
-    		Canvas bitmapCanvas = new Canvas(bitmap);
-    		
-    		float fCornerRadius = cornerRadius;
-        	if (cornerRadius == -1) 
-        		fCornerRadius = Math.min(width, height) / 11.f;
-
-        	
-        	paint = ((BitmapDrawable)maiDrawable).getPaint();
-        	final int color = 0xfffde18d; //0xfffed86d; // Bagground color
-        	
-        	
-        	maiDrawable.setColorFilter(Color.rgb(253, 225, 141), Mode.DST_OVER);
-        	
-        	imageRect.set(0, 0, width, height);
-        	
-        	saveCount = bitmapCanvas.saveLayer(imageRect, null,
-                    Canvas.MATRIX_SAVE_FLAG |
-                    Canvas.CLIP_SAVE_FLAG |
-                    Canvas.HAS_ALPHA_LAYER_SAVE_FLAG |
-                    Canvas.FULL_COLOR_LAYER_SAVE_FLAG |
-                    Canvas.CLIP_TO_LAYER_SAVE_FLAG);
-        	
-        	
-        	paint.setAntiAlias(true);
-            bitmapCanvas.drawARGB(0, 0, 0, 0);
-            paint.setColor(color);
-
-            bitmapCanvas.drawRoundRect(imageRect, fCornerRadius, fCornerRadius, paint);
-            
-            oldMode = paint.getXfermode();
-            
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            super.onDraw(bitmapCanvas);
-            paint.setXfermode(oldMode);
-            bitmapCanvas.restoreToCount(saveCount);
+    	if (maiDrawable == null) {
+    		super.onDraw(canvas);
     	}
-    	
-        //super.onDraw(canvas);
-       canvas.drawBitmap(this.bitmap, 0, 0, null);
+    	else {
+    		// Update the bitmap if the image should be redrawn
+    		if (width != this.width || height != this.height || cornerRadius != this.radius || maiDrawable != this.image)
+        	{
+        		this.width = width;
+        		this.height = height;
+        		this.radius = cornerRadius;
+        		this.image = maiDrawable;
+        		
+        		//Create proper bitmap
+        		bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
+        		Canvas bitmapCanvas = new Canvas(bitmap);
+        		
+        		float fCornerRadius = cornerRadius;
+            	if (cornerRadius == -1) 
+            		fCornerRadius = Math.min(width, height) / 11.f;
+
+            	
+            	paint = ((BitmapDrawable)maiDrawable).getPaint();
+            	final int color = 0xfffde18d; //0xfffed86d; // Bagground color
+            	
+            	
+            	maiDrawable.setColorFilter(Color.rgb(253, 225, 141), Mode.DST_OVER);
+            	
+            	imageRect.set(0, 0, width, height);
+            	
+            	saveCount = bitmapCanvas.saveLayer(imageRect, null,
+                        Canvas.MATRIX_SAVE_FLAG |
+                        Canvas.CLIP_SAVE_FLAG |
+                        Canvas.HAS_ALPHA_LAYER_SAVE_FLAG |
+                        Canvas.FULL_COLOR_LAYER_SAVE_FLAG |
+                        Canvas.CLIP_TO_LAYER_SAVE_FLAG);
+            	
+            	
+            	paint.setAntiAlias(true);
+                bitmapCanvas.drawARGB(0, 0, 0, 0);
+                paint.setColor(color);
+
+                bitmapCanvas.drawRoundRect(imageRect, fCornerRadius, fCornerRadius, paint);
+                
+                oldMode = paint.getXfermode();
+                
+                paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+                super.onDraw(bitmapCanvas);
+                paint.setXfermode(oldMode);
+                bitmapCanvas.restoreToCount(saveCount);
+        	}
+    		
+    		canvas.drawBitmap(this.bitmap, 0, 0, null);
+    	}
     }    
 }
