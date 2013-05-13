@@ -1,22 +1,35 @@
 package dk.aau.cs.giraf.zebra;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import dk.aau.cs.giraf.oasis.lib.Helper;
+import dk.aau.cs.giraf.oasis.lib.models.Profile;
+import dk.aau.cs.giraf.zebra.PictogramView.OnDeleteClickListener;
+import dk.aau.cs.giraf.zebra.SequenceListAdapter.OnAdapterGetViewListener;
 import dk.aau.cs.giraf.zebra.models.Child;
 import dk.aau.cs.giraf.zebra.models.Sequence;
+import dk.aau.cs.giraf.zebra.serialization.SequenceFileStore;
 
 public class MainActivity extends Activity {
 
@@ -27,6 +40,8 @@ public class MainActivity extends Activity {
 	
 	private GridView sequenceGrid;
 	private boolean isInEditMode = false;
+	
+	private long guardianId;
 	
 	private SequenceListAdapter sequenceAdapter;
 	
@@ -42,21 +57,14 @@ public class MainActivity extends Activity {
 		ListView childList = (ListView)findViewById(R.id.child_list);
 		childList.setAdapter(childAdapter);
 
-		sequenceAdapter = new SequenceListAdapter(this, sequences);
+		sequenceAdapter = setupAdapter();
 		
 		sequenceGrid = (GridView)findViewById(R.id.sequence_grid);
 		sequenceGrid.setAdapter(sequenceAdapter);
 		
-		if (children.size() == 0) {
-			Toast toast = Toast.makeText(this, getResources().getString(R.string.no_children), Toast.LENGTH_LONG);
-			toast.show();
-		}
-		else {
-			selectedChild = children.get(0);
-			refreshSelectedChild();
-		}
+		// Load children from the guardian
+		getChildren();
 		
-		//Load Child
 		childList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
@@ -81,7 +89,7 @@ public class MainActivity extends Activity {
 				
 				Sequence sequence = sequenceAdapter.getItem(arg2);
 				enterSequence(sequence, false);
-			}		
+			}
 		});
 		
 			
@@ -101,6 +109,7 @@ public class MainActivity extends Activity {
 				enterSequence(sequence, true);
 			}
 		});
+		
 		
 		
 		// Edit mode switcher button
@@ -129,7 +138,159 @@ public class MainActivity extends Activity {
 			}
 		});
 	}
+
+	private void getChildren() {
+		children.clear();
+		sequences.clear();
+
+		Bundle extras = getIntent().getExtras();
+        if (extras != null) {        	
+        	guardianId = extras.getLong("currentGuardianID");
+        	long childId = extras.getLong("currentChildID");
+        	
+    		Helper helper = new Helper(this);
+    		Profile guardian = helper.profilesHelper.getProfileById(guardianId);
+    		
+    		List<Profile> childProfiles = helper.profilesHelper.getChildrenByGuardian(guardian);
+    		Collections.sort(childProfiles, new Comparator<Profile>() {
+    	        @Override
+    	        public int compare(Profile p1, Profile p2) {
+    	            return p1.getFirstname().compareToIgnoreCase(p2.getFirstname());
+    	        }
+    		});
+    		
+    		for (Profile p : childProfiles) {
+    			
+    			String name = p.getFirstname() + " " + p.getSurname();
+    			Drawable picture = Drawable.createFromPath(p.getPicture());
+    			
+    			Child c = new Child(p.getId(), name, picture);
+    			children.add(c);
+    			
+    			if (childId == p.getId()) {
+    				selectedChild = c;
+    			}
+    		}
+    		loadSequences();
+    		refreshSelectedChild();
+        }
+        else {
+        	//TODO: REMOVE COMMENT
+//        	Toast toast = Toast.makeText(this, "Zebra must be started from the GIRAF Launcher", Toast.LENGTH_LONG);
+//        	toast.show();
+//        	
+//        	finish();
+        	
+        	//TODO: REMOVE THE FOLLOWING
+    		Helper helper = new Helper(this);
+    		
+    		Profile guardian = helper.profilesHelper.getGuardians().get(0);
+    		guardianId = guardian.getId();
+    		
+    		List<Profile> childProfiles = helper.profilesHelper.getChildrenByGuardian(guardian);
+    		Collections.sort(childProfiles, new Comparator<Profile>() {
+    	        @Override
+    	        public int compare(Profile p1, Profile p2) {
+    	            return p1.getFirstname().compareToIgnoreCase(p2.getFirstname());
+    	        }
+    		});
+    		
+    		for (Profile p : childProfiles) {
+    			
+    			String name = p.getFirstname() + " " + p.getSurname();
+    			Drawable picture = Drawable.createFromPath(p.getPicture());
+    			
+    			Child c = new Child(p.getId(), name, picture);
+    			children.add(c);
+    		}
+    		selectedChild = children.get(0);
+    		loadSequences();
+    		refreshSelectedChild();
+        	
+        }
+	}
 	
+	private SequenceListAdapter setupAdapter() {
+		final SequenceListAdapter adapter = new SequenceListAdapter(this, sequences);
+		
+		adapter.setOnAdapterGetViewListener(new OnAdapterGetViewListener() {
+			
+			@Override
+			public void onAdapterGetView(final int position, View view) {
+				if (view instanceof PictogramView) {
+					PictogramView pictoView = (PictogramView) view;
+					
+					pictoView.setOnDeleteClickListener(new OnDeleteClickListener() {
+						
+						@Override
+						public void onDeleteClick() {
+							deleteSequenceDialog(position);
+						}
+					});
+				}
+				
+			}
+		});
+		
+		return adapter;
+	}
+	
+	private boolean deleteSequenceDialog(final int position) {
+		
+		final Dialog dialog = new Dialog(this);
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setContentView(R.layout.dialog_box);
+		dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+		
+		TextView questionField = (TextView)dialog.findViewById(R.id.question);
+		String sequenceName = selectedChild.getSequences().get(position).getTitle();
+		String question;
+		
+		
+		if (sequenceName.length() == 0) {
+			question = "Vil du slette denne sekvens?";
+		} else {
+			question = "Vil du slette \"" + sequenceName + "\" ?";
+		}
+		
+		questionField.setText(question);
+		
+		final Button yesButton = (Button)dialog.findViewById(R.id.btn_yes);
+		yesButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+								
+				dialog.dismiss();
+				selectedChild.getSequences().remove(position);
+				SequenceFileStore.writeSequences(MainActivity.this, selectedChild, selectedChild.getSequences());
+				childAdapter.notifyDataSetChanged();
+				refreshSelectedChild();
+
+			}
+		});
+		
+		final Button noButton = (Button)dialog.findViewById(R.id.btn_no);
+		noButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+			}
+		});
+
+		dialog.show();
+		
+		return true;
+	}
+	
+
+	private void loadSequences() {
+		for (Child child : children) {
+			List<Sequence> list = SequenceFileStore.getSequences(this, child);
+			child.setSequences(list);
+		}
+	}
 	
 	public void refreshSelectedChild() {
 		((TextView)findViewById(R.id.child_name)).setText(selectedChild.getName());
@@ -161,6 +322,7 @@ public class MainActivity extends Activity {
 		Intent intent = new Intent(getApplication(), SequenceActivity.class);
 		intent.putExtra("profileId", selectedChild.getProfileId());
 		intent.putExtra("sequenceId", sequence.getSequenceId());
+		intent.putExtra("guardianId", guardianId);
 		intent.putExtra("editMode", isInEditMode);
 		intent.putExtra("new", isNew);
 

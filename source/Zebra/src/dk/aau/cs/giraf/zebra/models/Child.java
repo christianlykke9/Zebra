@@ -14,13 +14,10 @@ public class Child {
 	
 	private List<Sequence> sequences = new ArrayList<Sequence>();
 	
-	public Child(long profileId) {
+	public Child(long profileId, String name, Drawable picture) {
 		this.profileId = profileId;
-		
-		//TODO: FOR TESTING ONLY:
-		this.name = "Søren Knudsen";
-		
-		//TODO: Get the name from the database
+		this.name = name;
+		this.picture = picture;
 	}
 	
 	public long getProfileId() {

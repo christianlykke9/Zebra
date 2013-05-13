@@ -16,9 +16,11 @@ import android.widget.BaseAdapter;
  */
 public class SequenceListAdapter extends BaseAdapter {
 
+	
 	private List<Sequence> items;
 	private Context context;
 	private boolean isInEditMode;
+	private OnAdapterGetViewListener onAdapterGetViewListener;
 	
 	public SequenceListAdapter(Context context, List<Sequence> items) {
 		
@@ -33,12 +35,15 @@ public class SequenceListAdapter extends BaseAdapter {
 			v = new PictogramView(context, 16f);
 		}
 		
-        Sequence s = items.get(position);
+        Sequence sequence = items.get(position);
         
-        v.setTitle(s.getTitle());
+        v.setTitle(sequence.getTitle());
         v.setEditModeEnabled(isInEditMode);
-        // TODO: GET THE IMAGE ID
-        //v.setImage(s.getImageId());
+		v.setImage(sequence.getImage(context));
+        
+        
+        if (onAdapterGetViewListener != null)
+			onAdapterGetViewListener.onAdapterGetView(position, v);
 
         return v;
     }
@@ -57,11 +62,22 @@ public class SequenceListAdapter extends BaseAdapter {
 	public long getItemId(int position) {
         return position;
     }
-
 	
 	public void setEditModeEnabled(boolean editEnabled) {
 		if (isInEditMode != editEnabled) {
 			isInEditMode = editEnabled;
 		}
+	}
+	
+	public void setOnAdapterGetViewListener(OnAdapterGetViewListener onCreateViewListener) {
+		this.onAdapterGetViewListener = onCreateViewListener;
+	}
+	
+	public OnAdapterGetViewListener getOnAdapterGetViewListener() {
+		return this.onAdapterGetViewListener;
+	}
+	
+	public interface OnAdapterGetViewListener {
+		public void onAdapterGetView(int position, View view);
 	}
 }

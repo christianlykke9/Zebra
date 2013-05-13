@@ -1,5 +1,6 @@
 package dk.aau.cs.giraf.zebra;
 
+import dk.aau.cs.giraf.zebra.models.Pictogram;
 import dk.aau.cs.giraf.zebra.models.Sequence;
 import android.content.Context;
 import android.view.View;
@@ -27,7 +28,7 @@ public class SequenceAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public Object getItem(int position) {
+	public Pictogram getItem(int position) {
 		if (sequence == null) throw new IllegalStateException("No Sequence has been set for this Adapter");
 		
 		if (position >= 0 && position < sequence.getPictograms().size())
@@ -50,14 +51,14 @@ public class SequenceAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		
 		PictogramView view;
+		Pictogram pictogram = getItem(position);
 		
 		if (convertView == null) {
 			view = new PictogramView(context, 24f);
 		} else
 			view = (PictogramView)convertView;
 		
-		// TODO: GET THE IMAGE ID
-		//view.setImage(sequence.getImageId());
+		view.setImage(pictogram.getImage(context));
 		
 		if (onAdapterGetViewListener != null)
 			onAdapterGetViewListener.onAdapterGetView(position, view);

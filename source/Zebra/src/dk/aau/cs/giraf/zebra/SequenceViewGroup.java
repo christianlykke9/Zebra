@@ -399,68 +399,79 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				x >= getWidth() || x <= 0) {
 			
 			//Be careful with coordinates from the event if getPointerCount != 1
-			
-			if (isDragging) {
-				handled = true;
-				
-				stopAutoScroll();
-				
-				// Remove the highlight of the pictogram
-				((PictogramView)draggingView).placeDown();
-				
-				//Disallow movement when repositioning dragged view.
-				animatingDragReposition = true;
-				
-				TranslateAnimation move = new TranslateAnimation(
-						0,
-						calcChildLeftPosition(curDragIndexPos) - draggingView.getLeft(), 
-						0, 
-						0);
-				move.setDuration(ANIMATION_TIME);
-				
-				move.setAnimationListener(new AnimationListener() {
-
-					@Override
-					public void onAnimationEnd(Animation animation) {
-						if (startDragIndex != curDragIndexPos) {
-							final int childViews = getChildCount();
-							for (int i = 0; i < childViews; i++) {
-								getChildAt(i).clearAnimation();
+			if (draggingView != null) {
+				if (isDragging) {
+					handled = true;
+					
+					stopAutoScroll();
+					
+					// Remove the highlight of the pictogram
+					((PictogramView)draggingView).placeDown();
+					
+					//Disallow movement when repositioning dragged view.
+					animatingDragReposition = true;
+					
+					TranslateAnimation move = new TranslateAnimation(
+							0,
+							calcChildLeftPosition(curDragIndexPos) - draggingView.getLeft(), 
+							0, 
+							0);
+					move.setDuration(ANIMATION_TIME);
+					
+					move.setAnimationListener(new AnimationListener() {
+	
+						@Override
+						public void onAnimationEnd(Animation animation) {
+							if (startDragIndex != curDragIndexPos) {
+								final int childViews = getChildCount();
+								for (int i = 0; i < childViews; i++) {
+									getChildAt(i).clearAnimation();
+								}
+								rearrangeListener.onRearrange(startDragIndex, curDragIndexPos);
+								//layout(getLeft(), getTop(), getRight(), getBottom());
+								//This prevents lots of flicker
+								onLayout(true, getLeft(), getTop(), getRight(), getBottom());
+							} else {
+								//Must clear animation to prevent flicker - even though it just ended.
+								getChildAt(startDragIndex).clearAnimation();
+								layoutChild(startDragIndex);
 							}
-							rearrangeListener.onRearrange(startDragIndex, curDragIndexPos);
-							//layout(getLeft(), getTop(), getRight(), getBottom());
-							//This prevents lots of flicker
-							onLayout(true, getLeft(), getTop(), getRight(), getBottom());
-						} else {
-							//Must clear animation to prevent flicker - even though it just ended.
-							getChildAt(startDragIndex).clearAnimation();
-							layoutChild(startDragIndex);
+							
+							startDragIndex = -1;
+							isDragging = false;
+							curDragIndexPos = -1;
+							animatingDragReposition = false;
+							draggingView = null;
 						}
+	
+						@Override
+						public void onAnimationRepeat(Animation animation) {
+						}
+	
+						@Override
+						public void onAnimationStart(Animation animation) {
+						}
+					});
+					
+					draggingView.startAnimation(move);
+					
+				} else { //Not dragging
+	
+					if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+						handled = true;
 						
+						performItemClick(draggingView, startDragIndex, startDragIndex);
+						
+						// Remove the highlight of the pictogram
+						((PictogramView)draggingView).placeDown();
+						
+						// Reset the dragging parameters
 						startDragIndex = -1;
-						isDragging = false;
-						curDragIndexPos = -1;
-						animatingDragReposition = false;
 						draggingView = null;
 					}
-
-					@Override
-					public void onAnimationRepeat(Animation animation) {
-					}
-
-					@Override
-					public void onAnimationStart(Animation animation) {
-					}
-				});
-				
-				draggingView.startAnimation(move);
-				
-			} else {
-				//Not dragging
-				if (event.getActionMasked() == MotionEvent.ACTION_UP) {
-					performItemClick(draggingView, startDragIndex, startDragIndex);
 				}
 			}
+			
 			return handled;
 		}
 		
@@ -475,7 +486,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				if (isInEditMode) {
 					handled = true;
 					
-					startAutoScroll();
+					((PictogramView)draggingView).liftUp();
 				
 					for (int i = 0; i < this.getChildCount(); i++) {
 						this.getChildAt(i).invalidate();
@@ -502,18 +513,17 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			
 		case MotionEvent.ACTION_MOVE:
 			
-			if (draggingView == null) {
+			if (draggingView == null) {  // The user is not touching a pictogram
 				handled = true;
-				break;
 			}
 			
-			if (Math.abs(dragStartX - x) >= DRAG_DISTANCE) {
-				handled = true;
-				isDragging = true;
-				((PictogramView)draggingView).liftUp();
-			}
-			
-			if (isDragging) {
+			else {  // The user is touching a pictogram
+				
+				if (!isDragging && Math.abs(dragStartX - x) >= DRAG_DISTANCE) {  // The user is starting to move a pictogram
+					isDragging = true;
+					startAutoScroll();
+				}
+				
 				handled = true;
 				handleTouchMove(x);
 			}
@@ -534,16 +544,13 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			PictogramView pictogram = (PictogramView) this.getChildAt(i);
 			
 			if (i < selectedIndex) {
-				pictogram.setLowlighted(true);
-				pictogram.setSelected(false);
+				pictogram.setLowlighted();
 			}
 			else if (i > selectedIndex) {
-				pictogram.setLowlighted(false);
-				pictogram.setSelected(false);
+				pictogram.setNormal();
 			}
 			else {
-				pictogram.setLowlighted(false);
-				pictogram.setSelected(true);
+				pictogram.setSelected();
 			}
 		}
 	}
@@ -778,6 +785,21 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 			return ! doAutoScroll;
 		}
 	}
+	
+		public void liftUpAddNewButton()
+		{
+			addNewPictoGramView.setScaleX(PictogramView.HIGHLIGHT_SCALE);
+			addNewPictoGramView.setScaleY(PictogramView.HIGHLIGHT_SCALE);
+			addNewPictoGramView.setAlpha(0.7f);
+		}
+		
+		public void placeDownAddNewButton()
+		{
+			addNewPictoGramView.setScaleX(PictogramView.NORMAL_SCALE);
+			addNewPictoGramView.setScaleY(PictogramView.NORMAL_SCALE);
+			addNewPictoGramView.setAlpha(1f);
+		}
+
 	
 	public void setOnNewButtonClickedListener(OnNewButtonClickedListener listener) {
 		newButtonClickedListener = listener;

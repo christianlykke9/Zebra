@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import dk.aau.cs.giraf.pictogram.PictoFactory;
+
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 
@@ -16,7 +19,7 @@ public class Sequence {
 	private long sequenceId;
 	private String title;
 	private long imageId;
-	private Drawable image;
+	private String imagePath;
 	
 	public Sequence() {
 	}
@@ -46,10 +49,16 @@ public class Sequence {
 	
 	public void setImageId(long imageId) {
 		this.imageId = imageId;
+		this.imagePath = null;
 	}
 	
-	public Drawable getImage() {
-		return image;
+	public Drawable getImage(Context context) {
+		
+		if (imagePath == null) {
+			imagePath = PictoFactory.getPictogram(context, imageId).getImagePath();
+		}
+		
+		return Drawable.createFromPath(imagePath);
 	}
 
 	public List<Pictogram> getPictograms() {
