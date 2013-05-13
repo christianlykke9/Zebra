@@ -91,7 +91,7 @@ public class PictogramView extends LinearLayout {
 		params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		deleteButton.setLayoutParams(params);
 		
-		deleteButton.setPadding(4, 4, 4, 4);
+		deleteButton.setPadding(8, 8, 8, 8);
 		deleteButton.setBackgroundColor(Color.TRANSPARENT);
 		
 		deleteButton.setFocusable(false);
