@@ -306,6 +306,8 @@ public class MainActivity extends Activity {
 		childAdapter.notifyDataSetChanged();
 		refreshSelectedChild();
 		
+		sequenceAdapter.notifyDataSetChanged();
+		
 		// Remove highlighting from all images
 		for (int i = 0; i < sequenceGrid.getChildCount(); i++) {
 			View view = sequenceGrid.getChildAt(i);
