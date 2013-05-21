@@ -265,7 +265,7 @@ public class SequenceActivity extends Activity {
 			super.onBackPressed();
 		}
 	}
-
+	
 	private SequenceViewGroup setupSequenceViewGroup(
 			final SequenceAdapter adapter) {
 		final SequenceViewGroup sequenceGroup = (SequenceViewGroup) findViewById(R.id.sequenceViewGroup);
@@ -507,7 +507,7 @@ public class SequenceActivity extends Activity {
 		intent.putExtra("currentGuardianID", guardianId);
 		
 		if (modeId == PICTO_NEW_PICTOGRAM_CALL)
-			intent.putExtra("purpose", "multiple");
+			intent.putExtra("purpose", "multi");
 		else
 			intent.putExtra("purpose", "single");
 		
