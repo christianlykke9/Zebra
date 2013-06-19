@@ -547,7 +547,7 @@ public class SequenceViewGroup extends AdapterView<SequenceAdapter> {
 				pictogram.setLowlighted();
 			}
 			else if (i > selectedIndex) {
-				pictogram.setNormal();
+				pictogram.setLowlighted();
 			}
 			else {
 				pictogram.setSelected();

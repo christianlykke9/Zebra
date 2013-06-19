@@ -133,14 +133,6 @@ public class PictogramView extends LinearLayout {
 		this.invalidate();
 	}
 	
-	public void setNormal() {
-		pictogram.setScaleX(NORMAL_SCALE);
-		pictogram.setScaleY(NORMAL_SCALE);
-		this.setAlpha(1f);
-		
-		this.invalidate();
-	}
-	
 	private void setDeleteButtonVisible(boolean visible) {
 		deleteButton.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
 		invalidate();
