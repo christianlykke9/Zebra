@@ -303,10 +303,10 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onResume() {
 
+		super.onResume();
+		
 		childAdapter.notifyDataSetChanged();
 		refreshSelectedChild();
-		
-		sequenceAdapter.notifyDataSetChanged();
 		
 		// Remove highlighting from all images
 		for (int i = 0; i < sequenceGrid.getChildCount(); i++) {
@@ -317,7 +317,6 @@ public class MainActivity extends Activity {
 			}
 		}
 		
-		super.onResume();
 	}	
 
 	private void enterSequence(Sequence sequence, boolean isNew) {

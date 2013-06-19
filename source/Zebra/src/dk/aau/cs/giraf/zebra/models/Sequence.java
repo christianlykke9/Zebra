@@ -104,9 +104,9 @@ public class Sequence {
 	}
 	
 	public void copyFromSequence(Sequence sequence) {
-		this.sequenceId = sequence.sequenceId;
-		this.title = sequence.title;
-		this.imageId = sequence.imageId;
+		this.setSequenceId(sequence.sequenceId);
+		this.setTitle(sequence.title);
+		this.setImageId(sequence.imageId);
 		
 		this.pictograms.clear();
 		for (Pictogram pictogram : sequence.pictograms) {
