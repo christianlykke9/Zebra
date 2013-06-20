@@ -182,15 +182,24 @@ public class SequenceActivity extends Activity {
 
 		final Dialog dialog = new Dialog(this);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		dialog.setContentView(R.layout.dialog_box);
+		dialog.setContentView(R.layout.back_dialog_box);
 		dialog.getWindow().setBackgroundDrawable(
 				new ColorDrawable(Color.TRANSPARENT));
 
-		TextView question = (TextView) dialog.findViewById(R.id.question);
-		question.setText(getResources().getString(R.string.confirm_go_back));
+		final Button saveButton = (Button) dialog.findViewById(R.id.btn_save);
+		saveButton.setOnClickListener(new View.OnClickListener() {
 
-		final Button yesButton = (Button) dialog.findViewById(R.id.btn_yes);
-		yesButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+				SequenceActivity.this.saveChanges();
+				
+				finish();
+			}
+		});
+
+		final Button dontSaveButton = (Button) dialog.findViewById(R.id.btn_dont_save);
+		dontSaveButton.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -204,8 +213,8 @@ public class SequenceActivity extends Activity {
 			}
 		});
 
-		final Button noButton = (Button) dialog.findViewById(R.id.btn_no);
-		noButton.setOnClickListener(new View.OnClickListener() {
+		final Button cancelButton = (Button)dialog.findViewById(R.id.btn_back_cancel);
+		cancelButton.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -220,16 +229,12 @@ public class SequenceActivity extends Activity {
 
 		final Dialog dialog = new Dialog(this);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		dialog.setContentView(R.layout.dialog_box);
+		dialog.setContentView(R.layout.discard_dialog_box);
 		dialog.getWindow().setBackgroundDrawable(
 				new ColorDrawable(Color.TRANSPARENT));
 
-		TextView question = (TextView) dialog.findViewById(R.id.question);
-		question.setText(getResources().getString(
-				R.string.confirm_discarding_changes));
-
-		final Button yesButton = (Button) dialog.findViewById(R.id.btn_yes);
-		yesButton.setOnClickListener(new View.OnClickListener() {
+		final Button undoButton = (Button) dialog.findViewById(R.id.btn_undo_changes);
+		undoButton.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -245,8 +250,8 @@ public class SequenceActivity extends Activity {
 			}
 		});
 
-		final Button noButton = (Button) dialog.findViewById(R.id.btn_no);
-		noButton.setOnClickListener(new View.OnClickListener() {
+		final Button cancelButton = (Button) dialog.findViewById(R.id.btn_discard_cancel);
+		cancelButton.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {

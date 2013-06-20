@@ -239,7 +239,7 @@ public class MainActivity extends Activity {
 		
 		final Dialog dialog = new Dialog(this);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		dialog.setContentView(R.layout.dialog_box);
+		dialog.setContentView(R.layout.discard_dialog_box);
 		dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 		
 		TextView questionField = (TextView)dialog.findViewById(R.id.question);
@@ -255,12 +255,12 @@ public class MainActivity extends Activity {
 		
 		questionField.setText(question);
 		
-		final Button yesButton = (Button)dialog.findViewById(R.id.btn_yes);
-		yesButton.setOnClickListener(new View.OnClickListener() {
+		final Button undoButton = (Button)dialog.findViewById(R.id.btn_undo_changes);
+		undoButton.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-								
+				
 				dialog.dismiss();
 				selectedChild.getSequences().remove(position);
 				SequenceFileStore.writeSequences(MainActivity.this, selectedChild, selectedChild.getSequences());
@@ -270,8 +270,8 @@ public class MainActivity extends Activity {
 			}
 		});
 		
-		final Button noButton = (Button)dialog.findViewById(R.id.btn_no);
-		noButton.setOnClickListener(new View.OnClickListener() {
+		final Button cancelButton = (Button)dialog.findViewById(R.id.btn_discard_cancel);
+		cancelButton.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {

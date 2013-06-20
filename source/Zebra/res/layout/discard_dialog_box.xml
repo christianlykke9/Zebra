@@ -14,13 +14,12 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:gravity="center_horizontal"
-        android:layout_marginTop="20dp" >
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal" >
 
         <Button
-            android:id="@+id/btn_yes"
-            android:layout_width="200dp"
+            android:id="@+id/btn_undo_changes"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="25dp"
             android:background="@drawable/custom_btn"
@@ -28,14 +27,14 @@
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:paddingTop="10dp"
-            android:text="@string/yes"
+            android:text="@string/undo_changes"
             android:textColor="@color/text_color"
             android:textSize="26sp"
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/btn_no"
-            android:layout_width="200dp"
+            android:id="@+id/btn_discard_cancel"
+            android:layout_width="166dp"
             android:layout_height="fill_parent"
             android:layout_marginLeft="25dp"
             android:background="@drawable/custom_btn"
@@ -43,11 +42,10 @@
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:paddingTop="10dp"
-            android:text="@string/no"
+            android:text="@string/cancel"
             android:textColor="@color/text_color"
             android:textSize="26sp"
             android:textStyle="bold" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -70,7 +68,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="Question Question Question Question Question Question ?"
+            android:text="@string/discard_question"
             android:textColor="@color/text_color"
             android:textSize="28sp" />
     </LinearLayout>
