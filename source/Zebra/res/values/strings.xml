@@ -17,5 +17,6 @@
     <string name="dont_save">Gem ikke</string>
     <string name="back_question">Du er ved at afslutte sekvensen. Vil du gemme dine ændringer?</string>
     <string name="discard_question">Du er ved at fortryde dine ændringer. Er du sikker?</string>
+    <string name="delete_sequence">Slet sekvens</string>
 
 </resources>

@@ -239,7 +239,7 @@ public class MainActivity extends Activity {
 		
 		final Dialog dialog = new Dialog(this);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		dialog.setContentView(R.layout.discard_dialog_box);
+		dialog.setContentView(R.layout.delete_dialog_box);
 		dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 		
 		TextView questionField = (TextView)dialog.findViewById(R.id.question);
@@ -248,15 +248,15 @@ public class MainActivity extends Activity {
 		
 		
 		if (sequenceName.length() == 0) {
-			question = "Vil du slette denne sekvens?";
+			question = "Du er ved at slette sekvensen. Er du sikker?";
 		} else {
-			question = "Vil du slette \"" + sequenceName + "\" ?";
+			question = "Du er ved at slette sekvensen \"" + sequenceName + "\". Er du sikker?";
 		}
 		
 		questionField.setText(question);
 		
-		final Button undoButton = (Button)dialog.findViewById(R.id.btn_undo_changes);
-		undoButton.setOnClickListener(new View.OnClickListener() {
+		final Button deleteButton = (Button)dialog.findViewById(R.id.btn_delete);
+		deleteButton.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -270,7 +270,7 @@ public class MainActivity extends Activity {
 			}
 		});
 		
-		final Button cancelButton = (Button)dialog.findViewById(R.id.btn_discard_cancel);
+		final Button cancelButton = (Button)dialog.findViewById(R.id.btn_delete_cancel);
 		cancelButton.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
