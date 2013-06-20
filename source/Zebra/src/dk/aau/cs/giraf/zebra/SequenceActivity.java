@@ -158,12 +158,17 @@ public class SequenceActivity extends Activity {
 
 	private void saveChanges() {
 		setEditModeEnabled(false);
-
-		// Saving changes
-		sequence.setTitle(sequenceTitleView.getText().toString());
-		originalSequence.copyFromSequence(sequence);
-
-		SequenceFileStore.writeSequences(this, child, child.getSequences());
+		
+		if (isNew && sequence.getPictograms().size() == 0) {
+			child.getSequences().remove(originalSequence);
+		}
+		else {
+			// Saving changes
+			sequence.setTitle(sequenceTitleView.getText().toString());
+			originalSequence.copyFromSequence(sequence);
+	
+			SequenceFileStore.writeSequences(this, child, child.getSequences());
+		}
 	}
 
 	private void setEditModeEnabled(boolean isInEditMode) {
